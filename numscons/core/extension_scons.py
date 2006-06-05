@@ -67,7 +67,8 @@ def PythonExtension(env, target, source, *args, **kw):
     # Use LoadableModule because of Mac OS X
     # ... but scons has a bug (#issue 1669) with mingw and Loadable
     # Module, so use SharedLibrary with mingw.
-    if built_with_mingw(env):
+    # XXX: this is supposed to be solved in 0.98.2, take a look at it
+    if built_with_mingw(env) and not built_with_mstools(env):
         wrap = env.SharedLibrary(target, source, SHLIBPREFIX = '', 
                                  #LDMODULESUFFIX = '$PYEXTSUFFIX', 
                                  SHLIBSUFFIX = '$PYEXTSUFFIX', 
