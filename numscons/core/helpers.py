@@ -542,17 +542,32 @@ def customize_tools(env):
     env['ENV']['PATH'] = os.pathsep.join(path_list)
 
 def customize_link_flags(env):
+    from SCons.Action import ListAction, Action
     # We sometimes need to put link flags at the really end of the command
     # line, so we add a construction variable for it
     env['LINKFLAGSEND'] = []
     env['SHLINKFLAGSEND'] = ['$LINKFLAGSEND']
     env['LDMODULEFLAGSEND'] = []
 
-    # For mingw tools, we do it in our custom mingw scons tool
-    # XXX: this should be done at the tool level, that's the only way to avoid
-    # screwing things up....
-    if built_with_mstools(env) or built_with_mingw(env):
-        pass
+    if built_with_mingw(env) and not built_with_mstools(env):
+	# For mingw tools, we do it in our custom mingw
+	# scons tool XXX: this should be done at the tool
+	# level, that's the only way to avoid screwing
+	# things up....
+	pass
+    elif built_with_mstools(env):
+	# Sanity check: in case scons changes and we are not
+	# aware of it
+	assert isinstance(env["SHLINKCOM"], ListAction)
+	assert isinstance(env["LDMODULECOM"], ListAction)
+	# We replace the "real" shlib action of mslink by our
+	# own, which only differ in the linkdlagsend flags.
+	newshlibaction = Action('${TEMPFILE("$SHLINK $SHLINKFLAGS $_SHLINK_TARGETS $( $_LIBDIRFLAGS $) $_LIBFLAGS $SHLINKFLAGSEND $_PDB $_SHLINK_SOURCES")}')
+	env["SHLINKCOM"].list[0] = newshlibaction
+	env["LDMODULECOM"].list[0] = newshlibaction
+
+	newlibaction = '${TEMPFILE("$LINK $LINKFLAGS /OUT:$TARGET.windows $( $_LIBDIRFLAGS $) $_LIBFLAGS $LINKFLAGSEND $_PDB $SOURCES.windows")}'
+	env["LINKCOM"] = newlibaction
     else:
         env['LINKCOM'] = '%s $LINKFLAGSEND' % env['LINKCOM']
         env['SHLINKCOM'] = '%s $SHLINKFLAGSEND' % env['SHLINKCOM']
