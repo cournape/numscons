@@ -104,7 +104,10 @@ def CheckF77Clib(context):
         if built_with_mstools(env) and built_with_gnu_f77(env):
             from fortran import get_g2c_libs
             rtdir, msrtlibs = get_g2c_libs(env, final_flags)
-            env["F77_LDFLAGS"] = {"library_dirs": [rtdir], "libraries": msrtlibs}
+	    # XXX: this is ugly, we interpolate by hand.
+	    libdirflags = ["/LIBPATH:%s" % rtdir]
+	    libflags    = ["%s" % l for l in msrtlibs]
+            env["F77_LDFLAGS"] = libdirflags + libflags
         else:
             env['F77_LDFLAGS'] = final_flags
         context.Result(' '.join(env['F77_LDFLAGS']))
