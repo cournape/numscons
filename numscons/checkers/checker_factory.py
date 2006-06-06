@@ -31,10 +31,7 @@ def _get_language_opts(context, language):
         if not context.env.has_key('F77_LDFLAGS') and not CheckF77Clib(context):
             #add_lib_info(context.env, libname, None)
             return 0
-        if built_with_mstools(context.env):
-            moreopts = deepcopy(context.env["F77_LDFLAGS"])
-        else:
-            moreopts = {'linkflagsend' : copy(context.env['F77_LDFLAGS'])}
+        moreopts = {'linkflagsend' : copy(context.env['F77_LDFLAGS'])}
     else:
         raise ValueError("language %s unknown" % language)
 
