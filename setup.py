@@ -29,7 +29,7 @@ def configuration(parent_package='',top_path=None):
     return config
 
 setup(name = 'numscons',
-      version = '0.1',
+      version = '0.1dev',
       description = 'Enable to use scons within distutils to build extensions',
       classifiers = filter(None, CLASSIFIERS.split('\n')),
       author = 'David Cournapeau',
