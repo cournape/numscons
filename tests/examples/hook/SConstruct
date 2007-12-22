@@ -1,5 +1,5 @@
 # vim:syntax=python
-from numpy.distutils.scons import GetNumpyEnvironment
+from numscons import GetNumpyEnvironment
 
 env = GetNumpyEnvironment(ARGUMENTS)
 env.NumpyCtypes('hello', 'hello.c')

@@ -6,7 +6,7 @@ import sys
 import re
 from distutils.sysconfig import get_config_vars
 
-from numpy.distutils.misc_util import get_scons_build_dir, get_scons_configres_dir,\
+from numpy.distutils.command.scons import get_scons_build_dir, get_scons_configres_dir,\
     get_scons_configres_filename
 
 from default import tool_list, get_cc_config, get_f77_config
@@ -18,7 +18,7 @@ from extension_scons import PythonExtension, built_with_mstools, \
 from utils import pkg_to_path
 
 from numscons.tools.substinfile import TOOL_SUBST
-from misc import pyplat2sconsplat
+from misc import pyplat2sconsplat, is_cc_suncc, get_additional_toolpaths, is_f77_gnu
 
 __all__ = ['GetNumpyEnvironment']
 

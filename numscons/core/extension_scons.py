@@ -9,7 +9,7 @@ from distutils.unixccompiler import UnixCCompiler
 from numpy.distutils.misc_util import msvc_runtime_library
 
 from extension import get_pythonlib_dir, get_python_inc
-from misc import built_with_mstools, built_with_ming, built_with_gnu_f77, \
+from misc import built_with_mstools, built_with_mingw, built_with_gnu_f77, \
                  get_pythonlib_name
 
 def PythonExtension(env, target, source, *args, **kw):
