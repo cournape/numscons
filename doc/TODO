@@ -1,0 +1,50 @@
+Remaining things:
+    - Finish the split-up in numscons package (separate from numpy svn
+      repository)
+    - Start testing facilities (using nose ?)
+
+Then, those are the old remaining things to do (once we get to the point we
+were when scons was inside numpy repository):
+    - check windows
+    - umfpack checker
+    - finish scipy
+    - Add CPPPDEFINES in perflib checkers 
+    - CXX optimizations flags + Control cxxflags from env
+    - CLAPACK: check old atlas
+    - handle inplace
+    - doc
+
+Things to implement / problems to solve:
+    - Make 'real' python extension builders
+    - f2py interoperability ?
+    - fortran compiler optimization / option (underscore and so on)
+
+F2py:
+    - Numpy version to handle build dir issues
+    - Difference between .f and .pyf:
+
+Builder:
+    - Get a PythonExtension builder independant of distutils for upstream
+      integration
+    - Get a CtypesExtension builder independant of distutils for upstream
+      integration
+
+Tests:
+    - What can be tested ?
+
+Fortran:
+    - Rewrite verbose output parser using shlex for quote handling
+    - improve Fortran runtime detection for upstream integration
+    - improve Fortran mangling and dummy main detection for upstream
+      integration
+
+Not so important things:
+    - improve BrokenMathlib and Mathlib in core, and make them available to
+      everyone
+    - Generic Api builders (with dep tracking)
+    - Generic FromTemplate builder (with dep tracking)
+
+Documentation:
+    - scons / distutils integration, global design (BuildDir, directories, etc...)
+    - use cases: package developers (examples, etc...), numpy developers,
+      building numpy with scons, etc...
