@@ -3,6 +3,7 @@
 def configuration(parent_package='',top_path=None):
     from numpy.distutils.misc_util import Configuration
     config = Configuration('numscons',parent_package,top_path)
+    config.add_subpackage('checkers')
     config.add_subpackage('core')
     config.add_subpackage('tools')
     return config
