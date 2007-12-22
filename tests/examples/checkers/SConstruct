@@ -1,0 +1,71 @@
+# vim:syntax=python
+from numscons import GetNumpyEnvironment
+from numscons.checkers.perflib import \
+        CheckATLAS, CheckAccelerate, CheckMKL, CheckSunperf,\
+        IsMKL, IsATLAS, IsAccelerate, GetATLASVersion, GetMKLVersion,\
+        CheckFFTW3, CheckFFTW2, IsFFTW3, IsFFTW2
+from numscons import CheckCBLAS, \
+        CheckCLAPACK, CheckF77BLAS, CheckF77LAPACK,\
+        CheckFFT
+from numscons import CheckF77Mangling
+
+env = GetNumpyEnvironment(ARGUMENTS)
+
+import os
+try:
+    val = os.environ['DEBUG_SCONS_CHECK']
+    do_check = val
+except KeyError:
+    do_check = 1
+print "do_check is %s" % do_check
+
+config = env.NumpyConfigure(custom_tests = 
+    {'CheckATLAS' : CheckATLAS,
+    'CheckMKL' : CheckMKL,
+    'CheckAccelerate' : CheckAccelerate,
+    'CheckCBLAS' : CheckCBLAS,
+    'CheckF77Mangling' : CheckF77Mangling,
+    'CheckF77BLAS' : CheckF77BLAS,
+    'CheckF77LAPACK' : CheckF77LAPACK,
+    'CheckCLAPACK' : CheckCLAPACK,
+    'CheckSunperf' : CheckSunperf,
+    'CheckFFTW3' : CheckFFTW3,
+    'CheckFFTW2' : CheckFFTW2,
+    'CheckFFT' : CheckFFT})
+
+if do_check == 1:
+    st, opts = config.CheckATLAS(autoadd = 0)
+    st, opts = config.CheckMKL(autoadd = 0)
+    st, opts = config.CheckAccelerate(autoadd = 0)
+    st, opts = config.CheckSunperf(autoadd = 0)
+    st, opts = config.CheckFFTW2(autoadd = 0)
+    st, opts = config.CheckFFTW3(autoadd = 0)
+    st = config.CheckF77BLAS(autoadd = 0, check_version = True)
+    st = config.CheckCBLAS(autoadd = 0)
+    st = config.CheckF77LAPACK(autoadd = 0)
+    st = config.CheckCLAPACK(autoadd = 0)
+    st = config.CheckF77Mangling()
+    st = config.CheckFFT(autoadd = 0)
+
+    if IsMKL(env, 'blas'):
+        print "blas is MKL (%s)" % GetMKLVersion(env, 'blas')
+
+    if IsATLAS(env, 'blas'):
+        print "blas is ATLAS (%s)" % GetATLASVersion(env, 'blas')
+
+    if IsFFTW3(env, 'fft'):
+        print "fft is fftw3"
+    elif IsFFTW2(env, 'fft'):
+        print "fft is fftw2"
+    elif IsMKL(env, 'fft'):
+        print "fft is MKL"
+    else:
+        print "fft ?"
+
+    if env.has_key('LIBS'):
+        print "LIBS of env is %s" % env.Dump('LIBS')
+    else:
+        print "No LIBS in env"
+
+config.Finish()
+
