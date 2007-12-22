@@ -1,0 +1,7 @@
+Sun, 23 Dec 2007 01:21:50 +0900
+
+	* Starting to work on a separate numscons package, which will implement
+	most of the functionalities of numpy.distutils.scons.
+	* The package does not do much yet: incorporate last released scons-local
+	+ some patches I've done for CheckDeclaration and CheckTypeSize, not yet
+	incorporated upstream.
