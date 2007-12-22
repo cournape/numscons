@@ -1,0 +1,9 @@
+# vim:syntax=python
+from numscons import GetNumpyEnvironment
+
+env = GetNumpyEnvironment(ARGUMENTS)
+
+import sys
+if sys.platform == 'win32':
+    env.AppendUnique(CPPDEFINES = 'WIN32')
+env.NumpyCtypes('foo', source = ['foo.c'])
