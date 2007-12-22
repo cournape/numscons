@@ -6,6 +6,7 @@ def configuration(parent_package='',top_path=None):
     config = Configuration('scons_fake',parent_package,top_path)
 
     config.add_subpackage('hook')
+    config.add_subpackage('ctypesext')
     return config
 
 if __name__ == '__main__':
