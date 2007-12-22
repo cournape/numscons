@@ -33,4 +33,58 @@ def get_pythonlib_name(debug = 0):
     return template % (sys.hexversion >> 24, 
 		       (sys.hexversion >> 16) & 0xff)
 
+def pyplat2sconsplat():
+    # XXX: should see how env['PLATFORM'] is defined, make this a dictionary 
+    if sys.platform[:5] == 'linux':
+        return 'posix'
+    elif sys.platform[:5] == 'sunos':
+        return 'sunos'
+    else:
+        return sys.platform
+
+def is_cc_suncc(fullpath):
+    """Return true if the compiler is suncc."""
+    # I wish there was a better way: we launch suncc -V, read the output, and
+    # returns true if Sun is found in the output. We cannot check the status
+    # code, because the compiler does not seem to have a way to do nothing
+    # while returning success (0).
+    
+    suncc = re.compile('Sun C')
+    # Redirect stderr to stdout
+    cmd = fullpath + ' -V 2>&1'
+    out = os.popen(cmd)
+    cnt = out.read()
+    st = out.close()
+
+    return suncc.search(cnt)
+
+def get_local_toolpaths():
+    return [os.path.dirname(numpy.distutils.scons.tools.__file__)]
+
+def get_custom_toolpaths(env):
+    return env['scons_tool_path'].split(os.pathsep)
+
+def get_additional_toolpaths(env):
+    toolp = []
+    # Put custom toolpath FIRST !
+    toolp.extend(get_custom_toolpaths(env))
+    toolp.extend(get_local_toolpaths())
+    return toolp
+
+def is_f77_gnu(fullpath):
+    # XXX: do this properly
+    return pbasename(fullpath) == 'g77' or pbasename(fullpath) == 'gfortran'
+
+def get_vs_version(env):
+    try:
+        version = env['MSVS']['VERSION']
+        m = re.compile("([0-9]).([0-9])").match(version)
+        if m:
+            major = int(m.group(1))
+            minor = int(m.group(2))
+            return (major, minor)
+        else:
+            raise RuntimeError("FIXME: failed to parse VS version")
+    except KeyError:
+	    raise RuntimeError("Could not get VS version !")
 
