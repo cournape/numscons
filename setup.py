@@ -19,12 +19,19 @@ Operating System :: MacOS
 # update it when the contents of directories change.
 if os.path.exists('MANIFEST'): os.remove('MANIFEST')
 
-from distutils.core import setup
+from numpy.distutils.core import setup
+
+def configuration(parent_package='',top_path=None):
+    from numpy.distutils.misc_util import Configuration
+    config = Configuration(None, parent_package, top_path)
+    config.add_subpackage('numscons')
+    config.add_data_dir('numscons/scons-local')
+    return config
 
 setup(name = 'numscons',
       version = '0.1',
       description = 'Enable to use scons within distutils to build extensions',
+      classifiers = filter(None, CLASSIFIERS.split('\n')),
       author = 'David Cournapeau',
       author_email = 'david@ar.media.kyoto-u.ac.jp',
-      packages = ['numscons', 'numscons.core'],
-     )
+      configuration = configuration)
