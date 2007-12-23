@@ -87,21 +87,22 @@ class curry:
 
         return self.fun(*(self.pending + args), **kw)
 
-# Copied from scons code...
-import types
-# Don't "from types import ..." these because we need to get at the
-# types module later to look for UnicodeType.
-StringType      = types.StringType
-TupleType       = types.TupleType
-if hasattr(types, 'UnicodeType'):
-    UnicodeType = types.UnicodeType
-    def isstring(obj):
-        t = type(obj)
-        return t is StringType \
-            or t is UnicodeType \
-            or (t is InstanceType and isinstance(obj, UserString))
-else:
-    def isstring(obj):
-        t = type(obj)
-        return t is StringType \
-            or (t is InstanceType and isinstance(obj, UserString))
+# # Copied from scons code...
+# import types
+# from UserString import UserString
+# # Don't "from types import ..." these because we need to get at the
+# # types module later to look for UnicodeType.
+# StringType      = types.StringType
+# TupleType       = types.TupleType
+# if hasattr(types, 'UnicodeType'):
+#     UnicodeType = types.UnicodeType
+#     def isstring(obj):
+#         t = type(obj)
+#         return t is StringType \
+#             or t is UnicodeType \
+#             or (t is InstanceType and isinstance(obj, UserString))
+# else:
+#     def isstring(obj):
+#         t = type(obj)
+#         return t is StringType \
+#             or (t is InstanceType and isinstance(obj, UserString))
