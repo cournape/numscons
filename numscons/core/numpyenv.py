@@ -339,11 +339,9 @@ def _GetNumpyEnvironment(args):
     finalize_env(env)
 
     # Add the tool paths in the environment
-    if not env['ENV'].has_key('PATH'):
-        env['ENV']['PATH'] = os.pathsep.join(path_list)
-    else:
-        env['ENV']['PATH'] = os.pathsep.join(path_list + 
-                                             env['ENV']['PATH'].split(os.pathsep))
+    if env['ENV'].has_key('PATH'):
+        path_list += env['ENV']['PATH'].split(os.pathsep))
+    env['ENV']['PATH'] = os.pathsep.join(path_list)
 
     # XXX: Really, we should use our own subclass of Environment, instead of
     # adding Numpy* functions !
