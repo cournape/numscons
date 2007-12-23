@@ -5,14 +5,15 @@ Remaining things:
 
 Then, those are the old remaining things to do (once we get to the point we
 were when scons was inside numpy repository):
+    - clean the code: checkers, numpyenv in perticular
     - check windows
     - umfpack checker
-    - finish scipy
     - Add CPPPDEFINES in perflib checkers 
     - CXX optimizations flags + Control cxxflags from env
-    - CLAPACK: check old atlas
     - handle inplace
     - doc
+    - finish scipy
+    - CLAPACK: check old atlas
 
 Things to implement / problems to solve:
     - Make 'real' python extension builders
