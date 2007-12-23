@@ -39,7 +39,8 @@ def NumpyCheckLibAndHeader(context, libs, symbols = None, headers = None,
 
     # XXX: handle language
     if language:
-        raise NotImplementedError("FIXME: language selection not implemented yet !")
+        raise NotImplementedError("FIXME: language selection not "\
+                                  "implemented yet !")
 
     # Make sure libs and symbols are lists
     if libs and not is_List(libs):
@@ -81,7 +82,8 @@ def NumpyCheckLibAndHeader(context, libs, symbols = None, headers = None,
     try:
         value = os.environ[name]
         if value == 'None':
-            return context.Result('Disabled from env through var %s !' % name), {}
+            msg = 'Disabled from env through var %s !' % name
+            return context.Result(msg), {}
     except KeyError:
         pass
 

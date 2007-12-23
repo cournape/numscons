@@ -10,7 +10,8 @@ import sys
 import os
 from os.path import join as pjoin
 
-from distutils.sysconfig import get_python_version, get_python_inc, get_config_vars
+from distutils.sysconfig import get_python_version, get_python_inc, \
+                                get_config_vars
 
 def get_pythonlib_dir():
     """Returns a list of path to look for the python engine library

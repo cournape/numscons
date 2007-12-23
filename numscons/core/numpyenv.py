@@ -6,8 +6,9 @@ import sys
 import re
 from distutils.sysconfig import get_config_vars
 
-from numpy.distutils.command.scons import get_scons_build_dir, get_scons_configres_dir,\
-    get_scons_configres_filename
+from numpy.distutils.command.scons import get_scons_build_dir,\
+                                          get_scons_configres_dir,\
+                                          get_scons_configres_filename
 
 from default import tool_list, get_cc_config, get_f77_config
 from custom_builders import NumpySharedLibrary, NumpyCtypes, \
@@ -18,7 +19,8 @@ from extension_scons import PythonExtension, built_with_mstools, \
 from utils import pkg_to_path
 
 from numscons.tools.substinfile import TOOL_SUBST
-from misc import pyplat2sconsplat, is_cc_suncc, get_additional_toolpaths, is_f77_gnu
+from misc import pyplat2sconsplat, is_cc_suncc, get_additional_toolpaths, \
+                 is_f77_gnu
 
 __all__ = ['GetNumpyEnvironment']
 
@@ -44,12 +46,14 @@ def GetNumpyOptions(args):
              '')
 
     # Add directories related info
-    opts.Add('pkg_name', 'name of the package (including parent package if any)', '')
+    opts.Add('pkg_name', 
+             'name of the package (including parent package if any)', '')
     opts.Add('src_dir', 'src dir relative to top called', '.')
     opts.Add('build_prefix', 'build prefix (NOT including the package name)', 
              get_scons_build_dir())
     opts.Add('distutils_libdir', 
-             'build dir for libraries of distutils (NOT including the package name)', 
+             'build dir for libraries of distutils (NOT including '\
+             'the package name)', 
              pjoin('build', 'lib'))
     opts.Add('include_bootstrap', 
              "include directories for boostraping numpy (if you do not know" \
@@ -127,8 +131,7 @@ def GetNumpyEnvironment(args):
         env.Append(F77FLAGS = "%s" % os.environ['FFLAGS'])
         env.AppendUnique(F77FLAGS = env['NUMPY_EXTRA_FFLAGS'] +
                                     env['NUMPY_THREAD_FFLAGS'])
-    else:
-        env.AppendUnique(F77FLAGS  = env['NUMPY_WARN_FFLAGS'] +
+    else: env.AppendUnique(F77FLAGS  = env['NUMPY_WARN_FFLAGS'] +
                                      env['NUMPY_OPTIM_FFLAGS'] +
                                      env['NUMPY_DEBUG_SYMBOL_FFLAGS'] +
                                      env['NUMPY_EXTRA_FFLAGS'] +
@@ -141,36 +144,42 @@ def GetNumpyEnvironment(args):
 def initialize_cc(env, path_list):
     from SCons.Tool import Tool, FindTool
 
-    if len(env['cc_opt']) > 0:
-        try:
-            if len(env['cc_opt_path']) > 0:
-                if env['cc_opt'] == 'intelc':
-                    # Intel Compiler SCons.Tool has a special way to set the
-                    # path, so we use this one instead of changing
-                    # env['ENV']['PATH'].
-                    t = Tool(env['cc_opt'], toolpath = get_additional_toolpaths(env), 
-                             topdir = os.path.split(env['cc_opt_path'])[0])
-                    t(env) 
-                    customize_cc(t.name, env)
-                else:
-                    if is_cc_suncc(pjoin(env['cc_opt_path'], env['cc_opt'])):
-                        env['cc_opt'] = 'suncc'
-                    t = Tool(env['cc_opt'], toolpath = get_additional_toolpaths(env))
-                    t(env) 
-                    customize_cc(t.name, env)
-                    path_list.append(env['cc_opt_path'])
-            else:
-                # Do not care about PATH info because none given from scons
-                # distutils command
-                t = Tool(env['cc_opt'], toolpath = get_additional_toolpaths(env))
+    def set_cc_from_distutils():
+        if len(env['cc_opt_path']) > 0:
+            if env['cc_opt'] == 'intelc':
+                # Intel Compiler SCons.Tool has a special way to set the
+                # path, so we use this one instead of changing
+                # env['ENV']['PATH'].
+                t = Tool(env['cc_opt'], 
+                         toolpath = get_additional_toolpaths(env), 
+                         topdir = os.path.split(env['cc_opt_path'])[0])
                 t(env) 
                 customize_cc(t.name, env)
+            else:
+                if is_cc_suncc(pjoin(env['cc_opt_path'], env['cc_opt'])):
+                    env['cc_opt'] = 'suncc'
+                t = Tool(env['cc_opt'], 
+                         toolpath = get_additional_toolpaths(env))
+                t(env) 
+                customize_cc(t.name, env)
+                path_list.append(env['cc_opt_path'])
+        else:
+            # Do not care about PATH info because none given from scons
+            # distutils command
+            t = Tool(env['cc_opt'], toolpath = get_additional_toolpaths(env))
+            t(env) 
+            customize_cc(t.name, env)
+
+    if len(env['cc_opt']) > 0:
+        try:
+            set_cc_from_distutils()
         except EnvironmentError, e:
             # scons could not understand cc_opt (bad name ?)
-            raise AssertionError("SCONS: Could not initialize tool ? Error is %s" % \
-                                 str(e))
+            msg = "SCONS: Could not initialize tool ? Error is %s" % str(e)
+            raise AssertionError(msg)
     else:
-        t = Tool(FindTool(DEF_C_COMPILERS, env), toolpath = get_additional_toolpaths(env))
+        t = Tool(FindTool(DEF_C_COMPILERS, env), 
+                 toolpath = get_additional_toolpaths(env))
         t(env)
         customize_cc(t.name, env)
 
@@ -180,14 +189,16 @@ def initialize_f77(env, path_list):
     if len(env['f77_opt']) > 0:
         try:
             if len(env['f77_opt_path']) > 0:
-                t = Tool(env['f77_opt'], toolpath = get_additional_toolpaths(env))
+                t = Tool(env['f77_opt'], 
+                         toolpath = get_additional_toolpaths(env))
                 t(env) 
                 path_list.append(env['f77_opt_path'])
                 customize_f77(t.name, env)
         except EnvironmentError, e:
             # scons could not understand fc_opt (bad name ?)
-            raise AssertionError("SCONS: Could not initialize fortran tool ? "\
-                                 "Error is %s" % str(e))
+            msg = "SCONS: Could not initialize fortran tool ? "\
+                  "Error is %s" % str(e)
+            raise AssertionError(msg)
     else:
         def_fcompiler =  FindTool(DEF_FORTRAN_COMPILERS, env)
         if def_fcompiler:
@@ -220,13 +231,14 @@ def initialize_cxx(env, path_list):
     if len(env['cxx_opt']) > 0:
         try:
             if len(env['cxx_opt_path']) > 0:
-                t = Tool(env['cxx_opt'], toolpath = get_additional_toolpaths(env))
+                t = Tool(env['cxx_opt'], 
+                         toolpath = get_additional_toolpaths(env))
                 t(env) 
                 path_list.append(env['cxx_opt_path'])
         except EnvironmentError, e:
             # scons could not understand cxx_opt (bad name ?)
-            raise AssertionError("SCONS: Could not initialize tool ? Error is %s" % \
-                                 str(e))
+            msg = "SCONS: Could not initialize tool ? Error is %s" % str(e)
+            raise AssertionError(msg)
     else:
         def_fcompiler =  FindTool(DEF_FORTRAN_COMPILERS, env)
         if def_fcompiler:
@@ -310,17 +322,18 @@ def _GetNumpyEnvironment(args):
     try:
         t(env)
     except Exception, e:
-        pass
-        #print "===== BOOTSTRAPPING, f2py scons tool not available (%s) =====" % e
-
-    # XXX: understand how registration of source files work before reenabling those
+        msg = "===== BOOTSTRAPPING, f2py scons tool not available (%s) =====" \
+              % e
+        print msg
+    # XXX: understand how registration of source files work before reenabling
+    # those
 
     # t = Tool('npyctpl', 
-    #          toolpath = [os.path.dirname(numpy.distutils.scons.tools.__file__)])
+    #          toolpath = )
     # t(env)
 
     # t = Tool('npyftpl', 
-    #          toolpath = [os.path.dirname(numpy.distutils.scons.tools.__file__)])
+    #          toolpath = )
     # t(env)
 
     finalize_env(env)
@@ -329,7 +342,8 @@ def _GetNumpyEnvironment(args):
     if not env['ENV'].has_key('PATH'):
         env['ENV']['PATH'] = os.pathsep.join(path_list)
     else:
-        env['ENV']['PATH'] = os.pathsep.join(path_list + env['ENV']['PATH'].split(os.pathsep))
+        env['ENV']['PATH'] = os.pathsep.join(path_list + 
+                                             env['ENV']['PATH'].split(os.pathsep))
 
     # XXX: Really, we should use our own subclass of Environment, instead of
     # adding Numpy* functions !
