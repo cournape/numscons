@@ -1,6 +1,7 @@
 """This module implements wrappers around numpy.distutils template functions so
 that they can be used in scons builders. Both C and Fortran .src files
 generators are implemented."""
+import re
 from os.path import basename as pbasename, splitext, join as pjoin, \
                     dirname as pdirname
 
@@ -44,8 +45,8 @@ def generate_from_template_emitter(target, source, env):
     t = pjoin(pdirname(str(target[0])), base)
     return ([t], source)
     
-# _INCLUDE_RE = re.compile(r"include\s*['\"](\S+)['\"]", re.M)
-# 
-# def generate_from_template_scanner(node, env, path, arg = None):
-#     cnt = node.get_contents()
-#     return _INCLUDE_RE.findall(cnt)
+_INCLUDE_RE = re.compile(r"include\s*['\"](\S+)['\"]", re.M)
+
+def generate_from_template_scanner(node, env, path, arg = None):
+    cnt = node.get_contents()
+    return _INCLUDE_RE.findall(cnt)
