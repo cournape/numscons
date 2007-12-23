@@ -54,23 +54,23 @@ def get_empty(dic, key):
     except KeyError, e:
         return []
 
-def rsplit(s, sep, max = -1):
+def rsplit(s, sep, maxsplit = -1):
     """Equivalent of rsplit, but works on 2.3."""
     try:
-        return s.rsplit(sep, max)
+        return s.rsplit(sep, maxsplit)
     except AttributeError:
-        return _rsplit(s, sep, max)
+        return _rsplit(s, sep, maxsplit)
 
-def _rsplit(s, sep, max):
+def _rsplit(s, sep, maxsplit):
     """Equivalent of rsplit, but works on 2.3."""
     l = s.split(sep)
-    if len(l) < 2 or max == 0:
+    if len(l) < 2 or maxsplit == 0:
         return [s]
-    elif max < 0:
+    elif maxsplit < 0:
         return l[-len(l):]
     else:
-        st = sep.join(l[0:-max])
-        return [st] + l[-max:]
+        st = sep.join(l[0:-maxsplit])
+        return [st] + l[-maxsplit:]
 
 class partial:
     def __init__(self, fun, *args, **kwargs):
