@@ -1,8 +1,8 @@
 #! /usr/bin/env python
 # Last Change: Fri Nov 16 01:00 PM 2007 J
 
-# This module defines various utilities used throughout the scons support
-# library.
+"""This module defines various utilities used throughout the scons support
+library."""
 
 import os
 import re
@@ -45,12 +45,12 @@ def pkg_to_path(pkg_name):
     Example: numpy.core becomes numpy/core."""
     return os.sep.join(pkg_name.split('.'))
 
-def get_empty(dict, key):
-    """Assuming dict is a dictionary with lists as values, returns an empty
+def get_empty(dic, key):
+    """Assuming dic is a dictionary with lists as values, returns an empty
     list if key is not found, or a (deep) copy of the existing value if it
     does."""
     try:
-        return deepcopy(dict[key])
+        return deepcopy(dic[key])
     except KeyError, e:
         return []
 
@@ -72,7 +72,7 @@ def _rsplit(s, sep, max):
         st = sep.join(l[0:-max])
         return [st] + l[-max:]
 
-class curry:
+class partial:
     def __init__(self, fun, *args, **kwargs):
         self.fun = fun
         self.pending = args[:]
