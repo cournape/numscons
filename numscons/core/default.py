@@ -1,5 +1,7 @@
 #! /usr/bin/env python
 # Last Change: Tue Dec 04 04:00 PM 2007 J
+"""This module defines the default tools for each platform, as well as the
+default compiler configurations."""
 import sys
 import distutils.sysconfig
 
@@ -8,20 +10,22 @@ import distutils.sysconfig
 def tool_list(platform):
     """platform should be the value returned by enbv['PLATFORM'], not
     sys.platform !!!!."""
-    # Here, we set the list of default tools as used by numpy.distutils.scons. This
-    # is ripped of scons, because scons does not provide a way to get separate
-    # default lists for separate tools (e.g linker, C compiler, etc...)
+    # Here, we set the list of default tools as used by numpy.distutils.scons.
+    # This is ripped of scons, because scons does not provide a way to get
+    # separate default lists for separate tools (e.g linker, C compiler,
+    # etc...)
 
     if str(platform) == 'win32':
-        "prefer Microsoft tools on Windows"
+        # prefer Microsoft tools on Windows
         linkers = ['mslink', 'gnulink', 'ilink', 'linkloc', 'ilink32' ]
-        c_compilers = ['msvc', 'mingw', 'gcc', 'intelc', 'icl', 'icc', 'cc', 'bcc32' ]
+        c_compilers = ['msvc', 'mingw', 'gcc', 'intelc', 'icl', 'icc', 'cc',
+                       'bcc32' ]
         cxx_compilers = ['msvc', 'intelc', 'icc', 'g++', 'c++', 'bcc32' ]
         assemblers = ['masm', 'nasm', 'gas', '386asm' ]
         fortran_compilers = ['g77', 'ifl', 'cvf', 'f95', 'f90', 'fortran']
         ars = ['mslib', 'ar', 'tlib']
     elif str(platform) == 'os2':
-        "prefer IBM tools on OS/2"
+        # prefer IBM tools on OS/2
         linkers = ['ilink', 'gnulink', 'mslink']
         c_compilers = ['icc', 'gcc', 'msvc', 'cc']
         cxx_compilers = ['icc', 'g++', 'msvc', 'c++']
@@ -29,7 +33,7 @@ def tool_list(platform):
         fortran_compilers = ['ifl', 'g77']
         ars = ['ar', 'mslib']
     elif str(platform) == 'irix':
-        "prefer MIPSPro on IRIX"
+        # prefer MIPSPro on IRIX
         linkers = ['sgilink', 'gnulink']
         c_compilers = ['sgicc', 'gcc', 'cc']
         cxx_compilers = ['sgic++', 'g++', 'c++']
@@ -37,7 +41,7 @@ def tool_list(platform):
         fortran_compilers = ['f95', 'f90', 'f77', 'g77', 'fortran']
         ars = ['sgiar']
     elif str(platform) == 'sunos':
-        "prefer Forte tools on SunOS"
+        # prefer Forte tools on SunOS
         linkers = ['sunlink', 'gnulink']
         c_compilers = ['suncc', 'gcc', 'cc']
         cxx_compilers = ['sunc++', 'g++', 'c++']
@@ -45,7 +49,7 @@ def tool_list(platform):
         fortran_compilers = ['f95', 'f90', 'f77', 'g77', 'fortran']
         ars = ['sunar']
     elif str(platform) == 'hpux':
-        "prefer aCC tools on HP-UX"
+        # prefer aCC tools on HP-UX
         linkers = ['hplink', 'gnulink']
         c_compilers = ['hpcc', 'gcc', 'cc']
         cxx_compilers = ['hpc++', 'g++', 'c++']
@@ -53,7 +57,7 @@ def tool_list(platform):
         fortran_compilers = ['f95', 'f90', 'f77', 'g77', 'fortran']
         ars = ['ar']
     elif str(platform) == 'aix':
-        "prefer AIX Visual Age tools on AIX"
+        # prefer AIX Visual Age tools on AIX
         linkers = ['aixlink', 'gnulink']
         c_compilers = ['aixcc', 'gcc', 'cc']
         cxx_compilers = ['aixc++', 'g++', 'c++']
@@ -61,7 +65,7 @@ def tool_list(platform):
         fortran_compilers = ['f95', 'f90', 'aixf77', 'g77', 'fortran']
         ars = ['ar']
     elif str(platform) == 'darwin':
-        "prefer GNU tools on Mac OS X, except for some linkers and IBM tools"
+        # prefer GNU tools on Mac OS X, except for some linkers and IBM tools
         linkers = ['applelink', 'gnulink']
         c_compilers = ['gcc', 'cc']
         cxx_compilers = ['g++', 'c++']
@@ -69,7 +73,7 @@ def tool_list(platform):
         fortran_compilers = ['f95', 'f90', 'g77']
         ars = ['ar']
     else:
-        "prefer GNU tools on all other platforms"
+        # prefer GNU tools on all other platforms
         linkers = ['gnulink', 'mslink', 'ilink']
         c_compilers = ['gcc', 'msvc', 'intelc', 'icc', 'cc']
         cxx_compilers = ['g++', 'msvc', 'intelc', 'icc', 'c++']
@@ -93,6 +97,8 @@ def tool_list(platform):
 # scons invocation, and in distutils scons command....)
 
 class CompilerConfig:
+    """Class to keep compiler-specific flags: this is where all
+    optimization-related flags info is put."""
     def __init__(self, optim = None, warn = None, debug = None, debug_symbol =
                  None, thread = None, extra = None, link_optim = None):
         # XXX: several level of optimizations ?
@@ -153,14 +159,19 @@ class FCompilerConfig:
 
 # It seems that scons consider any option with space in it as a multi option,
 # which breaks command line options. So just don't put space.
+
+# Put the configuration information elsewhere (in a text file)
 def get_cc_config(name):
+    """Given a scons tool name, returns a CompilerConfig instance, initialized
+    with default parameters."""
     # name is the scons name for the tool
     if name == 'gcc':
         if distutils.sysconfig.get_config_vars('LDFLAGS')[0].find('-pthread'):
             thread = ['-pthread']
         else:
             thread = []
-        cfg = CompilerConfig(optim = ['-O2', '-fno-strict-aliasing', '-DNDEBUG'],
+        cfg = CompilerConfig(optim = ['-O2', '-fno-strict-aliasing', 
+                                      '-DNDEBUG'],
                              warn = ['-Wall', '-Wstrict-prototypes'],
                              debug_symbol = ['-g'], 
                              thread = thread)
@@ -169,21 +180,24 @@ def get_cc_config(name):
             raise NotImplementedError('FIXME: intel compiler on windows not '\
                                       ' supported yet')
             
-        cfg = CompilerConfig(optim = ['-O2', '-fomit-frame-pointer', '-fno-strict-aliasing', '-DNDEBUG'],
+        cfg = CompilerConfig(optim = ['-O2', '-fomit-frame-pointer', 
+                                      '-fno-strict-aliasing', '-DNDEBUG'],
                              warn = ['-Wall', '-Wstrict-prototypes'],
                              debug_symbol = ['-g'],
                              thread = ['-pthread'])
     elif name == 'msvc':
         # XXX: distutils part of customization:
         # if self.__arch == "Intel":
-        #     self.compile_options = [ '/nologo', '/Ox', '/MD', '/W3', '/GX' , '/DNDEBUG']
-        #     self.compile_options_debug = ['/nologo', '/Od', '/MDd', '/W3', '/GX', '/Z7', '/D_DEBUG']
+        #     self.compile_options = ['/nologo', '/Ox', '/MD', '/W3', 
+        #                             '/GX' , '/DNDEBUG']
+        #     self.compile_options_debug = ['/nologo', '/Od', '/MDd', 
+        #                                   '/W3', '/GX', '/Z7', '/D_DEBUG']
         # else:
         #     # Win64
         #     self.compile_options = [ '/nologo', '/Ox', '/MD', '/W3', '/GS-' ,
         #     '/DNDEBUG']
-        #     self.compile_options_debug = ['/nologo', '/Od', '/MDd', '/W3', '/GS-',
-        #     '/Z7', '/D_DEBUG']
+        #     self.compile_options_debug = ['/nologo', '/Od', '/MDd', '/W3', 
+        #                                   '/GS-', '/Z7', '/D_DEBUG']
         # 
         # self.ldflags_shared = ['/DLL', '/nologo', '/INCREMENTAL:NO']
         # if self.__version >= 7:
@@ -222,18 +236,21 @@ def get_cc_config(name):
 
     return cfg
 
-import numpy.distutils.fcompiler as _FC
+#import numpy.distutils.fcompiler as _FC
 
 # XXX: handle F77, F90 and co ?
 def get_f77_config(name):
+    """Given a scons tool name, returns a FCompilerConfig instance, initialized
+    with default parameters."""
     # name is the scons name for the tool
     if name == 'g77' or name == 'gfortran':
-	dist_ldflags = distutils.sysconfig.get_config_vars('LDFLAGS')[0]
-	if dist_ldflags and dist_ldflags.find('-pthread'):
+        dist_ldflags = distutils.sysconfig.get_config_vars('LDFLAGS')[0]
+        if dist_ldflags and dist_ldflags.find('-pthread'):
             thread = ['-pthread']
         else:
             thread = []
-        cfg = FCompilerConfig(optim = ['-O2', '-fno-strict-aliasing', '-DNDEBUG'],
+        cfg = FCompilerConfig(optim = ['-O2', '-fno-strict-aliasing', 
+                                       '-DNDEBUG'],
                               warn = ['-Wall'],
                               debug_symbol = ['-g'], 
                               thread = thread)
