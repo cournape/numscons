@@ -1,4 +1,8 @@
 # Last Changed: .
+
+"""This initialize a scons environment using info from distutils, and all our
+customization (python extension builders, build_dir, etc...)."""
+
 import os
 import os.path
 from os.path import join as pjoin, dirname as pdirname, basename as pbasename
@@ -6,8 +10,8 @@ import sys
 import re
 from distutils.sysconfig import get_config_vars
 
-from numpy.distutils.command.scons import get_scons_build_dir,\
-                                          get_scons_configres_dir,\
+from numpy.distutils.command.scons import get_scons_build_dir, \
+                                          get_scons_configres_dir, \
                                           get_scons_configres_filename
 
 from default import tool_list, get_cc_config, get_f77_config
@@ -340,7 +344,7 @@ def _GetNumpyEnvironment(args):
 
     # Add the tool paths in the environment
     if env['ENV'].has_key('PATH'):
-        path_list += env['ENV']['PATH'].split(os.pathsep))
+        path_list += env['ENV']['PATH'].split(os.pathsep)
     env['ENV']['PATH'] = os.pathsep.join(path_list)
 
     # XXX: Really, we should use our own subclass of Environment, instead of
@@ -430,7 +434,8 @@ def _GetNumpyEnvironment(args):
     else:
         BuildDir(env['build_dir'], '.')
 
-    # Generate help (if calling scons directly during debugging, this could be useful)
+    # Generate help (if calling scons directly during debugging, this could be
+    # useful)
     Help(opts.GenerateHelpText(env))
 
     # Getting the config options from *.cfg files
@@ -439,7 +444,8 @@ def _GetNumpyEnvironment(args):
 
     # This will be used to keep configuration information on a per package basis
     env['NUMPY_PKG_CONFIG'] = {}
-    env['NUMPY_PKG_CONFIG_FILE'] = pjoin(get_scons_configres_dir(), env['src_dir'], 
+    env['NUMPY_PKG_CONFIG_FILE'] = pjoin(get_scons_configres_dir(), 
+                                         env['src_dir'], 
                                          get_scons_configres_filename())
 
     return env
