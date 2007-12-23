@@ -6,8 +6,6 @@ customization (python extension builders, build_dir, etc...)."""
 import os
 import os.path
 from os.path import join as pjoin, dirname as pdirname, basename as pbasename
-import sys
-import re
 from distutils.sysconfig import get_config_vars
 
 from numpy.distutils.command.scons import get_scons_build_dir, \
@@ -108,6 +106,11 @@ def finalize_env(env):
         env.AppendUnique(F77FLAGS = ['-fno-second-underscore'])
 
 def GetNumpyEnvironment(args):
+    """Returns a correctly initialized scons environment. 
+
+    This environment contains builders for python extensions, ctypes
+    extensions, fortran builders, etc... Generally, call it with args =
+    ARGUMENTS, which contain the arguments given to the scons process."""
     env = _GetNumpyEnvironment(args)
 
     #------------------------------
@@ -257,8 +260,6 @@ def _GetNumpyEnvironment(args):
     from SCons.Tool import Tool, FindTool, FindAllTools
     from SCons.Script import BuildDir, Help
     from SCons.Errors import EnvironmentError
-    from SCons.Builder import Builder
-    from SCons.Scanner import Scanner
 
     # XXX: this function is too long and clumsy...
 
@@ -367,12 +368,12 @@ def _GetNumpyEnvironment(args):
         env['LDMODULECOM'] = '%s $LDMODULEFLAGSEND' % env['LDMODULECOM']
 
     # Put config code and log in separate dir for each subpackage
-    from utils import curry
-    NumpyConfigure = curry(env.Configure, 
-                           conf_dir = pjoin(env['build_dir'], '.sconf'), 
-                           log_file = pjoin(env['build_dir'], 'config.log'))
+    from utils import partial
+    NumpyConfigure = partial(env.Configure, 
+                             conf_dir = pjoin(env['build_dir'], '.sconf'), 
+                             log_file = pjoin(env['build_dir'], 'config.log'))
     env.NumpyConfigure = NumpyConfigure
-    env.NumpyGlob = curry(_glob, env)
+    env.NumpyGlob = partial(_glob, env)
 
     # XXX: Huge, ugly hack ! SConsign needs an absolute path or a path relative
     # to where the SConstruct file is. We have to find the path of the build
@@ -396,37 +397,8 @@ def _GetNumpyEnvironment(args):
     except KeyError:
         pass
 
-    # Adding custom builder
-
-    # XXX: Put them into tools ?
-    env['BUILDERS']['NumpySharedLibrary'] = NumpySharedLibrary
-    env['BUILDERS']['NumpyCtypes'] = NumpyCtypes
-    env['BUILDERS']['PythonExtension'] = PythonExtension
-    env['BUILDERS']['NumpyPythonExtension'] = NumpyPythonExtension
-
-    from template_generators import generate_from_c_template, \
-                                    generate_from_f_template, \
-                                    generate_from_template_emitter, \
-                                    generate_from_template_scanner
-
-    tpl_scanner = Scanner(function = generate_from_template_scanner, 
-                          skeys = ['.src'])
-    env['BUILDERS']['FromCTemplate'] = Builder(
-                action = generate_from_c_template, 
-                emitter = generate_from_template_emitter,
-                source_scanner = tpl_scanner)
-
-    env['BUILDERS']['FromFTemplate'] = Builder(
-                action = generate_from_f_template, 
-                emitter = generate_from_template_emitter,
-                source_scanner = tpl_scanner)
-
-    from custom_builders import NumpyFromCTemplate, NumpyFromFTemplate
-    env['BUILDERS']['NumpyFromCTemplate'] = NumpyFromCTemplate
-    env['BUILDERS']['NumpyFromFTemplate'] = NumpyFromFTemplate
-
-    createStaticExtLibraryBuilder(env)
-    env['BUILDERS']['NumpyStaticExtLibrary'] = NumpyStaticExtLibrary
+    # Adding custom builders
+    add_custom_builders(env)
 
     # Setting build directory according to command line option
     if len(env['src_dir']) > 0:
@@ -449,3 +421,40 @@ def _GetNumpyEnvironment(args):
                                          get_scons_configres_filename())
 
     return env
+
+def add_custom_builders(env):
+    """Call this to add all our custom builders to the environment."""
+    from SCons.Scanner import Scanner
+    from SCons.Builder import Builder
+
+    # XXX: Put them into tools ?
+    env['BUILDERS']['NumpySharedLibrary'] = NumpySharedLibrary
+    env['BUILDERS']['NumpyCtypes'] = NumpyCtypes
+    env['BUILDERS']['PythonExtension'] = PythonExtension
+    env['BUILDERS']['NumpyPythonExtension'] = NumpyPythonExtension
+
+    from template_generators import generate_from_c_template, \
+                                    generate_from_f_template, \
+                                    generate_from_template_emitter, \
+                                    generate_from_template_scanner
+
+    from custom_builders import NumpyFromCTemplate, NumpyFromFTemplate
+
+    tpl_scanner = Scanner(function = generate_from_template_scanner, 
+                          skeys = ['.src'])
+    env['BUILDERS']['FromCTemplate'] = Builder(
+                action = generate_from_c_template, 
+                emitter = generate_from_template_emitter,
+                source_scanner = tpl_scanner)
+
+    env['BUILDERS']['FromFTemplate'] = Builder(
+                action = generate_from_f_template, 
+                emitter = generate_from_template_emitter,
+                source_scanner = tpl_scanner)
+
+    env['BUILDERS']['NumpyFromCTemplate'] = NumpyFromCTemplate
+    env['BUILDERS']['NumpyFromFTemplate'] = NumpyFromFTemplate
+
+    createStaticExtLibraryBuilder(env)
+    env['BUILDERS']['NumpyStaticExtLibrary'] = NumpyStaticExtLibrary
+
