@@ -1,0 +1,6 @@
+# vim:syntax=python
+from numscons import GetNumpyEnvironment
+
+env = GetNumpyEnvironment(ARGUMENTS)
+
+env.NumpyPythonExtension('spam', source = ['hellomodule.c'])

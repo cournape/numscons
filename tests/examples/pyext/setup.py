@@ -3,13 +3,10 @@ import os.path
 
 def configuration(parent_package='',top_path=None):
     from numpy.distutils.misc_util import Configuration
-    config = Configuration('scons_fake',parent_package,top_path)
+    config = Configuration('pyext',parent_package,top_path)
 
-    config.add_subpackage('checkers')
-    config.add_subpackage('checklib')
-    config.add_subpackage('ctypesext')
-    config.add_subpackage('hook')
-    config.add_subpackage('pyext')
+    config.add_sconscript('SConstruct', source_files = ['hellomodule.c'])
+    config.add_data_dir('tests')
     return config
 
 if __name__ == '__main__':
