@@ -1,5 +1,7 @@
 from ConfigParser import SafeConfigParser, ConfigParser
 
+from numscons.core.utils import partial
+
 _OPTIONS = ['optim', 'warn', 'debug_sym', 'debug', 'thread', 'extra',
             'link_optim']
 
@@ -15,7 +17,8 @@ class Config:
         self._dic[key] = item
         
 class CompilerConfig:
-    """Put config objects value into a dictionary usable by scons."""
+    """Put config objects value into a dictionary usable by scons. C compiler
+    version"""
     def __init__(self, cfg):
         self._cfg = cfg
 
@@ -34,9 +37,29 @@ class CompilerConfig:
                 d[k] = v.split()
         return d
         
-def get_config(name):
+class F77CompilerConfig:
+    """Put config objects value into a dictionary usable by scons. Fortran 77
+    compiler version"""
+    def __init__(self, cfg):
+        self._cfg = cfg
+
+    def get_flags_dict(self):
+        d = {'NUMPY_OPTIM_FFLAGS' : self._cfg['optim'],
+             'NUMPY_WARN_FFLAGS' : self._cfg['warn'],
+             'NUMPY_THREAD_FFLAGS' : self._cfg['thread'],
+             'NUMPY_EXTRA_FFLAGS' : self._cfg['debug'],
+             'NUMPY_DEBUG_FFLAGS' : self._cfg['debug'],
+             'NUMPY_DEBUG_SYMBOL_FFLAGS' : self._cfg['debug_sym']}
+        for k, v in d.items():
+            if v is None:
+                d[k] = []
+            else:
+                d[k] = v.split()
+        return d
+        
+def get_config(name, cfgfname):
     config = ConfigParser()
-    config.read("compiler.cfg")
+    config.read(cfgfname)
     if not config.has_section(name):
         raise ValueError("compiler %s is not configured" % name)
 
@@ -47,7 +70,14 @@ def get_config(name):
 
     return cfg
 
+get_cc_config = partial(get_config, cfgfname = "compiler.cfg")
+get_fc_config = partial(get_config, cfgfname = "fcompiler.cfg")
+
 if __name__ == '__main__':
-    cfg = get_config('gcc')
+    cfg = get_cc_config('gcc')
+    cc = CompilerConfig(cfg)
+    print cc.get_flags_dict()
+
+    cfg = get_fc_config('gnu')
     cc = CompilerConfig(cfg)
     print cc.get_flags_dict()
