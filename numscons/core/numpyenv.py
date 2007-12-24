@@ -257,7 +257,6 @@ def initialize_cxx(env, path_list):
 def _GetNumpyEnvironment(args):
     """Call this with args = ARGUMENTS."""
     from SCons.Environment import Environment
-    from SCons.Tool import Tool, FindTool, FindAllTools
     from SCons.Script import BuildDir, Help
     from SCons.Errors import EnvironmentError
 
@@ -277,9 +276,6 @@ def _GetNumpyEnvironment(args):
     # given first. We have to 
     env = Environment(options = opts, tools = [], PYEXTSUFFIX = pyextsuffix)
 
-    # Add the file substitution tool
-    TOOL_SUBST(env)
-
     # Setting dirs according to command line options
     env.AppendUnique(build_dir = pjoin(env['build_prefix'], env['src_dir']))
     env.AppendUnique(distutils_installdir = pjoin(env['distutils_libdir'], 
@@ -288,84 +284,12 @@ def _GetNumpyEnvironment(args):
     #------------------------------------------------
     # Setting tools according to command line options
     #------------------------------------------------
-
-    # List of supplemental paths to take into account
-    path_list = []
-
-    # Initialize CC tool from distutils info
-    initialize_cc(env, path_list)
-
-    # Initialize F77 tool from distutils info
-    initialize_f77(env, path_list)
-
-    # Initialize CXX tool from distutils info
-    initialize_cxx(env, path_list)
-
-    # Adding default tools for the one we do not customize: mingw is special
-    # according to scons, don't ask me why, but this does not work as expected
-    # for this tool.
-    if not env['cc_opt'] == 'mingw':
-        for i in [DEF_LINKERS, DEF_CXX_COMPILERS, DEF_ASSEMBLERS, DEF_ARS]:
-            t = FindTool(i, env) or i[0]
-            Tool(t)(env)
-    else:
-        try:
-            t = FindTool(['g++'], env)
-            #env['LINK'] = None
-        except EnvironmentError:
-            raise RuntimeError('g++ not found: this is necessary with mingw32 '\
-                               'to build numpy !') 
-        # XXX: is this really the right place ?
-        env.AppendUnique(CFLAGS = '-mno-cygwin')
-			
-    for t in FindAllTools(DEF_OTHER_TOOLS, env):
-        Tool(t)(env)
-
-    # Add our own, custom tools (f2py, from_template, etc...)
-    t = Tool('f2py', toolpath = get_additional_toolpaths(env))
-
-    try:
-        t(env)
-    except Exception, e:
-        msg = "===== BOOTSTRAPPING, f2py scons tool not available (%s) =====" \
-              % e
-        print msg
-    # XXX: understand how registration of source files work before reenabling
-    # those
-
-    # t = Tool('npyctpl', 
-    #          toolpath = )
-    # t(env)
-
-    # t = Tool('npyftpl', 
-    #          toolpath = )
-    # t(env)
-
-    finalize_env(env)
-
-    # Add the tool paths in the environment
-    if env['ENV'].has_key('PATH'):
-        path_list += env['ENV']['PATH'].split(os.pathsep)
-    env['ENV']['PATH'] = os.pathsep.join(path_list)
-
-    # XXX: Really, we should use our own subclass of Environment, instead of
-    # adding Numpy* functions !
+    customize_tools(env)
 
     #---------------
     #     Misc
     #---------------
-
-    # We sometimes need to put link flags at the really end of the command
-    # line, so we add a construction variable for it
-    env['LINKFLAGSEND'] = []
-    env['SHLINKFLAGSEND'] = ['$LINKFLAGSEND']
-    env['LDMODULEFLAGSEND'] = []
-
-    # For mingw tools, we do it in our custom mingw scons tool
-    if not env['cc_opt'] == 'mingw':
-        env['LINKCOM'] = '%s $LINKFLAGSEND' % env['LINKCOM']
-        env['SHLINKCOM'] = '%s $SHLINKFLAGSEND' % env['SHLINKCOM']
-        env['LDMODULECOM'] = '%s $LDMODULEFLAGSEND' % env['LDMODULECOM']
+    customize_link_flags(env)
 
     # Put config code and log in separate dir for each subpackage
     from utils import partial
@@ -411,6 +335,10 @@ def _GetNumpyEnvironment(args):
     Help(opts.GenerateHelpText(env))
 
     # Getting the config options from *.cfg files
+    set_site_config(env)
+    return env
+
+def set_site_config(env):
     config = get_config()
     env['NUMPY_SITE_CONFIG'] = config
 
@@ -420,12 +348,13 @@ def _GetNumpyEnvironment(args):
                                          env['src_dir'], 
                                          get_scons_configres_filename())
 
-    return env
-
 def add_custom_builders(env):
     """Call this to add all our custom builders to the environment."""
     from SCons.Scanner import Scanner
     from SCons.Builder import Builder
+
+    # Add the file substitution tool
+    TOOL_SUBST(env)
 
     # XXX: Put them into tools ?
     env['BUILDERS']['NumpySharedLibrary'] = NumpySharedLibrary
@@ -458,3 +387,78 @@ def add_custom_builders(env):
     createStaticExtLibraryBuilder(env)
     env['BUILDERS']['NumpyStaticExtLibrary'] = NumpyStaticExtLibrary
 
+
+def customize_tools(env):
+    from SCons.Tool import Tool, FindTool, FindAllTools
+
+    # List of supplemental paths to take into account
+    path_list = []
+
+    # Initialize CC tool from distutils info
+    initialize_cc(env, path_list)
+
+    # Initialize F77 tool from distutils info
+    initialize_f77(env, path_list)
+
+    # Initialize CXX tool from distutils info
+    initialize_cxx(env, path_list)
+
+    # Adding default tools for the one we do not customize: mingw is special
+    # according to scons, don't ask me why, but this does not work as expected
+    # for this tool.
+    if not env['cc_opt'] == 'mingw':
+        for i in [DEF_LINKERS, DEF_CXX_COMPILERS, DEF_ASSEMBLERS, DEF_ARS]:
+            t = FindTool(i, env) or i[0]
+            Tool(t)(env)
+    else:
+        try:
+            t = FindTool(['g++'], env)
+            #env['LINK'] = None
+        except EnvironmentError:
+            raise RuntimeError('g++ not found: this is necessary with mingw32 '\
+                               'to build numpy !') 
+        # XXX: is this really the right place ?
+        env.AppendUnique(CFLAGS = '-mno-cygwin')
+            
+    for t in FindAllTools(DEF_OTHER_TOOLS, env):
+        Tool(t)(env)
+
+    # Add our own, custom tools (f2py, from_template, etc...)
+    t = Tool('f2py', toolpath = get_additional_toolpaths(env))
+
+    try:
+        t(env)
+    except Exception, e:
+        msg = "===== BOOTSTRAPPING, f2py scons tool not available (%s) =====" \
+              % e
+        print msg
+    # XXX: understand how registration of source files work before reenabling
+    # those
+
+    # t = Tool('npyctpl', 
+    #          toolpath = )
+    # t(env)
+
+    # t = Tool('npyftpl', 
+    #          toolpath = )
+    # t(env)
+
+    finalize_env(env)
+
+    # Add the tool paths in the environment
+    if env['ENV'].has_key('PATH'):
+        path_list += env['ENV']['PATH'].split(os.pathsep)
+    env['ENV']['PATH'] = os.pathsep.join(path_list)
+
+def customize_link_flags(env):
+    # We sometimes need to put link flags at the really end of the command
+    # line, so we add a construction variable for it
+    env['LINKFLAGSEND'] = []
+    env['SHLINKFLAGSEND'] = ['$LINKFLAGSEND']
+    env['LDMODULEFLAGSEND'] = []
+
+    # For mingw tools, we do it in our custom mingw scons tool
+    if not env['cc_opt'] == 'mingw':
+        env['LINKCOM'] = '%s $LINKFLAGSEND' % env['LINKCOM']
+        env['SHLINKCOM'] = '%s $SHLINKFLAGSEND' % env['SHLINKCOM']
+        env['LDMODULECOM'] = '%s $LDMODULEFLAGSEND' % env['LDMODULECOM']
