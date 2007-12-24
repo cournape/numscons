@@ -291,13 +291,50 @@ def _GetNumpyEnvironment(args):
     #---------------
     customize_link_flags(env)
 
+    customize_scons_dirs(env)
+
+    # Adding custom builders
+    add_custom_builders(env)
+
+    # Getting the config options from *.cfg files
+    set_site_config(env)
+
+    # Setting build directory according to command line option
+    if len(env['src_dir']) > 0:
+        BuildDir(env['build_dir'], env['src_dir'])
+    else:
+        BuildDir(env['build_dir'], '.')
+
+    # Add HOME in the environment: some tools seem to require it (Intel
+    # compiler, for licenses stuff)
+    try:
+        env['ENV']['HOME'] = os.environ['HOME']
+    except KeyError:
+        pass
+
+    # Generate help (if calling scons directly during debugging, this could be
+    # useful)
+    Help(opts.GenerateHelpText(env))
+
+    return env
+
+def set_site_config(env):
+    config = get_config()
+    env['NUMPY_SITE_CONFIG'] = config
+
+    # This will be used to keep configuration information on a per package basis
+    env['NUMPY_PKG_CONFIG'] = {}
+    env['NUMPY_PKG_CONFIG_FILE'] = pjoin(get_scons_configres_dir(), 
+                                         env['src_dir'], 
+                                         get_scons_configres_filename())
+
+def customize_scons_dirs(env):
     # Put config code and log in separate dir for each subpackage
     from utils import partial
     NumpyConfigure = partial(env.Configure, 
                              conf_dir = pjoin(env['build_dir'], '.sconf'), 
                              log_file = pjoin(env['build_dir'], 'config.log'))
     env.NumpyConfigure = NumpyConfigure
-    env.NumpyGlob = partial(_glob, env)
 
     # XXX: Huge, ugly hack ! SConsign needs an absolute path or a path relative
     # to where the SConstruct file is. We have to find the path of the build
@@ -313,40 +350,6 @@ def _GetNumpyEnvironment(args):
                                             env['build_dir']),
                      '.sconsign.dblite')
     env.SConsignFile(sconsign)
-
-    # Add HOME in the environment: some tools seem to require it (Intel
-    # compiler, for licenses stuff)
-    try:
-        env['ENV']['HOME'] = os.environ['HOME']
-    except KeyError:
-        pass
-
-    # Adding custom builders
-    add_custom_builders(env)
-
-    # Setting build directory according to command line option
-    if len(env['src_dir']) > 0:
-        BuildDir(env['build_dir'], env['src_dir'])
-    else:
-        BuildDir(env['build_dir'], '.')
-
-    # Generate help (if calling scons directly during debugging, this could be
-    # useful)
-    Help(opts.GenerateHelpText(env))
-
-    # Getting the config options from *.cfg files
-    set_site_config(env)
-    return env
-
-def set_site_config(env):
-    config = get_config()
-    env['NUMPY_SITE_CONFIG'] = config
-
-    # This will be used to keep configuration information on a per package basis
-    env['NUMPY_PKG_CONFIG'] = {}
-    env['NUMPY_PKG_CONFIG_FILE'] = pjoin(get_scons_configres_dir(), 
-                                         env['src_dir'], 
-                                         get_scons_configres_filename())
 
 def add_custom_builders(env):
     """Call this to add all our custom builders to the environment."""
