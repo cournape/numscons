@@ -1,8 +1,8 @@
 #! /usr/bin/env python
 # Last Change: Fri Nov 16 01:00 PM 2007 J
 
-# This module defines various utilities used throughout the scons support
-# library.
+"""This module defines various utilities used throughout the scons support
+library."""
 
 import os
 import re
@@ -45,34 +45,34 @@ def pkg_to_path(pkg_name):
     Example: numpy.core becomes numpy/core."""
     return os.sep.join(pkg_name.split('.'))
 
-def get_empty(dict, key):
-    """Assuming dict is a dictionary with lists as values, returns an empty
+def get_empty(dic, key):
+    """Assuming dic is a dictionary with lists as values, returns an empty
     list if key is not found, or a (deep) copy of the existing value if it
     does."""
     try:
-        return deepcopy(dict[key])
+        return deepcopy(dic[key])
     except KeyError, e:
         return []
 
-def rsplit(s, sep, max = -1):
+def rsplit(s, sep, maxsplit = -1):
     """Equivalent of rsplit, but works on 2.3."""
     try:
-        return s.rsplit(sep, max)
+        return s.rsplit(sep, maxsplit)
     except AttributeError:
-        return _rsplit(s, sep, max)
+        return _rsplit(s, sep, maxsplit)
 
-def _rsplit(s, sep, max):
+def _rsplit(s, sep, maxsplit):
     """Equivalent of rsplit, but works on 2.3."""
     l = s.split(sep)
-    if len(l) < 2 or max == 0:
+    if len(l) < 2 or maxsplit == 0:
         return [s]
-    elif max < 0:
+    elif maxsplit < 0:
         return l[-len(l):]
     else:
-        st = sep.join(l[0:-max])
-        return [st] + l[-max:]
+        st = sep.join(l[0:-maxsplit])
+        return [st] + l[-maxsplit:]
 
-class curry:
+class partial:
     def __init__(self, fun, *args, **kwargs):
         self.fun = fun
         self.pending = args[:]
@@ -87,21 +87,22 @@ class curry:
 
         return self.fun(*(self.pending + args), **kw)
 
-# Copied from scons code...
-import types
-# Don't "from types import ..." these because we need to get at the
-# types module later to look for UnicodeType.
-StringType      = types.StringType
-TupleType       = types.TupleType
-if hasattr(types, 'UnicodeType'):
-    UnicodeType = types.UnicodeType
-    def isstring(obj):
-        t = type(obj)
-        return t is StringType \
-            or t is UnicodeType \
-            or (t is InstanceType and isinstance(obj, UserString))
-else:
-    def isstring(obj):
-        t = type(obj)
-        return t is StringType \
-            or (t is InstanceType and isinstance(obj, UserString))
+# # Copied from scons code...
+# import types
+# from UserString import UserString
+# # Don't "from types import ..." these because we need to get at the
+# # types module later to look for UnicodeType.
+# StringType      = types.StringType
+# TupleType       = types.TupleType
+# if hasattr(types, 'UnicodeType'):
+#     UnicodeType = types.UnicodeType
+#     def isstring(obj):
+#         t = type(obj)
+#         return t is StringType \
+#             or t is UnicodeType \
+#             or (t is InstanceType and isinstance(obj, UserString))
+# else:
+#     def isstring(obj):
+#         t = type(obj)
+#         return t is StringType \
+#             or (t is InstanceType and isinstance(obj, UserString))
