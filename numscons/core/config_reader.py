@@ -58,6 +58,7 @@ class F77CompilerConfig:
         return d
         
 def get_config(name, cfgfname):
+    # name should be a list
     config = ConfigParser()
     config.read(cfgfname)
     if not config.has_section(name):
@@ -71,13 +72,13 @@ def get_config(name, cfgfname):
     return cfg
 
 get_cc_config = partial(get_config, cfgfname = "compiler.cfg")
-get_fc_config = partial(get_config, cfgfname = "fcompiler.cfg")
+get_f77_config = partial(get_config, cfgfname = "fcompiler.cfg")
 
 if __name__ == '__main__':
     cfg = get_cc_config('gcc')
     cc = CompilerConfig(cfg)
     print cc.get_flags_dict()
 
-    cfg = get_fc_config('gnu')
+    cfg = get_f77_config('gnu')
     cc = CompilerConfig(cfg)
     print cc.get_flags_dict()
