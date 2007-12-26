@@ -195,18 +195,12 @@ def initialize_f77(env, path_list):
     from SCons.Tool import Tool, FindTool
 
     if len(env['f77_opt']) > 0:
-        try:
-            if len(env['f77_opt_path']) > 0:
-                t = Tool(env['f77_opt'], 
-                         toolpath = get_additional_toolpaths(env))
-                t(env) 
-                path_list.append(env['f77_opt_path'])
-                customize_f77(t.name, env)
-        except EnvironmentError, e:
-            # scons could not understand fc_opt (bad name ?)
-            msg = "SCONS: Could not initialize fortran tool ? "\
-                  "Error is %s" % str(e)
-            raise AssertionError(msg)
+        if len(env['f77_opt_path']) > 0:
+            t = Tool(env['f77_opt'], 
+                     toolpath = get_additional_toolpaths(env))
+            t(env) 
+            path_list.append(env['f77_opt_path'])
+            customize_f77(t.name, env)
     else:
         def_fcompiler =  FindTool(DEF_FORTRAN_COMPILERS, env)
         if def_fcompiler:
@@ -238,16 +232,11 @@ def initialize_cxx(env, path_list):
     from SCons.Tool import Tool, FindTool
 
     if len(env['cxx_opt']) > 0:
-        try:
-            if len(env['cxx_opt_path']) > 0:
-                t = Tool(env['cxx_opt'], 
-                         toolpath = get_additional_toolpaths(env))
-                t(env) 
-                path_list.append(env['cxx_opt_path'])
-        except EnvironmentError, e:
-            # scons could not understand cxx_opt (bad name ?)
-            msg = "SCONS: Could not initialize tool ? Error is %s" % str(e)
-            raise AssertionError(msg)
+        if len(env['cxx_opt_path']) > 0:
+            t = Tool(env['cxx_opt'], 
+                     toolpath = get_additional_toolpaths(env))
+            t(env) 
+            path_list.append(env['cxx_opt_path'])
     else:
         def_fcompiler =  FindTool(DEF_FORTRAN_COMPILERS, env)
         if def_fcompiler:
