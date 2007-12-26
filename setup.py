@@ -53,5 +53,7 @@ setup(cmdclass = {'install': install},
       classifiers = filter(None, CLASSIFIERS.split('\n')),
       author = 'David Cournapeau',
       author_email = 'david@ar.media.kyoto-u.ac.jp',
-      packages = ['numscons'],
-      data_dir = ['numscons/scons-local'])
+      packages = ['numscons', 'numscons.core', 'numscons.checkers', 'numscons.tools'],
+      package_data = {'numscons.core' : ['compiler.cfg']},
+      data_dir = ['numscons/scons-local'],
+      )
