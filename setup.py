@@ -30,13 +30,18 @@ if os.path.exists('MANIFEST'): os.remove('MANIFEST')
 # distutils, which would create an obvious boostrapping problem once we want to
 # build numpy with scons ... Thanks to distutils wonderful design, this means
 # we have to reimplement 3 classes, yeah !
+
 class Distribution(old_Distribution):
+    """This new Distribution class is necessary to support the new data_dir
+    argument in setup files."""
     def __init__(self, attrs = None):
         assert not hasattr(self, 'data_dir')
         self.data_dir = []
         old_Distribution.__init__(self, attrs)
 
 class install_data(old_install_data):
+    """this install_data command does not install data files into the wild, but
+    put them into the package directory."""
     def finalize_options(self):
         if self.install_dir is None:
             installobj = self.distribution.get_command_obj('install')
@@ -46,6 +51,8 @@ class install_data(old_install_data):
         old_install_data.run(self)
 
 class install(old_install):
+    """This install command extends the data_files list of data files using the
+    data_dir argument."""
     def run(self):
         dist = self.distribution
 
