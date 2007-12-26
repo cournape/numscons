@@ -1,5 +1,5 @@
 #! /usr/bin/env python
-# Last Change: Tue Dec 04 04:00 PM 2007 J
+# Last Change: Wed Dec 26 09:00 PM 2007 J
 """This module defines the default tools for each platform, as well as the
 default compiler configurations."""
 import sys
@@ -87,13 +87,3 @@ def tool_list(platform):
             'tar', 'tex', 'yacc', 'zip']
     return linkers, c_compilers, cxx_compilers, assemblers, fortran_compilers, \
            ars, other_tools
-
-# Handling compiler configuration: only flags which change how to build object
-# files. Nothing related to linking, search path, etc... should be given here.
-# Basically, limit yourself to optimization/debug/warning flags.
-
-# XXX: customization from site.cfg or other ?
-# XXX: cache this between different scons calls (would need to move outside
-# scons invocation, and in distutils scons command....)
-
-#from config_reader import get_cc_config, get_fc_config

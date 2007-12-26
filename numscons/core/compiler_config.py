@@ -3,6 +3,15 @@ from os.path import join as pjoin, dirname as pdirname
 
 from numscons.core.utils import partial
 
+"""Module to handle compiler configuration. 
+
+Configurations are set into config files, and are obtained from get_*_config
+functions. The object returned by those functions have a method get_flags_dict
+which returns a dictionary which can be copied into scons environments objects
+as construction variables."""
+
+# XXX: customization from site.cfg or other ?
+# XXX: how to cache this between different scons calls 
 _OPTIONS = ['optim', 'warn', 'debug_sym', 'debug', 'thread', 'extra',
             'link_optim']
 
@@ -91,6 +100,6 @@ if __name__ == '__main__':
     cc = CompilerConfig(cfg)
     print cc.get_flags_dict()
 
-    cfg = get_f77_config('gnu')
+    cfg = get_f77_config('g77')
     cc = CompilerConfig(cfg)
     print cc.get_flags_dict()
