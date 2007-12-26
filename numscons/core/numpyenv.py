@@ -183,12 +183,7 @@ def initialize_cc(env, path_list):
             customize_cc(t.name, env)
 
     if len(env['cc_opt']) > 0:
-        try:
-            set_cc_from_distutils()
-        except EnvironmentError, e:
-            # scons could not understand cc_opt (bad name ?)
-            msg = "SCONS: Could not initialize tool ? Error is %s" % str(e)
-            raise AssertionError(msg)
+        set_cc_from_distutils()
     else:
         t = Tool(FindTool(DEF_C_COMPILERS, env), 
                  toolpath = get_additional_toolpaths(env))

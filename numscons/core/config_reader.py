@@ -60,9 +60,11 @@ class F77CompilerConfig:
 def get_config(name, cfgfname):
     # name should be a list
     config = ConfigParser()
-    config.read(cfgfname)
+    st = config.read(cfgfname)
+    if len(st) < 1:
+        raise IOError("config file %s not found" % cfgfname)
     if not config.has_section(name):
-        raise ValueError("compiler %s is not configured" % name)
+        raise ValueError("compiler %s has no configuration" % name)
 
     cfg = Config()
 
