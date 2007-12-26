@@ -1,4 +1,5 @@
 from ConfigParser import SafeConfigParser, ConfigParser
+from os.path import join as pjoin, dirname as pdirname
 
 from numscons.core.utils import partial
 
@@ -57,9 +58,18 @@ class F77CompilerConfig:
                 d[k] = v.split()
         return d
         
-def get_config(name, cfgfname):
-    # name should be a list
+def get_config(name, language):
+    # XXX name should be a list
     config = ConfigParser()
+    if language == 'c':
+        cfgfname = pjoin(pdirname(__file__), "compiler.cfg")
+        cmpcfg = CompilerConfig
+    elif language == 'f77':
+        cfgfname = pjoin(pdirname(__file__), "fcompiler.cfg")
+        cmpcfg = F77CompilerConfig
+    else:
+        raise ValueError("language %s not recognized !" % language)
+
     st = config.read(cfgfname)
     if len(st) < 1:
         raise IOError("config file %s not found" % cfgfname)
@@ -71,10 +81,10 @@ def get_config(name, cfgfname):
     for o in config.options(name):
         cfg[o] = config.get(name, o)        
 
-    return cfg
+    return cmpcfg(cfg)
 
-get_cc_config = partial(get_config, cfgfname = "compiler.cfg")
-get_f77_config = partial(get_config, cfgfname = "fcompiler.cfg")
+get_cc_config = partial(get_config, language = 'c')
+get_f77_config = partial(get_config, language = 'f77')
 
 if __name__ == '__main__':
     cfg = get_cc_config('gcc')
