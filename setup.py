@@ -6,6 +6,7 @@ from distutils.dir_util import copy_tree
 from distutils.core import setup
 from distutils.dist import Distribution as old_Distribution
 from distutils.command.install import install as old_install
+from distutils.command.install_data import install_data as old_install_data
 
 CLASSIFIERS = """\
 Development Status :: 4 - Beta
@@ -25,27 +26,44 @@ Operating System :: MacOS
 # update it when the contents of directories change.
 if os.path.exists('MANIFEST'): os.remove('MANIFEST')
 
+# We implement our own add_data_dir method, to avoid depending on numpy
+# distutils, which would create an obvious boostrapping problem once we want to
+# build numpy with scons ... Thanks to distutils wonderful design, this means
+# we have to reimplement 3 classes, yeah !
 class Distribution(old_Distribution):
     def __init__(self, attrs = None):
         assert not hasattr(self, 'data_dir')
         self.data_dir = []
         old_Distribution.__init__(self, attrs)
 
-# We implement our own add_data_dir method, to avoid depending on numpy
-# distutils, which would create an obvious boostrapping problem once we want to
-# build numpy with scons ...
-class install(old_install):
-    def initialize_options(self):
-        old_install.initialize_options(self)
+class install_data(old_install_data):
+    def finalize_options(self):
+        if self.install_dir is None:
+            installobj = self.distribution.get_command_obj('install')
+            self.install_dir = installobj.install_purelib
 
     def run(self):
-        old_install.run(self)
+        old_install_data.run(self)
+
+class install(old_install):
+    def run(self):
         dist = self.distribution
+
+        if dist.data_files is None:
+            dist.data_files = []
+
         for d in dist.data_dir:
-            install_data_dir = os.path.join(self.install_purelib, d)
-            copy_tree(d, install_data_dir)
-        
-setup(cmdclass = {'install': install},
+            install_data_files = []
+            for roots, dirs, files in os.walk(d):
+                for file in files:
+                    install_data_files.append((roots, [os.path.join(roots, file)]))
+
+            dist.data_files.extend(install_data_files)
+
+        old_install.run(self)
+
+# Main setup method
+setup(cmdclass = {'install': install, 'install_data': install_data},
       distclass = Distribution,
       name = 'numscons',
       version = '0.1dev',
@@ -53,7 +71,8 @@ setup(cmdclass = {'install': install},
       classifiers = filter(None, CLASSIFIERS.split('\n')),
       author = 'David Cournapeau',
       author_email = 'david@ar.media.kyoto-u.ac.jp',
-      packages = ['numscons', 'numscons.core', 'numscons.checkers', 'numscons.tools'],
+      packages = ['numscons', 'numscons.core', 'numscons.checkers',
+                  'numscons.tools'],
       package_data = {'numscons.core' : ['compiler.cfg', 'fcompiler.cfg']},
       data_dir = ['numscons/scons-local'],
       )
