@@ -54,6 +54,23 @@ def get_empty(dic, key):
     except KeyError, e:
         return []
 
+class NonDefaultKeyError(KeyError):
+    pass
+
+class DefaultDic:
+    """Structure similar to a dictionary, with a restricted set of possible
+    keys."""
+    def __init__(self, avkeys, default = None):
+        self._dic = dict([(i, default) for i in avkeys])
+
+    def __getitem__(self, key):
+        return self._dic[key]
+        
+    def __setitem__(self, key, item):
+        if not self._dic.has_key(key):
+            raise NonDefaultKeyError('Yo')
+        self._dic[key] = item
+        
 def rsplit(s, sep, maxsplit = -1):
     """Equivalent of rsplit, but works on 2.3."""
     try:
