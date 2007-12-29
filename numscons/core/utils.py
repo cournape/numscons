@@ -57,7 +57,7 @@ def get_empty(dic, key):
 class NonDefaultKeyError(KeyError):
     pass
 
-class DefaultDic:
+class DefaultDict:
     """Structure similar to a dictionary, with a restricted set of possible
     keys."""
     def __init__(self, avkeys, default = None):
