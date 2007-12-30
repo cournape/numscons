@@ -7,6 +7,7 @@ import os
 from copy import deepcopy
 
 from numscons.core.libinfo import get_config_from_section, get_config
+from numscons.core.utils import DefaultDict
 
 # Tools to save and restore environments construction variables (the ones often
 # altered for configuration tests)
@@ -21,12 +22,12 @@ _arg2env = {'cpppath' : 'CPPPATH',
 def save_and_set(env, opts):
     """keys given as config opts args."""
     saved_keys = {}
-    keys = opts.data.keys()
+    keys = opts.keys()
     for k in keys:
         saved_keys[k] = (env.has_key(_arg2env[k]) and\
                          deepcopy(env[_arg2env[k]])) or\
                         []
-    kw = zip([_arg2env[k] for k in keys], [opts.data[k] for k in keys])
+    kw = zip([_arg2env[k] for k in keys], [opts[k] for k in keys])
     kw = dict(kw)
     env.AppendUnique(**kw)
     return saved_keys
@@ -38,59 +39,15 @@ def restore(env, saved_keys):
     kw = dict(kw)
     env.Replace(**kw)
 
-class ConfigOpts:
+class ConfigOpts(DefaultDict):
     # Any added key should be added as an argument to __init__ 
     _keys = ['cpppath', 'cflags', 'libpath', 'libs', 'linkflags', 'rpath',
              'frameworks']
-    def __init__(self, cpppath = None, cflags = None, libpath = None, libs = None, 
-                 linkflags = None, rpath = None, frameworks = None):
-        data = {}
-
-        if not cpppath:
-            data['cpppath'] = []
-        else:
-            data['cpppath'] = cpppath
-
-        if not cflags:
-            data['cflags'] = []
-        else:
-            data['cflags'] = cflags
-
-        if not libpath:
-            data['libpath'] = []
-        else:
-            data['libpath'] = libpath
-
-        if not libs:
-            data['libs'] = []
-        else:
-            data['libs'] = libs
-
-        if not linkflags:
-            data['linkflags'] = []
-        else:
-            data['linkflags'] = linkflags
-
-        if not rpath:
-            data['rpath'] = []
-        else:
-            data['rpath'] = rpath
-
-        if not frameworks:
-            data['frameworks'] = []
-        else:
-            data['frameworks'] = frameworks
-
-        self.data = data
-
-    def __getitem__(self, key):
-        return self.data[key]
-
-    def __setitem__(self, key, item):
-        self.data[key] = item
+    def __init__(self, default = None):
+        DefaultDict.__init__(self, avkeys = ConfigOpts._keys)
 
     def __repr__(self):
-        msg = [r'%s : %s' % (k, i) for k, i in self.data.items()]
+        msg = [r'%s : %s' % (k, i) for k, i in self.items()]
         return '\n'.join(msg)
 
 # Implementation function to check symbol in a library

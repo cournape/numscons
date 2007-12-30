@@ -80,6 +80,7 @@ setup(cmdclass = {'install': install, 'install_data': install_data},
       author_email = 'david@ar.media.kyoto-u.ac.jp',
       packages = ['numscons', 'numscons.core', 'numscons.checkers',
                   'numscons.tools'],
-      package_data = {'numscons.core' : ['compiler.cfg', 'fcompiler.cfg']},
+      package_data = {'numscons.core' : ['compiler.cfg', 'fcompiler.cfg'], 
+                      'numscons.checkers' : ['perflib.cfg']},
       data_dir = ['numscons/scons-local'],
       )

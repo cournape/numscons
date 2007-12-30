@@ -1,10 +1,11 @@
 #! /usr/bin/env python
 # Last Change: Tue Dec 04 03:00 PM 2007 J
-from os.path import join as pjoin
+from os.path import join as pjoin, dirname as pdirname
+from ConfigParser import SafeConfigParser, RawConfigParser
 
 from numpy.distutils.system_info import default_lib_dirs
 
-from support import save_and_set, restore, ConfigOpts, ConfigRes
+from numscons.core.utils import DefaultDict
 
 #------------------------
 # Generic functionalities
@@ -40,37 +41,60 @@ class PerflibConfig:
 #-------------------------------------------
 # Perflib specific configuration and helpers
 #-------------------------------------------
+def build_config():
+    perflib = ['GenericBlas', 'GenericLapack', 'MKL', 'ATLAS', 'Accelerate',
+               'vecLib', 'Sunperf', 'FFTW2', 'FFTW3']
+    opts = ['cpppath', 'cflags', 'libpath', 'libs', 'linkflags', 'rpath',
+            'frameworks']
+    defint = {'atlas_def_libs' : 
+              ','.join([pjoin(i, 'atlas') for i in default_lib_dirs])}
+    cfg = SafeConfigParser()
+
+    st = cfg.read(pjoin(pdirname(__file__), 'perflib.cfg'))
+    # XXX: check this properly
+    assert len(st) > 0
+
+    def get_perflib_config(name):
+        yop =  DefaultDict(avkeys = opts)
+        for i in cfg.options(name):
+            yop[i] =  cfg.get(name, i, vars = defint).split(',')
+
+        return yop
+
+    ret = {}
+    for i in perflib:
+        ret[i] = get_perflib_config(i)
+
+    return ret
+        
+_PCONFIG = build_config()
+
 CONFIG = {
         'GenericBlas': PerflibConfig('BLAS', 'blas', 
-                                    ConfigOpts(libs = ['blas']),
+                                    _PCONFIG['GenericBlas'],
                                     [], []),
         'GenericLapack': PerflibConfig('LAPACK', 'lapack', 
-                                      ConfigOpts(libs = ['lapack']),
+                                      _PCONFIG['GenericLapack'],
                                       [], []),
-        'MKL': PerflibConfig('MKL', 'mkl', ConfigOpts(libs = ['mkl', 'guide', 'm']),
+        'MKL': PerflibConfig('MKL', 'mkl', _PCONFIG['MKL'],
                              ['mkl.h'], ['MKLGetVersion']),
-        'ATLAS': PerflibConfig('ATLAS', 'atlas', 
-                               ConfigOpts(libs = ['atlas'], 
-                               libpath = [pjoin(i, 'atlas') for i in 
-                                          default_lib_dirs]),
-                               ['atlas_enum.h'],
-                               ['ATL_sgemm']),
+        'ATLAS': PerflibConfig('ATLAS', 'atlas', _PCONFIG['ATLAS'], 
+                               ['atlas_enum.h'], ['ATL_sgemm']),
         'Accelerate' : PerflibConfig('Framework: Accelerate', 'accelerate', 
-                                      ConfigOpts(frameworks = ['Accelerate']),
+                                      _PCONFIG['Accelerate'],
                                       ['Accelerate/Accelerate.h'],
                                       ['cblas_sgemm']),
         'vecLib' : PerflibConfig('Framework: vecLib', 'vecLib', 
-                                 ConfigOpts(frameworks = ['vecLib']),
+                                 _PCONFIG['vecLib'],
                                  ['vecLib/vecLib.h'],
                                  ['cblas_sgemm']),
         'Sunperf' : PerflibConfig('Sunperf', 'sunperf', 
-                                  ConfigOpts(cflags = ['-dalign'], 
-                                             linkflags = ['-xlic_lib=sunperf']),
+                                  _PCONFIG['Sunperf'],
                                   ['sunperf.h'],
                                   ['cblas_sgemm']),
-        'FFTW3' : PerflibConfig('FFTW3', 'fftw', ConfigOpts(libs = ['fftw3']),
+        'FFTW3' : PerflibConfig('FFTW3', 'fftw', _PCONFIG['FFTW3'],
                                 ['fftw3.h'], ['fftw_cleanup']),
-        'FFTW2' : PerflibConfig('FFTW2', 'fftw', ConfigOpts(libs = ['fftw']),
+        'FFTW2' : PerflibConfig('FFTW2', 'fftw', _PCONFIG['FFTW2'],
                                 ['fftw.h'], ['fftw_forget_wisdom'])
         }
 
@@ -111,4 +135,3 @@ class GetVersionFactory:
 
     def get_func(self):
         return self.func
-
