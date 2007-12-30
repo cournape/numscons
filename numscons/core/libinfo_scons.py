@@ -58,13 +58,16 @@ def NumpyCheckLibAndHeader(context, libs, symbols = None, headers = None,
     (cus_cpppath, cus_libs, cus_libpath), found = \
         get_config_from_section(siteconfig, section)
     if found:
-        opts = ConfigOpts(cpppath = cus_cpppath, libpath = cus_libpath, 
-                          libs = cus_libs)
+        opts = ConfigOpts()
+        opts['cpppath'] = cus_cpppath
+        opts['libpath'] = cus_libpath
+        opts['libs'] = cus_libs
         # XXX: fix this
         if len(cus_libs) == 1 and len(cus_libs[0]) == 0:
             opts['libs'] = libs
     else:
-        opts = ConfigOpts(libs = libs)
+        opts = ConfigOpts()
+        opts['libs'] = libs
     
     # Display message
     if symbols:
