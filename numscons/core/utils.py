@@ -64,7 +64,7 @@ class DefaultDict(dict):
         dict.__init__(self, [(i, default) for i in avkeys])
 
     def __setitem__(self, key, val):
-        if key is not in self:
+        if self.has_key(key):
             raise NonDefaultKeyError(key)
         dict.__setitem__(self, key, val)
         
