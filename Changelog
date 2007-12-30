@@ -1,3 +1,7 @@
+Wed, 26 Dec 2007 21:34:07 +0900
+	* the compiler configurations are not put into configuration files,
+	which are read by the functions get_f77_config and get_cc_config.
+
 Sun, 23 Dec 2007 01:21:50 +0900
 
 	* Starting to work on a separate numscons package, which will implement

@@ -5,7 +5,7 @@
 import os
 import unittest
 
-from utils import pkg_to_path, _rsplit
+from utils import pkg_to_path, _rsplit, DefaultDic
 
 class PkgToPathTester(unittest.TestCase):
     def setUp(self):
@@ -31,6 +31,28 @@ class RsplitTester(unittest.TestCase):
         a2 = 'floupi'
         assert a2.rsplit('.') ==  _rsplit(a2, '.', -1)
         assert a2.rsplit('.', 1) == _rsplit(a2, '.', 1)
+
+class DefaultDicTester(unittest.TestCase):
+    def test_basic1(self):
+        d = DefaultDic(('a', 'b'))
+        a = d['a']
+        b = d['b']
+
+    def test_defval(self):
+        d = DefaultDic(('a', 'b'), default = 1)
+        a = d['a']
+        b = d['b']
+        assert a == b == 1
+
+    def test_nonav(self):
+        # Check that setting a key not given in the ctor fails
+        d = DefaultDic(('a', 'b'))
+        d['a'] = 1 
+        try:
+            d['c'] = 2
+            raise AssertionError('Setting a non existing key succeeded, should have failed.')
+        except KeyError:
+            pass
 
 if __name__ == "__main__":
     unittest.main()

@@ -9,20 +9,24 @@ from os.path import join as pjoin, dirname as pdirname, basename as pbasename
 from distutils.sysconfig import get_config_vars
 
 from numpy.distutils.command.scons import get_scons_build_dir, \
-                                          get_scons_configres_dir, \
-                                          get_scons_configres_filename
+     get_scons_configres_dir, get_scons_configres_filename
 
-from default import tool_list, get_cc_config, get_f77_config
-from custom_builders import NumpySharedLibrary, NumpyCtypes, \
-            NumpyPythonExtension, NumpyStaticExtLibrary
-from libinfo import get_config
-from extension_scons import PythonExtension, built_with_mstools, \
-                            createStaticExtLibraryBuilder
-from utils import pkg_to_path
+from numscons.core.default import tool_list
+from numscons.core.compiler_config import get_cc_config, get_f77_config
+from numscons.core.custom_builders import NumpySharedLibrary, NumpyCtypes, \
+     NumpyPythonExtension, NumpyStaticExtLibrary
+from numscons.core.libinfo import get_config
+from numscons.core.extension_scons import PythonExtension, built_with_mstools, \
+     createStaticExtLibraryBuilder
+from numscons.core.utils import pkg_to_path, partial
+from numscons.core.misc import pyplat2sconsplat, is_cc_suncc, \
+     get_additional_toolpaths, is_f77_gnu, get_vs_version
+from numscons.core.template_generators import generate_from_c_template, \
+     generate_from_f_template, generate_from_template_emitter, \
+     generate_from_template_scanner
+from numscons.core.custom_builders import NumpyFromCTemplate, NumpyFromFTemplate
 
 from numscons.tools.substinfile import TOOL_SUBST
-from misc import pyplat2sconsplat, is_cc_suncc, get_additional_toolpaths, \
-                 is_f77_gnu
 
 __all__ = ['GetNumpyEnvironment']
 
@@ -89,7 +93,7 @@ def finalize_env(env):
     # This will customize some things, to cope with some idiosyncraties with
     # some tools, and are too specific to be in tools.
     if built_with_mstools(env):
-        major, minor = get_vs_version(env)
+        major = get_vs_version(env)[0]
         # For VS 8 and above (VS 2005), use manifest for DLL
         if major >= 8:
             env['LINKCOM'] = [env['LINKCOM'], 
@@ -111,7 +115,7 @@ def GetNumpyEnvironment(args):
     This environment contains builders for python extensions, ctypes
     extensions, fortran builders, etc... Generally, call it with args =
     ARGUMENTS, which contain the arguments given to the scons process."""
-    env = _GetNumpyEnvironment(args)
+    env = _get_numpy_env(args)
 
     #------------------------------
     # C compiler last customization
@@ -149,6 +153,7 @@ def GetNumpyEnvironment(args):
     return env
 
 def initialize_cc(env, path_list):
+    """Initialize C compiler from distutils info."""
     from SCons.Tool import Tool, FindTool
 
     def set_cc_from_distutils():
@@ -178,12 +183,7 @@ def initialize_cc(env, path_list):
             customize_cc(t.name, env)
 
     if len(env['cc_opt']) > 0:
-        try:
-            set_cc_from_distutils()
-        except EnvironmentError, e:
-            # scons could not understand cc_opt (bad name ?)
-            msg = "SCONS: Could not initialize tool ? Error is %s" % str(e)
-            raise AssertionError(msg)
+        set_cc_from_distutils()
     else:
         t = Tool(FindTool(DEF_C_COMPILERS, env), 
                  toolpath = get_additional_toolpaths(env))
@@ -191,21 +191,16 @@ def initialize_cc(env, path_list):
         customize_cc(t.name, env)
 
 def initialize_f77(env, path_list):
+    """Initialize F77 compiler from distutils info."""
     from SCons.Tool import Tool, FindTool
 
     if len(env['f77_opt']) > 0:
-        try:
-            if len(env['f77_opt_path']) > 0:
-                t = Tool(env['f77_opt'], 
-                         toolpath = get_additional_toolpaths(env))
-                t(env) 
-                path_list.append(env['f77_opt_path'])
-                customize_f77(t.name, env)
-        except EnvironmentError, e:
-            # scons could not understand fc_opt (bad name ?)
-            msg = "SCONS: Could not initialize fortran tool ? "\
-                  "Error is %s" % str(e)
-            raise AssertionError(msg)
+        if len(env['f77_opt_path']) > 0:
+            t = Tool(env['f77_opt'], 
+                     toolpath = get_additional_toolpaths(env))
+            t(env) 
+            path_list.append(env['f77_opt_path'])
+            customize_f77(t.name, env)
     else:
         def_fcompiler =  FindTool(DEF_FORTRAN_COMPILERS, env)
         if def_fcompiler:
@@ -233,19 +228,15 @@ def initialize_f77(env, path_list):
         env['SHF77FLAGS'] = '$F77FLAGS %s' % env.subst('$_SHFORTRANFLAGSG')
 
 def initialize_cxx(env, path_list):
+    """Initialize C++ compiler from distutils info."""
     from SCons.Tool import Tool, FindTool
 
     if len(env['cxx_opt']) > 0:
-        try:
-            if len(env['cxx_opt_path']) > 0:
-                t = Tool(env['cxx_opt'], 
-                         toolpath = get_additional_toolpaths(env))
-                t(env) 
-                path_list.append(env['cxx_opt_path'])
-        except EnvironmentError, e:
-            # scons could not understand cxx_opt (bad name ?)
-            msg = "SCONS: Could not initialize tool ? Error is %s" % str(e)
-            raise AssertionError(msg)
+        if len(env['cxx_opt_path']) > 0:
+            t = Tool(env['cxx_opt'], 
+                     toolpath = get_additional_toolpaths(env))
+            t(env) 
+            path_list.append(env['cxx_opt_path'])
     else:
         def_fcompiler =  FindTool(DEF_FORTRAN_COMPILERS, env)
         if def_fcompiler:
@@ -254,11 +245,10 @@ def initialize_cxx(env, path_list):
         else:
             print "========== NO CXX COMPILER FOUND ==========="
 
-def _GetNumpyEnvironment(args):
+def _get_numpy_env(args):
     """Call this with args = ARGUMENTS."""
     from SCons.Environment import Environment
     from SCons.Script import BuildDir, Help
-    from SCons.Errors import EnvironmentError
 
     # XXX: this function is too long and clumsy...
 
@@ -307,10 +297,8 @@ def _GetNumpyEnvironment(args):
 
     # Add HOME in the environment: some tools seem to require it (Intel
     # compiler, for licenses stuff)
-    try:
+    if os.environ.has_key('HOME'):
         env['ENV']['HOME'] = os.environ['HOME']
-    except KeyError:
-        pass
 
     # Generate help (if calling scons directly during debugging, this could be
     # useful)
@@ -330,7 +318,6 @@ def set_site_config(env):
 
 def customize_scons_dirs(env):
     # Put config code and log in separate dir for each subpackage
-    from utils import partial
     NumpyConfigure = partial(env.Configure, 
                              conf_dir = pjoin(env['build_dir'], '.sconf'), 
                              log_file = pjoin(env['build_dir'], 'config.log'))
@@ -364,13 +351,6 @@ def add_custom_builders(env):
     env['BUILDERS']['NumpyCtypes'] = NumpyCtypes
     env['BUILDERS']['PythonExtension'] = PythonExtension
     env['BUILDERS']['NumpyPythonExtension'] = NumpyPythonExtension
-
-    from template_generators import generate_from_c_template, \
-                                    generate_from_f_template, \
-                                    generate_from_template_emitter, \
-                                    generate_from_template_scanner
-
-    from custom_builders import NumpyFromCTemplate, NumpyFromFTemplate
 
     tpl_scanner = Scanner(function = generate_from_template_scanner, 
                           skeys = ['.src'])
