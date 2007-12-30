@@ -1,3 +1,8 @@
+Sun, 30 Dec 2007 16:15:30 +0900
+	* the perflib configurations are not put into a configuration file.
+	This should enable more drastic simplification to the internals of
+	perflib, which is way too complicated right now.
+
 Wed, 26 Dec 2007 21:34:07 +0900
 	* the compiler configurations are not put into configuration files,
 	which are read by the functions get_f77_config and get_cc_config.
