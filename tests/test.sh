@@ -1,5 +1,7 @@
 PREFIX=$PWD
+TESTINSTALL=$PREFIX/tmp/lib/python2.5/site-packages
 rm -rf $PREFIX/build
 rm -rf $PREFIX/tmp
-python setup.py scons install --prefix=$PREFIX/tmp
-(cd $PREFIX/tmp && PYTHONPATH=$PREFIX/tmp/lib/python2.5/site-packages:$PYTHONPATH nosetests $PREFIX)
+PYTHONPATH=$HOME/local/lib/python2.5/site-packages python setup.py scons install --prefix=$PREFIX/tmp
+echo "====== TESTING BUILT EXTENSIONS .... ========"
+(cd $PREFIX/tmp && nosetests -w $TESTINSTALL -v numsconstests)
