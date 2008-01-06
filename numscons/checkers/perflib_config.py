@@ -1,9 +1,9 @@
 #! /usr/bin/env python
-# Last Change: Tue Dec 04 03:00 PM 2007 J
+# Last Change: Sun Jan 06 08:00 PM 2008 J
 from os.path import join as pjoin, dirname as pdirname
 from ConfigParser import SafeConfigParser, RawConfigParser
 
-from numpy.distutils.system_info import default_lib_dirs
+from numscons.numdist import default_lib_dirs
 
 from numscons.core.utils import DefaultDict
 
