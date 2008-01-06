@@ -1,5 +1,5 @@
 #! /usr/bin/env python
-# Last Change: Fri Nov 16 01:00 PM 2007 J
+# Last Change: Sun Jan 06 09:00 PM 2008 J
 
 """This module defines various utilities used throughout the scons support
 library."""
@@ -101,22 +101,22 @@ class partial:
 
         return self.fun(*(self.pending + args), **kw)
 
-# # Copied from scons code...
-# import types
-# from UserString import UserString
-# # Don't "from types import ..." these because we need to get at the
-# # types module later to look for UnicodeType.
-# StringType      = types.StringType
-# TupleType       = types.TupleType
-# if hasattr(types, 'UnicodeType'):
-#     UnicodeType = types.UnicodeType
-#     def isstring(obj):
-#         t = type(obj)
-#         return t is StringType \
-#             or t is UnicodeType \
-#             or (t is InstanceType and isinstance(obj, UserString))
-# else:
-#     def isstring(obj):
-#         t = type(obj)
-#         return t is StringType \
-#             or (t is InstanceType and isinstance(obj, UserString))
+# Copied from scons code...
+import types
+from UserString import UserString
+# Don't "from types import ..." these because we need to get at the
+# types module later to look for UnicodeType.
+StringType      = types.StringType
+TupleType       = types.TupleType
+if hasattr(types, 'UnicodeType'):
+    UnicodeType = types.UnicodeType
+    def isstring(obj):
+        t = type(obj)
+        return t is StringType \
+            or t is UnicodeType \
+            or (t is InstanceType and isinstance(obj, UserString))
+else:
+    def isstring(obj):
+        t = type(obj)
+        return t is StringType \
+            or (t is InstanceType and isinstance(obj, UserString))
