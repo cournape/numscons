@@ -1,12 +1,12 @@
 #! /usr/bin/env python
-# Last Change: Fri Dec 07 06:00 PM 2007 J
+# Last Change: Sun Jan 06 08:00 PM 2008 J
 
 # Module for support to build python extension. scons specific code goes here.
 import sys
 from copy import deepcopy
 
 from distutils.unixccompiler import UnixCCompiler
-from numpy.distutils.misc_util import msvc_runtime_library
+from numdist_copy import msvc_runtime_library
 
 from extension import get_pythonlib_dir, get_python_inc
 from misc import built_with_mstools, built_with_mingw, built_with_gnu_f77, \
