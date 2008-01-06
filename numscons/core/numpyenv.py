@@ -8,9 +8,6 @@ import os.path
 from os.path import join as pjoin, dirname as pdirname, basename as pbasename
 from distutils.sysconfig import get_config_vars
 
-from numpy.distutils.command.scons import get_scons_build_dir, \
-     get_scons_configres_dir, get_scons_configres_filename
-
 from numscons.core.default import tool_list
 from numscons.core.compiler_config import get_cc_config, get_f77_config
 from numscons.core.custom_builders import NumpySharedLibrary, NumpyCtypes, \
