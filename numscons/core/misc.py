@@ -12,6 +12,24 @@ def get_scons_path():
     """Returns the name of the directory where our local scons is."""
     return pjoin(pdirname(numscons.__file__), 'scons-local')
 
+def get_scons_build_dir():
+    """Return the top path where everything produced by scons will be put.
+    
+    The path is relative to the top setup.py"""
+    return pjoin('build', 'scons')
+
+def get_scons_configres_dir():
+    """Return the top path where everything produced by scons will be put.
+    
+    The path is relative to the top setup.py"""
+    return pjoin('build', 'scons-configres')
+
+def get_scons_configres_filename():
+    """Return the top path where everything produced by scons will be put.
+    
+    The path is relative to the top setup.py"""
+    return '__configres.py'
+
 # Those built_* are not good: we should have a better way to get the real type
 # of compiler instead of being based on names (to support things like colorgcc,
 # gcc-4.2, etc...). Fortunately, we mostly need this on MS platform only.
