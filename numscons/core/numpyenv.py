@@ -25,6 +25,9 @@ from numscons.core.custom_builders import NumpyFromCTemplate, NumpyFromFTemplate
 
 from numscons.tools.substinfile import TOOL_SUBST
 
+from misc import get_scons_build_dir, get_scons_configres_dir,\
+                 get_scons_configres_filename
+
 __all__ = ['GetNumpyEnvironment']
 
 DEF_LINKERS, DEF_C_COMPILERS, DEF_CXX_COMPILERS, DEF_ASSEMBLERS, \
