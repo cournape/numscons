@@ -1,3 +1,6 @@
+Sun, 06 Jan 2008 21:43:15 +0900
+	* 0.2.1 release
+
 Sun, 06 Jan 2008 21:25:45 +0900
 	* Remove all dependencies on numpy.distutils.
 
