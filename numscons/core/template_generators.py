@@ -6,7 +6,7 @@ from os.path import basename as pbasename, splitext, join as pjoin, \
                     dirname as pdirname
 
 from numscons.numdist import process_c_file
-from numpy.distutils.from_template import process_file as process_f_file
+from numscons.numdist import process_f_file
 
 def do_generate_from_c_template(targetfile, sourcefile, env):
     """Generate a C source file from template using numpy.distutils

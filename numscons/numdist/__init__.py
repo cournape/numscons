@@ -3,3 +3,4 @@ from numdist_copy import default_lib_dirs, default_include_dirs, \
 from numdist_copy import msvc_runtime_library
 
 from conv_template import process_file as process_c_file
+from from_template import process_file as process_f_file
