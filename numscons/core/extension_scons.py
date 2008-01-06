@@ -6,7 +6,7 @@ import sys
 from copy import deepcopy
 
 from distutils.unixccompiler import UnixCCompiler
-from numdist_copy import msvc_runtime_library
+from numscons.numdist import msvc_runtime_library
 
 from extension import get_pythonlib_dir, get_python_inc
 from misc import built_with_mstools, built_with_mingw, built_with_gnu_f77, \
