@@ -206,10 +206,10 @@ def CheckSunperf(context, autoadd = 1, check_version = 0):
         for k, v in pa.items():
     	    opts[k].extend(deepcopy(v))
         res = ConfigRes(cfg.name, opts, res.is_customized())
-	context.Result('Succeeded !')
+        context.Result('Succeeded !')
     else:
         st = 0
-	context.Result('Failed !')
+        context.Result('Failed !')
 
     return st, res
 
