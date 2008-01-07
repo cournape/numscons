@@ -1,5 +1,5 @@
 #! /usr/bin/env python
-# Last Change: Sun Jan 06 08:00 PM 2008 J
+# Last Change: Sun Jan 06 09:00 PM 2008 J
 
 # Module for support to build python extension. scons specific code goes here.
 import sys
