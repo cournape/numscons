@@ -11,6 +11,7 @@ from core.numpyenv import GetNumpyEnvironment
 from core.libinfo_scons import NumpyCheckLibAndHeader
 
 from checkers import CheckF77BLAS, CheckCBLAS, CheckCLAPACK, CheckF77LAPACK, CheckFFT
+from checkers.configuration import write_info
 from fortran_scons import CheckF77Mangling
 #import tools
 

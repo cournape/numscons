@@ -12,9 +12,9 @@ from distutils.util import get_platform
 #         c_sgemm as sunperf_src, lapack_sgesv, blas_sgemm, c_sgemm2, \
 #         clapack_sgesv as clapack_src
 # from numpy.distutils.scons.fortran_scons import CheckF77Mangling, CheckF77Clib
-from numscons.configuration import add_info
 from perflib import CheckMKL, CheckFFTW3, CheckFFTW2
-from support import check_include_and_run, ConfigOpts, ConfigRes
+from support import check_include_and_run
+from configuration import ConfigOpts, ConfigRes, add_info
 
 __all__ = ['CheckFFT']
 

@@ -7,7 +7,7 @@ import os
 from copy import deepcopy
 
 from numscons.core.libinfo import get_config_from_section, get_config
-from numscons.core.utils import DefaultDict
+from configuration import ConfigRes
 
 # Tools to save and restore environments construction variables (the ones often
 # altered for configuration tests)
@@ -39,17 +39,6 @@ def restore(env, saved_keys):
     kw = dict(kw)
     env.Replace(**kw)
 
-class ConfigOpts(DefaultDict):
-    # Any added key should be added as an argument to __init__ 
-    _keys = ['cpppath', 'cflags', 'libpath', 'libs', 'linkflags', 'rpath',
-             'frameworks']
-    def __init__(self, default = None):
-        DefaultDict.__init__(self, avkeys = ConfigOpts._keys)
-
-    def __repr__(self):
-        msg = [r'%s : %s' % (k, i) for k, i in self.items()]
-        return '\n'.join(msg)
-
 # Implementation function to check symbol in a library
 def check_symbol(context, headers, sym, extra = r''):
     # XXX: add dep vars in code
@@ -70,36 +59,6 @@ return 0;
 ''' % {'func' : sym})
     code.append(extra)
     return context.TryLink('\n'.join(code), '.c')
-
-class ConfigRes:
-    def __init__(self, name, cfgopts, origin, version = None):
-        self.name = name
-        self.cfgopts = cfgopts
-        self.origin = origin
-        self.version = version
-
-    def __getitem__(self, key):
-        return self.cfgopts.data[key]
-
-    def __setitem__(self, key, item):
-        self.cfgopts.data[key] = item
-
-    def is_customized(self):
-        return bool(self.origin)
-
-    def __repr__(self):
-        msg = ['Using %s' % self.name]
-        if self.is_customized():
-            msg += [  'Customized items site.cfg:']
-        else:
-            msg += ['  Using default configuration:']
-
-        msg += ['  %s : %s' % (k, i) for k, i in self.cfgopts.items() if i is not None]
-        msg += ['  Version is : %s' % self.version]
-        return '\n'.join(msg)
-
-    def __str__(self):
-        return self.__repr__()
 
 def _check_headers(context, cpppath, cflags, headers, autoadd):          
     """Try to compile code including the given headers."""       

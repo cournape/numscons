@@ -17,7 +17,8 @@ from numscons.testcode_snippets import cblas_sgemm as cblas_src, \
         c_sgemm as sunperf_src, lapack_sgesv
 
 from support import check_include_and_run, check_symbol
-from support import save_and_set, restore, ConfigOpts, ConfigRes
+from support import save_and_set, restore
+from configuration import ConfigOpts, ConfigRes
 from support import check_code as _check
 from perflib_config import PerflibConfig, IsFactory, GetVersionFactory, CONFIG
 
