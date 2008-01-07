@@ -34,7 +34,7 @@ def save_and_set(env, opts):
 
 def restore(env, saved_keys):
     keys = saved_keys.keys()
-    kw = zip([_arg2env[k] for k in keys], 
+    kw = zip([_arg2env[k] for k in keys],
              [saved_keys[k] for k in keys])
     kw = dict(kw)
     env.Replace(**kw)
@@ -47,7 +47,7 @@ def check_symbol(context, headers, sym, extra = r''):
     code.append(r'''
 #undef %(func)s
 #ifdef __cplusplus
-extern "C" 
+extern "C"
 #endif
 char %(func)s();
 
@@ -60,42 +60,42 @@ return 0;
     code.append(extra)
     return context.TryLink('\n'.join(code), '.c')
 
-def _check_headers(context, cpppath, cflags, headers, autoadd):          
-    """Try to compile code including the given headers."""       
-    env = context.env        
-         
-    #----------------------------        
-    # Check headers are available        
-    #----------------------------        
-    oldCPPPATH = (env.has_key('CPPPATH') and deepcopy(env['CPPPATH'])) or []         
-    oldCFLAGS = (env.has_key('CFLAGS') and deepcopy(env['CFLAGS'])) or []        
-    env.AppendUnique(CPPPATH = cpppath)          
-    env.AppendUnique(CFLAGS = cflags)        
-    # XXX: handle context        
-    hcode = ['#include <%s>' % h for h in headers]       
-         
-    # HACK: we add cpppath in the command of the source, to add dependency of        
-    # the check on the cpppath.          
-    hcode.extend(['#if 0', '%s' % cpppath, '#endif\n'])          
-    src = '\n'.join(hcode)       
-         
-    ret = context.TryCompile(src, '.c')          
-    if ret == 0 or autoadd == 0:         
-        env.Replace(CPPPATH = oldCPPPATH)        
-        env.Replace(CFLAGS = oldCFLAGS)          
-        
-    return ret 
+def _check_headers(context, cpppath, cflags, headers, autoadd):
+    """Try to compile code including the given headers."""
+    env = context.env
+
+    #----------------------------
+    # Check headers are available
+    #----------------------------
+    oldCPPPATH = (env.has_key('CPPPATH') and deepcopy(env['CPPPATH'])) or []
+    oldCFLAGS = (env.has_key('CFLAGS') and deepcopy(env['CFLAGS'])) or []
+    env.AppendUnique(CPPPATH = cpppath)
+    env.AppendUnique(CFLAGS = cflags)
+    # XXX: handle context
+    hcode = ['#include <%s>' % h for h in headers]
+
+    # HACK: we add cpppath in the command of the source, to add dependency of
+    # the check on the cpppath.
+    hcode.extend(['#if 0', '%s' % cpppath, '#endif\n'])
+    src = '\n'.join(hcode)
+
+    ret = context.TryCompile(src, '.c')
+    if ret == 0 or autoadd == 0:
+        env.Replace(CPPPATH = oldCPPPATH)
+        env.Replace(CFLAGS = oldCFLAGS)
+
+    return ret
 
 def check_include_and_run(context, name, opts, headers, run_src, autoadd = 1):
     """This is a basic implementation for generic "test include and run"
     testers.
-    
+
     For example, for library foo, which implements function do_foo, and with
     include header foo.h, this will:
         - test that foo.h is found and compilable by the compiler
         - test that the given source code can be compiled. The source code
           should contain a simple program with the function.
-          
+
     Arguments:
         - name: name of the library
         - cpppath: list of directories
@@ -108,7 +108,7 @@ def check_include_and_run(context, name, opts, headers, run_src, autoadd = 1):
     context.Message('Checking for %s ... ' % name)
     env = context.env
 
-    ret = _check_headers(context, opts['cpppath'], opts['cflags'], headers, 
+    ret = _check_headers(context, opts['cpppath'], opts['cflags'], headers,
                          autoadd)
     if not ret:
         context.Result('Failed: %s include not found' % name)
@@ -119,10 +119,11 @@ def check_include_and_run(context, name, opts, headers, run_src, autoadd = 1):
     #------------------------------
     saved = save_and_set(env, opts)
     try:
-        # HACK: we add libpath and libs at the end of the source as a comment, to
-        # add dependency of the check on those.
+        # HACK: we add libpath and libs at the end of the source as a comment,
+        # to add dependency of the check on those.
         src = '\n'.join([r'#include <%s>' % h for h in headers] +\
-                        [run_src, r'#if  0', r'%s' % str(opts), r'#endif', '\n'])
+                        [run_src, r'#if  0', r'%s' % str(opts), r'#endif',
+                         '\n'])
         ret, out = context.TryRun(src, '.c')
     finally:
         if (not ret or not autoadd):
@@ -138,11 +139,11 @@ def check_include_and_run(context, name, opts, headers, run_src, autoadd = 1):
 
 def check_run_f77(context, name, opts, run_src, autoadd = 1):
     """This is a basic implementation for generic "run" testers.
-    
+
     For example, for library foo, which implements function do_foo
         - test that the given source code can be compiled. The source code
           should contain a simple program with the function.
-          
+
     Arguments:
         - name: name of the library."""
 
@@ -154,9 +155,10 @@ def check_run_f77(context, name, opts, run_src, autoadd = 1):
     #------------------------------
     saved = save_and_set(env, opts)
     try:
-        # HACK: we add libpath and libs at the end of the source as a comment, to
-        # add dependency of the check on those.
-        src = '\n'.join([run_src] + [r'* %s' % s for s in str(opts).split('\n')])
+        # HACK: we add libpath and libs at the end of the source as a comment,
+        # to add dependency of the check on those.
+        src = '\n'.join([run_src] + [r'* %s' % s for s in
+                                     str(opts).split('\n')])
         ret, out = context.TryRun(src, '.f')
     finally:
         if (not ret or not autoadd):
@@ -170,27 +172,31 @@ def check_run_f77(context, name, opts, run_src, autoadd = 1):
     context.Result(ret)
     return ret
 
-def check_code(context, name, section, defopts, headers_to_check, funcs_to_check, 
-           check_version, version_checker, autoadd, rpath_is_libpath = True):
+def check_code(context, name, section, defopts, headers_to_check,
+               funcs_to_check, check_version, version_checker, autoadd,
+               rpath_is_libpath = True):
     """Generic implementation for perflib check.
 
     This checks for header (by compiling code including them) and symbols in
     libraries (by linking code calling for given symbols). Optionnaly, it can
     get the version using some specific function.
-    
+
     See CheckATLAS or CheckMKL for examples."""
     context.Message("Checking %s ... " % name)
 
     try:
         value = os.environ[name]
         if value == 'None':
-            return context.Result('Disabled from env through var %s !' % name), {}
+            return context.Result('Disabled from env through var %s !' \
+                                  % name), \
+                   {}
     except KeyError:
         pass
 
     # Get site.cfg customization if any
     siteconfig, cfgfiles = get_config()
-    (cpppath, libs, libpath), found = get_config_from_section(siteconfig, section)
+    (cpppath, libs, libpath), found = get_config_from_section(siteconfig,
+                                                              section)
     if found:
         opts = ConfigOpts(cpppath = cpppath, libpath = libpath, libs = libs)
         if len(libs) == 1 and len(libs[0]) == 0:
@@ -199,7 +205,7 @@ def check_code(context, name, section, defopts, headers_to_check, funcs_to_check
         opts = defopts
 
     if rpath_is_libpath:
-	opts['rpath'] = deepcopy(opts['libpath'])
+        opts['rpath'] = deepcopy(opts['libpath'])
 
     env = context.env
 
@@ -229,12 +235,12 @@ def check_code(context, name, section, defopts, headers_to_check, funcs_to_check
     finally:
         if st == 0 or autoadd == 0:
             restore(env, saved)
-        
+
     if not st:
         context.Result('Failed (could not check symbol %s : check config.log '\
                        'in %s for more details))' % (sym, env['build_dir']))
         return st, ConfigRes(name, opts, found)
-        
+
     context.Result(st)
 
     # Check version if requested
