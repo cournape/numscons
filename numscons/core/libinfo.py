@@ -7,7 +7,7 @@ import os
 import ConfigParser
 
 from numscons.numdist import default_lib_dirs, default_include_dirs, \
-                            default_src_dirs, get_standard_file
+                             default_src_dirs, get_standard_file
 
 # Think about a cache mechanism, to avoid reparsing the config file everytime.
 def get_config():
