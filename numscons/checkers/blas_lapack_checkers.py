@@ -12,10 +12,10 @@ from numscons.testcode_snippets import cblas_sgemm as cblas_src, \
         c_sgemm as sunperf_src, lapack_sgesv, blas_sgemm, c_sgemm2, \
         clapack_sgesv as clapack_src
 from numscons.fortran_scons import CheckF77Mangling, CheckF77Clib
-from numscons.configuration import add_info
 from numscons.core.utils import rsplit
 from numscons.core.extension_scons import built_with_mstools, built_with_mingw
 
+from configuration import add_info
 from perflib import CheckMKL, CheckATLAS, CheckSunperf, CheckAccelerate, CONFIG
 from support import check_include_and_run, ConfigOpts, ConfigRes
 
