@@ -19,7 +19,7 @@ from numscons.testcode_snippets import cblas_sgemm as cblas_src, \
 from support import check_include_and_run, check_symbol
 from support import save_and_set, restore
 from configuration import ConfigOpts, ConfigRes
-from support import check_code as _check
+from common import check_code as _check
 from perflib_config import PerflibConfig, IsFactory, GetVersionFactory, CONFIG
 
 from numscons.core.utils import popen_wrapper
