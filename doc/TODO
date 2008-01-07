@@ -2,12 +2,16 @@ Then, those are the old remaining things to do (once we get to the point we
 were when scons was inside numpy repository):
     - clean writing info code: instead of using intricate add_info and co, use
       scons Environment to keep info about each perflib. This should make the
-      design much simpler.
-    - clean the code: checkers, numpyenv in perticular
-    - check windows
+      design much simpler. (0.2.* serie)
+    - clean the code of numpyenv; in perticular: builder creation (should be
+      done through tools), remove _glob (scons has the functionality now),
+      rename functions, and set the order right. (0.2* serie)
+    - clean up numpy.core building (0.3* serie)
+    - rewrite output parser using shlex (0.3* serie)
+    - check windows: in perticular MS studio + g77 (0.4* serie)
+    - CXX optimizations flags + Control cxxflags from env
     - umfpack checker
     - Add CPPPDEFINES in perflib checkers 
-    - CXX optimizations flags + Control cxxflags from env
     - handle inplace
     - doc
     - finish scipy
@@ -32,7 +36,6 @@ Tests:
     - What can be tested ?
 
 Fortran:
-    - Rewrite verbose output parser using shlex for quote handling
     - improve Fortran runtime detection for upstream integration
     - improve Fortran mangling and dummy main detection for upstream
       integration
