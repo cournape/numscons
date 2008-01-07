@@ -1,4 +1,12 @@
 #! /usr/bin/env python
+"""Module implementing check_code function, which is the common function used
+by most perflib checkers.
+
+This function checks that a list of headers can be found, as well as a list of
+symbols, given a list of path and libraries to look for. It also supports
+customization using site.cfg, as well being disabled from the user environment
+(e.g. ATLAS=None)."""
+
 import os
 from copy import deepcopy
 

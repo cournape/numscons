@@ -67,6 +67,7 @@ def _check_headers(context, cpppath, cflags, headers, autoadd):
     #----------------------------
     # Check headers are available
     #----------------------------
+    # XXX: this should be rewritten using save/restore...
     oldCPPPATH = (env.has_key('CPPPATH') and deepcopy(env['CPPPATH'])) or []
     oldCFLAGS = (env.has_key('CFLAGS') and deepcopy(env['CFLAGS'])) or []
     env.AppendUnique(CPPPATH = cpppath)
