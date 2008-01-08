@@ -14,6 +14,9 @@ _PERFLIBS = ('GenericBlas', 'GenericLapack', 'MKL', 'ATLAS', 'Accelerate',
 # Generic functionalities
 #------------------------
 class PerflibConfig:
+    """A class which contain all the information for a given performance
+    library, including build options (cflags, libs, path, etc....) and meta
+    information (name, version, how to check)."""
     def __init__(self, name, section, defopts, headers, funcs, 
                  version_checker = None):
         """Initialize the configuration.
