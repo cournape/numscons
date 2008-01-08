@@ -256,7 +256,8 @@ def CheckHeader(context, header_name, header = None, language = None,
 
     context.Display("Checking for %s header file %s... " % (lang, header_name))
     ret = context.CompileProg(text, suffix)
-    _YesNoResult(context, ret, "HAVE_" + header_name, text)
+    _YesNoResult(context, ret, "HAVE_" + header_name, text, 
+                 "Define to 1 if you have the <%s> header file." % header_name)
     return ret
 
 
@@ -570,7 +571,8 @@ return 0;
 
         ret = context.BuildProg(text, suffix)
 
-        _YesNoResult(context, ret, sym, text)
+        _YesNoResult(context, ret, sym, text,
+                     "Define to 1 if you have the `%s' library." % lib_name)
         if oldLIBS != -1 and (ret or not autoadd):
             context.SetLIBS(oldLIBS)
             
