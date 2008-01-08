@@ -14,7 +14,8 @@ _PERFLIBS = ('GenericBlas', 'GenericLapack', 'MKL', 'ATLAS', 'Accelerate',
 # Generic functionalities
 #------------------------
 class PerflibConfig:
-    def __init__(self, name, section, defopts, headers, funcs, version_checker = None):
+    def __init__(self, name, section, defopts, headers, funcs, 
+                 version_checker = None):
         """Initialize the configuration.
 
         Args:

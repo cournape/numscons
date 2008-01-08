@@ -40,6 +40,7 @@ def CheckCBLAS(context, autoadd = 1, check_version = 0):
     siteconfig, cfgfiles = get_config()
     (cpppath, libs, libpath), found = get_config_from_section(siteconfig, section)
     if found:
+        # XXX: deepcopy rpath ?
         cfg = ConfigOpts(cpppath = cpppath, libs = libs, libpath = libpath,
                          rpath = libpath)
         st = check_include_and_run(context, 'CBLAS (from site.cfg) ', cfg,

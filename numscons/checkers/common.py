@@ -1,6 +1,6 @@
 #! /usr/bin/env python
 """Module implementing check_code function, which is the common function used
-by most perflib checkers.
+by most perflib checkers for the actual check.
 
 This function checks that a list of headers can be found, as well as a list of
 symbols, given a list of path and libraries to look for. It also supports

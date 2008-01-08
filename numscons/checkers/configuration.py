@@ -38,12 +38,6 @@ class ConfigRes:
         self.origin = origin
         self.version = version
 
-    def __getitem__(self, key):
-        return self.cfgopts.data[key]
-
-    def __setitem__(self, key, item):
-        self.cfgopts.data[key] = item
-
     def is_customized(self):
         return bool(self.origin)
 
