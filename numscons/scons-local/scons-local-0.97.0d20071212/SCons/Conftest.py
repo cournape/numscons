@@ -581,30 +581,6 @@ return 0;
 
     return ret
 
-def Define(context, name, value, comment):
-    """
-    Define a pre processor symbol name, with the optional given value in the
-    current config header.
-
-    If value is None (default), then #define name is written. If value is not
-    none, then #define name value is written.
-    
-    comment is a string which will be put as a C comment in the
-    header, to explain the meaning of the value (appropriate C comments /* and
-    */ will be put automatically."""
-    lines = []
-    if comment:
-        comment_str = "/* %s */" % comment
-        lines.append(comment_str)
-
-    if value is not None:
-        define_str = "#define %s %s" % (name, value)
-    else:
-        define_str = "#define %s" % name
-    lines.append(define_str)
-    lines.append('')
-
-    context.config_h = context.config_h + '\n'.join(lines)
 #
 # END OF PUBLIC FUNCTIONS
 #
