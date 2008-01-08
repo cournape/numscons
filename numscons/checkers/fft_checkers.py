@@ -14,7 +14,7 @@ from distutils.util import get_platform
 # from numpy.distutils.scons.fortran_scons import CheckF77Mangling, CheckF77Clib
 from perflib import CheckMKL, CheckFFTW3, CheckFFTW2
 from support import check_include_and_run
-from configuration import ConfigOpts, ConfigRes, add_info
+from configuration import BuildOpts, ConfigRes, add_info
 
 __all__ = ['CheckFFT']
 

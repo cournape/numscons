@@ -7,7 +7,7 @@ import os
 from copy import deepcopy
 
 from numscons.core.libinfo import get_config_from_section, get_config
-from configuration import ConfigRes, ConfigOpts
+from configuration import ConfigRes, BuildOpts
 
 # Tools to save and restore environments construction variables (the ones often
 # altered for configuration tests)

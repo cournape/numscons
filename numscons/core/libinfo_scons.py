@@ -9,7 +9,7 @@ from copy import deepcopy
 
 from numscons.core.libinfo import get_config_from_section, get_config
 from numscons.checkers.support import save_and_set, restore, check_symbol
-from numscons.checkers.configuration import ConfigOpts
+from numscons.checkers.configuration import BuildOpts
 
 from libinfo import get_config, get_paths, parse_config_param
 from utils import get_empty
@@ -58,7 +58,7 @@ def NumpyCheckLibAndHeader(context, libs, symbols = None, headers = None,
     (cus_cpppath, cus_libs, cus_libpath), found = \
         get_config_from_section(siteconfig, section)
     if found:
-        opts = ConfigOpts()
+        opts = BuildOpts()
         opts['cpppath'] = cus_cpppath
         opts['libpath'] = cus_libpath
         opts['libs'] = cus_libs
@@ -66,7 +66,7 @@ def NumpyCheckLibAndHeader(context, libs, symbols = None, headers = None,
         if len(cus_libs) == 1 and len(cus_libs[0]) == 0:
             opts['libs'] = libs
     else:
-        opts = ConfigOpts()
+        opts = BuildOpts()
         opts['libs'] = libs
     
     # Display message

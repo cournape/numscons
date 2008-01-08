@@ -20,12 +20,12 @@ def write_info(env):
     f.writelines("config = %s" % str(config_str))
     f.close()
 
-class ConfigOpts(DefaultDict):
+class BuildOpts(DefaultDict):
     # Any added key should be added as an argument to __init__ 
     _keys = ['cpppath', 'cflags', 'libpath', 'libs', 'linkflags', 'rpath',
              'frameworks']
     def __init__(self, default = None):
-        DefaultDict.__init__(self, avkeys = ConfigOpts._keys)
+        DefaultDict.__init__(self, avkeys = BuildOpts._keys)
 
     def __repr__(self):
         msg = [r'%s : %s' % (k, i) for k, i in self.items()]

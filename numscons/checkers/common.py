@@ -11,7 +11,7 @@ import os
 from copy import deepcopy
 
 from numscons.core.libinfo import get_config_from_section, get_config
-from configuration import ConfigRes, ConfigOpts
+from configuration import ConfigRes, BuildOpts
 from support import save_and_set, restore, check_symbol
 
 def _get_site_cfg_customization(section, defopts):
@@ -19,7 +19,7 @@ def _get_site_cfg_customization(section, defopts):
     (cpppath, libs, libpath), found = get_config_from_section(siteconfig,
                                                               section)
     if found:
-        opts = ConfigOpts(cpppath = cpppath, libpath = libpath, libs = libs)
+        opts = BuildOpts(cpppath = cpppath, libpath = libpath, libs = libs)
         if len(libs) == 1 and len(libs[0]) == 0:
             opts['libs'] = defopts['libs']
     else:

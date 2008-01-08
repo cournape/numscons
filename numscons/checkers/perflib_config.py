@@ -26,7 +26,7 @@ class PerflibConfig:
                 the name of the perflib
             - section : str
                 the name of the section used in site.cfg for customization
-            - defopts : ConfigOpts
+            - defopts : BuildOpts
                 the compilation configuration for the checker
             - headers : list
                 the list of headers to test in the checker
@@ -35,7 +35,7 @@ class PerflibConfig:
             - version_checker : callable
                 optional function to check version of the perflib. Its
                 arguments should be env and opts, where env is a scons
-                environment and opts a ConfigOpts instance. It should return an
+                environment and opts a BuildOpts instance. It should return an
                 integer (1 if successfull) and a version string."""
                 
         self.name = name

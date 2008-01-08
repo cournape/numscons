@@ -15,7 +15,7 @@ from numscons.fortran_scons import CheckF77Mangling, CheckF77Clib
 from numscons.core.utils import rsplit
 from numscons.core.extension_scons import built_with_mstools, built_with_mingw
 
-from configuration import add_info, ConfigOpts, ConfigRes
+from configuration import add_info, BuildOpts, ConfigRes
 from perflib import CheckMKL, CheckATLAS, CheckSunperf, CheckAccelerate, CONFIG
 from support import check_include_and_run
 
@@ -41,7 +41,7 @@ def CheckCBLAS(context, autoadd = 1, check_version = 0):
     (cpppath, libs, libpath), found = get_config_from_section(siteconfig, section)
     if found:
         # XXX: deepcopy rpath ?
-        cfg = ConfigOpts(cpppath = cpppath, libs = libs, libpath = libpath,
+        cfg = BuildOpts(cpppath = cpppath, libs = libs, libpath = libpath,
                          rpath = libpath)
         st = check_include_and_run(context, 'CBLAS (from site.cfg) ', cfg,
                                   [], cblas_src, autoadd)
@@ -110,7 +110,7 @@ def CheckF77BLAS(context, autoadd = 1, check_version = 0):
     siteconfig, cfgfiles = get_config()
     (cpppath, libs, libpath), found = get_config_from_section(siteconfig, section)
     if found:
-        cfg = ConfigOpts(cpppath = cpppath, libs = libs, libpath = libpath,
+        cfg = BuildOpts(cpppath = cpppath, libs = libs, libpath = libpath,
                          rpath = libpath)
         st = check_include_and_run(context, 'BLAS (from site.cfg) ', cfg,
                                   [], test_src, autoadd)
@@ -208,7 +208,7 @@ def CheckF77LAPACK(context, autoadd = 1, check_version = 0):
         # XXX: handle def library names correctly
         if len(libs) == 1 and len(libs[0]) == 0:
             libs = ['lapack', 'blas']
-        cfg = ConfigOpts(cpppath = cpppath, libs = libs, libpath = libpath,
+        cfg = BuildOpts(cpppath = cpppath, libs = libs, libpath = libpath,
                          rpath = deepcopy(libpath))
 
         # fortrancfg is used to merge info from fortran checks and site.cfg
