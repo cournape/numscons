@@ -6,6 +6,7 @@ from ConfigParser import SafeConfigParser, RawConfigParser
 from numscons.numdist import default_lib_dirs
 
 from numscons.core.utils import DefaultDict
+from numscons.checkers.configuration import available_opts_flags
 
 _PERFLIBS = ('GenericBlas', 'GenericLapack', 'MKL', 'ATLAS', 'Accelerate',
              'vecLib', 'Sunperf', 'FFTW2', 'FFTW3')
@@ -59,8 +60,7 @@ class PerflibConfig:
 # Perflib specific configuration and helpers
 #-------------------------------------------
 def build_config():
-    opts = ['cpppath', 'cflags', 'libpath', 'libs', 'linkflags', 'rpath',
-            'frameworks']
+    opts = available_opts_flags()
     defint = {'atlas_def_libs' : 
               ','.join([pjoin(i, 'atlas') for i in default_lib_dirs])}
     cfg = SafeConfigParser()

@@ -20,10 +20,16 @@ def write_info(env):
     f.writelines("config = %s" % str(config_str))
     f.close()
 
+_BUILD_OPTS_FLAGS = ('cpppath', 'cflags', 'libpath', 'libs', 'linkflags',
+                     'rpath', 'frameworks')
+
+def available_opts_flags():
+    return _BUILD_OPTS_FLAGS
+
 class BuildOpts(DefaultDict):
-    # Any added key should be added as an argument to __init__ 
-    _keys = ['cpppath', 'cflags', 'libpath', 'libs', 'linkflags', 'rpath',
-             'frameworks']
+    """Small container class to keep all necessary options to build with a
+    given library/package, such as cflags, libs, library paths, etc..."""
+    _keys = _BUILD_OPTS_FLAGS
     def __init__(self, default = None):
         DefaultDict.__init__(self, avkeys = BuildOpts._keys)
 
