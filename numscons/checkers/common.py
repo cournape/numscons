@@ -85,19 +85,13 @@ def check_code(context, name, section, defopts, headers_to_check,
     context.Message("Checking %s ... " % name)
 
     # Is customized from user environment ?
-    try:
-        if os.environ[name] == 'None':
-            return context.Result('Disabled from env through var %s !' \
-                                  % name), \
-                   {}
-    except KeyError:
-        pass
+    if os.environ.has_key(name) and os.environ[name] == 'None':
+        return context.Result('Disabled from env through var %s !' % name), {}
 
     # Get site.cfg customization if any
     opts, found = _get_site_cfg_customization(section, defopts)
     if opts is None:
         opts = defopts
-
     if rpath_is_libpath:
         opts['rpath'] = deepcopy(opts['libpath'])
 
