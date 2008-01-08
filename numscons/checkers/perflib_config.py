@@ -1,11 +1,14 @@
 #! /usr/bin/env python
-# Last Change: Sun Jan 06 08:00 PM 2008 J
+# Last Change: Wed Jan 09 12:00 AM 2008 J
 from os.path import join as pjoin, dirname as pdirname
 from ConfigParser import SafeConfigParser, RawConfigParser
 
 from numscons.numdist import default_lib_dirs
 
 from numscons.core.utils import DefaultDict
+
+_PERFLIBS = ('GenericBlas', 'GenericLapack', 'MKL', 'ATLAS', 'Accelerate',
+             'vecLib', 'Sunperf', 'FFTW2', 'FFTW3')
 
 #------------------------
 # Generic functionalities
@@ -38,12 +41,20 @@ class PerflibConfig:
         self.funcs = funcs
         self.version_checker = version_checker
 
+    def __str__(self):
+        return self.__repr__()
+
+    def __repr__(self):
+        repr = ["Display name: %s" % self.name]
+        repr += ["Section name: %s" % self.section]
+        repr += ["Headers to check : %s" % self.headers]
+        repr += ["Funcs to check : %s" % self.funcs]
+        return '\n'.join(repr)
+
 #-------------------------------------------
 # Perflib specific configuration and helpers
 #-------------------------------------------
 def build_config():
-    perflib = ['GenericBlas', 'GenericLapack', 'MKL', 'ATLAS', 'Accelerate',
-               'vecLib', 'Sunperf', 'FFTW2', 'FFTW3']
     opts = ['cpppath', 'cflags', 'libpath', 'libs', 'linkflags', 'rpath',
             'frameworks']
     defint = {'atlas_def_libs' : 
@@ -55,48 +66,34 @@ def build_config():
     assert len(st) > 0
 
     def get_perflib_config(name):
-        yop =  DefaultDict(avkeys = opts)
+        yop = {}
         for i in cfg.options(name):
-            yop[i] =  cfg.get(name, i, vars = defint).split(',')
+            yop[i] =  cfg.get(name, i, vars = defint)
 
-        return yop
+        dispname = yop['dispname']
+        sitename = yop['sitename']
+
+        htc = None
+        if yop.has_key('htc'):
+            htc = yop['htc'].split(',')
+        ftc = None
+        if yop.has_key('ftc'):
+            ftc = yop['ftc'].split(',')
+
+        defopts = DefaultDict(avkeys = opts)
+        for k in yop.keys():
+            if defopts.has_key(k):
+                defopts[k] = yop[k].split(',')
+
+        return PerflibConfig(dispname, sitename, defopts, htc, ftc)
 
     ret = {}
-    for i in perflib:
+    for i in _PERFLIBS:
         ret[i] = get_perflib_config(i)
 
     return ret
         
-_PCONFIG = build_config()
-
-CONFIG = {
-        'GenericBlas': PerflibConfig('BLAS', 'blas', 
-                                    _PCONFIG['GenericBlas'],
-                                    [], []),
-        'GenericLapack': PerflibConfig('LAPACK', 'lapack', 
-                                      _PCONFIG['GenericLapack'],
-                                      [], []),
-        'MKL': PerflibConfig('MKL', 'mkl', _PCONFIG['MKL'],
-                             ['mkl.h'], ['MKLGetVersion']),
-        'ATLAS': PerflibConfig('ATLAS', 'atlas', _PCONFIG['ATLAS'], 
-                               ['atlas_enum.h'], ['ATL_sgemm']),
-        'Accelerate' : PerflibConfig('Framework: Accelerate', 'accelerate', 
-                                      _PCONFIG['Accelerate'],
-                                      ['Accelerate/Accelerate.h'],
-                                      ['cblas_sgemm']),
-        'vecLib' : PerflibConfig('Framework: vecLib', 'vecLib', 
-                                 _PCONFIG['vecLib'],
-                                 ['vecLib/vecLib.h'],
-                                 ['cblas_sgemm']),
-        'Sunperf' : PerflibConfig('Sunperf', 'sunperf', 
-                                  _PCONFIG['Sunperf'],
-                                  ['sunperf.h'],
-                                  ['cblas_sgemm']),
-        'FFTW3' : PerflibConfig('FFTW3', 'fftw', _PCONFIG['FFTW3'],
-                                ['fftw3.h'], ['fftw_cleanup']),
-        'FFTW2' : PerflibConfig('FFTW2', 'fftw', _PCONFIG['FFTW2'],
-                                ['fftw.h'], ['fftw_forget_wisdom'])
-        }
+CONFIG = build_config()
 
 class IsFactory:
     def __init__(self, name):
@@ -135,3 +132,9 @@ class GetVersionFactory:
 
     def get_func(self):
         return self.func
+
+if __name__ == '__main__':
+    for k, v in CONFIG.items():
+        print "++++++++++++++++++"
+        print k
+        print v
