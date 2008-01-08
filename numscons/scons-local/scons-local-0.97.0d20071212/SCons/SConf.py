@@ -439,7 +439,7 @@ class SConfBase:
         */ will be put automatically."""
         lines = []
         if comment:
-            comment_str = "/* %s */" % comment
+            comment_str = "\n/* %s */" % comment
             lines.append(comment_str)
 
         if value is not None:
