@@ -1,5 +1,5 @@
 #! /usr/bin/env python
-# Last Change: Tue Dec 04 03:00 PM 2007 J
+# Last Change: Tue Jan 08 11:00 PM 2008 J
 
 # This module defines checkers for performances libs providing standard API,
 # such as MKL (Intel), ATLAS, Sunperf (solaris and linux), Accelerate (Mac OS
@@ -20,7 +20,7 @@ from support import check_include_and_run, check_symbol
 from support import save_and_set, restore
 from configuration import ConfigOpts, ConfigRes
 from common import check_code as _check
-from perflib_config import PerflibConfig, IsFactory, GetVersionFactory, CONFIG
+from perflib_config import IsFactory, GetVersionFactory, CONFIG
 
 from numscons.core.utils import popen_wrapper
 from numscons.testcode_snippets import cblas_sgemm
