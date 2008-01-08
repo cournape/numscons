@@ -6,7 +6,7 @@ from ConfigParser import SafeConfigParser, RawConfigParser
 from numscons.numdist import default_lib_dirs
 
 from numscons.core.utils import DefaultDict
-from numscons.checkers.configuration import available_opts_flags
+from configuration import available_opts_flags
 
 _PERFLIBS = ('GenericBlas', 'GenericLapack', 'MKL', 'ATLAS', 'Accelerate',
              'vecLib', 'Sunperf', 'FFTW2', 'FFTW3')
@@ -18,33 +18,15 @@ class PerflibConfig:
     """A class which contain all the information for a given performance
     library, including build options (cflags, libs, path, etc....) and meta
     information (name, version, how to check)."""
-    def __init__(self, name, section, defopts, headers, funcs, 
-                 version_checker = None):
-        """Initialize the configuration.
-
-        Args:
-            - name : str
-                the name of the perflib
-            - section : str
-                the name of the section used in site.cfg for customization
-            - defopts : BuildOpts
-                the compilation configuration for the checker
-            - headers : list
-                the list of headers to test in the checker
-            - funcs : list
-                the list of functions to test in the checker.
-            - version_checker : callable
-                optional function to check version of the perflib. Its
-                arguments should be env and opts, where env is a scons
-                environment and opts a BuildOpts instance. It should return an
-                integer (1 if successfull) and a version string."""
-                
-        self.name = name
-        self.section = section
-        self.defopts = defopts
-        self.headers = headers
-        self.funcs = funcs
-        self.version_checker = version_checker
+    def __init__(self, values):
+        """Initialize the configuration."""
+        self.values = values
+        self.name = values['dispname']
+        self.section = values['sitename']
+        #self.defopts = defopts
+        self.headers = values['htc']
+        self.funcs = values['ftc']
+        #self.version_checker = version_checker
 
     def __str__(self):
         return self.__repr__()
@@ -60,9 +42,15 @@ class PerflibConfig:
 # Perflib specific configuration and helpers
 #-------------------------------------------
 def build_config():
-    opts = available_opts_flags()
+    # opts contain a list of all available options available in perflib.cfg
+    list_opts = list(available_opts_flags())
+    list_opts.append('htc')
+    list_opts.append('ftc')
+    str_opts = ['dispname', 'sitename']
+
     defint = {'atlas_def_libs' : 
               ','.join([pjoin(i, 'atlas') for i in default_lib_dirs])}
+
     cfg = SafeConfigParser()
 
     st = cfg.read(pjoin(pdirname(__file__), 'perflib.cfg'))
@@ -70,26 +58,16 @@ def build_config():
     assert len(st) > 0
 
     def get_perflib_config(name):
-        yop = {}
+        yop = DefaultDict(avkeys = str_opts + list_opts)
         for i in cfg.options(name):
             yop[i] =  cfg.get(name, i, vars = defint)
 
-        dispname = yop['dispname']
-        sitename = yop['sitename']
+        for k  in list_opts:
+            v = yop[k]
+            if v is not None:
+                v.split(',')
 
-        htc = None
-        if yop.has_key('htc'):
-            htc = yop['htc'].split(',')
-        ftc = None
-        if yop.has_key('ftc'):
-            ftc = yop['ftc'].split(',')
-
-        defopts = DefaultDict(avkeys = opts)
-        for k in yop.keys():
-            if defopts.has_key(k):
-                defopts[k] = yop[k].split(',')
-
-        return PerflibConfig(dispname, sitename, defopts, htc, ftc)
+        return PerflibConfig(yop)
 
     ret = {}
     for i in _PERFLIBS:
