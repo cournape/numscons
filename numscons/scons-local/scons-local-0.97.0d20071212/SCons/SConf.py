@@ -409,7 +409,8 @@ class SConfBase:
                  'CheckCHeader'       : CheckCHeader,
                  'CheckCXXHeader'     : CheckCXXHeader,
                  'CheckLib'           : CheckLib,
-                 'CheckLibWithHeader' : CheckLibWithHeader
+                 'CheckLibWithHeader' : CheckLibWithHeader,
+                 'Define'             : Define,
                }
         self.AddTests(default_tests)
         self.AddTests(custom_tests)
@@ -896,6 +897,13 @@ def CheckHeader(context, header, include_quotes = '<>', language = None):
                                      include_quotes = include_quotes)
     context.did_show_result = 1
     return not res
+
+def Define(context, name, value = None, comment = None):
+    """
+    A test for a C header file.
+    """
+    return SCons.Conftest.Define(context, name, value, comment)
+
 
 # Bram: Make this function obsolete?  CheckHeader() is more generic.
 
