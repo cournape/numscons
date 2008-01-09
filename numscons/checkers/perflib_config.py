@@ -2,6 +2,7 @@
 # Last Change: Wed Jan 09 11:00 PM 2008 J
 from os.path import join as pjoin, dirname as pdirname
 from ConfigParser import SafeConfigParser, RawConfigParser
+from copy import copy
 
 from numscons.numdist import default_lib_dirs
 
@@ -40,6 +41,12 @@ class PerflibConfig:
         repr += ["Headers to check : %s" % self.headers]
         repr += ["Funcs to check : %s" % self.funcs]
         return '\n'.join(repr)
+
+    def get_def_opts(self):
+        return self.defopts
+
+    def get_def_opts_copy(self):
+        return copy(self.defopts)
 
 #-------------------------------------------
 # Perflib specific configuration and helpers

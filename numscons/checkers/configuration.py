@@ -1,6 +1,7 @@
 #! /usr/bin/env python
-# Last Change: Thu Nov 22 12:00 PM 2007 J
+# Last Change: Wed Jan 09 11:00 PM 2008 J
 import os
+from copy import deepcopy
 
 from numscons.core.utils import DefaultDict
 
@@ -36,6 +37,12 @@ class BuildOpts(DefaultDict):
     def __repr__(self):
         msg = [r'%s : %s' % (k, i) for k, i in self.items()]
         return '\n'.join(msg)
+
+    def __copy__(self):
+        cpy = BuildOpts()
+        for k in self.keys():
+            cpy[k] = deepcopy(self[k])
+        return cpy 
 
 class ConfigRes:
     def __init__(self, name, cfgopts, origin, version = None):
