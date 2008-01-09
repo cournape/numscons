@@ -1,12 +1,12 @@
 #! /usr/bin/env python
-# Last Change: Wed Jan 09 12:00 AM 2008 J
+# Last Change: Wed Jan 09 11:00 PM 2008 J
 from os.path import join as pjoin, dirname as pdirname
 from ConfigParser import SafeConfigParser, RawConfigParser
 
 from numscons.numdist import default_lib_dirs
 
 from numscons.core.utils import DefaultDict
-from configuration import available_opts_flags
+from configuration import available_opts_flags, BuildOpts
 
 _PERFLIBS = ('GenericBlas', 'GenericLapack', 'MKL', 'ATLAS', 'Accelerate',
              'vecLib', 'Sunperf', 'FFTW2', 'FFTW3')
@@ -23,10 +23,13 @@ class PerflibConfig:
         self.values = values
         self.name = values['dispname']
         self.section = values['sitename']
-        #self.defopts = defopts
         self.headers = values['htc']
         self.funcs = values['ftc']
         #self.version_checker = version_checker
+
+        self.defopts = BuildOpts()
+        for opt in available_opts_flags():
+            self.defopts[opt] = values[opt]
 
     def __str__(self):
         return self.__repr__()
@@ -62,10 +65,10 @@ def build_config():
         for i in cfg.options(name):
             yop[i] =  cfg.get(name, i, vars = defint)
 
-        for k  in list_opts:
+        for k in list_opts:
             v = yop[k]
             if v is not None:
-                v.split(',')
+                yop[k] = v.split(',')
 
         return PerflibConfig(yop)
 
