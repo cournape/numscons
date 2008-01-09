@@ -21,6 +21,8 @@ def write_info(env):
     f.writelines("config = %s" % str(config_str))
     f.close()
 
+# List of options that BuildOpts can keep. If later additional variables should
+# be added (e.g. cpp flags, etc...), they should be added here.
 _BUILD_OPTS_FLAGS = ('cpppath', 'cflags', 'libpath', 'libs', 'linkflags',
                      'rpath', 'frameworks')
 
@@ -43,6 +45,27 @@ class BuildOpts(DefaultDict):
         for k in self.keys():
             cpy[k] = deepcopy(self[k])
         return cpy 
+
+class BuildOptsFactory:
+    """This class can return cutomized BuildOpts instances according to some options.
+    
+    For example, you would create a BuildOptsFactory with a MKL BuildOpts
+    instance, and the factory would return customized BuildOpts for blas,
+    lapack, etc..."""
+    def __init__(self, bld_opts):
+        pass
+
+    def get_blas_config(self):
+        pass
+
+    def get_cblas_config(self):
+        pass
+
+    def get_lapack_config(self):
+        pass
+
+    def get_clapack_config(self):
+        pass
 
 class ConfigRes:
     def __init__(self, name, cfgopts, origin, version = None):
