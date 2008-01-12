@@ -47,7 +47,8 @@ class BuildOpts(DefaultDict):
         return cpy 
 
 class BuildOptsFactory:
-    """This class can return cutomized BuildOpts instances according to some options.
+    """This class can return cutomized BuildOpts instances according to some
+    options.
     
     For example, you would create a BuildOptsFactory with a MKL BuildOpts
     instance, and the factory would return customized BuildOpts for blas,
