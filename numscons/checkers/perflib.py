@@ -1,12 +1,14 @@
 #! /usr/bin/env python
-# Last Change: Wed Jan 09 11:00 PM 2008 J
+# Last Change: Sat Jan 12 06:00 PM 2008 J
 
-# This module defines checkers for performances libs providing standard API,
-# such as MKL (Intel), ATLAS, Sunperf (solaris and linux), Accelerate (Mac OS
-# X), etc... Those checkers merely only check whether the library is found
-# using a library specific check if possible, or other heuristics.
-# Generally, you don't use those directly: they are used in 'meta' checkers,
-# such as BLAS, CBLAS, LAPACK checkers.
+"""This module defines checkers for performances libs providing standard API,
+such as MKL (Intel), ATLAS, Sunperf (solaris and linux), Accelerate (Mac OS X),
+etc... Those checkers merely only check whether the library is found using a
+library specific check if possible, or other heuristics.
+
+Generally, you don't use those directly: they are used in 'meta' checkers, such
+as BLAS, CBLAS, LAPACK checkers."""
+
 import re
 from copy import deepcopy
 from os.path import join as pjoin

@@ -1,5 +1,5 @@
 #! /usr/bin/env python
-# Last Change: Wed Jan 09 11:00 PM 2008 J
+# Last Change: Sat Jan 12 07:00 PM 2008 J
 """This module contains the infrastructure to get all the necessary options for
 perflib checkers."""
 
@@ -10,7 +10,9 @@ from copy import copy
 from numscons.numdist import default_lib_dirs
 
 from numscons.core.utils import DefaultDict
-from configuration import available_opts_flags, BuildOpts
+from configuration import available_build_opts_flags,\
+                          available_build_opts_factory_flags, \
+                          BuildOptsFactory, BuildOpts
 
 _PERFLIBS = ('GenericBlas', 'GenericLapack', 'MKL', 'ATLAS', 'Accelerate',
              'vecLib', 'Sunperf', 'FFTW2', 'FFTW3')
@@ -22,17 +24,18 @@ class PerflibConfig:
     """A class which contain all the information for a given performance
     library, including build options (cflags, libs, path, etc....) and meta
     information (name, version, how to check)."""
-    def __init__(self, values):
+    def __init__(self, dispname, sitename, values):
         """Initialize the configuration."""
+        self.name = dispname
+        self.section = sitename
+
         self.values = values
-        self.name = values['dispname']
-        self.section = values['sitename']
         self.headers = values['htc']
         self.funcs = values['ftc']
         #self.version_checker = version_checker
 
         self.defopts = BuildOpts()
-        for opt in available_opts_flags():
+        for opt in available_build_opts_flags():
             self.defopts[opt] = values[opt]
 
     def __str__(self):
@@ -55,14 +58,16 @@ class PerflibConfig:
 # Perflib specific configuration and helpers
 #-------------------------------------------
 def build_config():
-    # opts contain a list of all available options available in perflib.cfg
-    list_opts = list(available_opts_flags())
-    list_opts.append('htc')
-    list_opts.append('ftc')
-    str_opts = ['dispname', 'sitename']
+    # list_opts contain a list of all available options available in
+    # perflib.cfg which can be a list.
+    list_opts = available_build_opts_factory_flags() + ('htc', 'ftc')
 
-    defint = {'atlas_def_libs' : 
-              ','.join([pjoin(i, 'atlas') for i in default_lib_dirs])}
+    # str_opts contain a list of all available options available in perflib.cfg
+    # which are strings and cannot be list.
+    str_opts = ('dispname', 'sitename')
+
+    #defint = {'atlas_def_libs' : 
+    #          ','.join([pjoin(i, 'atlas') for i in default_lib_dirs])}
 
     cfg = SafeConfigParser()
 
@@ -71,16 +76,28 @@ def build_config():
     assert len(st) > 0
 
     def get_perflib_config(name):
-        yop = DefaultDict(avkeys = str_opts + list_opts)
-        for i in cfg.options(name):
-            yop[i] =  cfg.get(name, i, vars = defint)
+        yop = DefaultDict(avkeys = list_opts)
+        opts = cfg.options(name)
+
+        # Get mandatory options first
+        def get_opt(opt):
+            opts.pop(opts.index(opt))
+            o = cfg.get(name, opt)
+            return o
+        dispname = get_opt('dispname')
+        sitename = get_opt('sitename')
+
+        # Now get all optional options 
+        for i in opts:
+            #yop[i] =  cfg.get(name, i, vars = defint)
+            yop[i] =  cfg.get(name, i)
 
         for k in list_opts:
             v = yop[k]
             if v is not None:
                 yop[k] = v.split(',')
 
-        return PerflibConfig(yop)
+        return PerflibConfig(dispname, sitename, yop)
 
     ret = {}
     for i in _PERFLIBS:
@@ -88,6 +105,8 @@ def build_config():
 
     return ret
         
+# A dictionary which keys are the name of the perflib (same than perflib.cfg
+# section name) and values a PerflibConfig instance.
 CONFIG = build_config()
 
 class IsFactory:

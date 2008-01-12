@@ -1,5 +1,5 @@
 #! /usr/bin/env python
-# Last Change: Wed Jan 09 11:00 PM 2008 J
+# Last Change: Sat Jan 12 06:00 PM 2008 J
 import os
 from copy import deepcopy
 
@@ -26,8 +26,16 @@ def write_info(env):
 _BUILD_OPTS_FLAGS = ('cpppath', 'cflags', 'libpath', 'libs', 'linkflags',
                      'rpath', 'frameworks')
 
-def available_opts_flags():
+# List of options that BuildOptsFactory can keep. If later additional variables
+# should be added, they should be added here.
+_BUILD_OPTS_FACTORY_FLAGS = _BUILD_OPTS_FLAGS + ('cblas_libs', 'blas_libs',
+                            'clapack_libs', 'lapack_libs')
+
+def available_build_opts_flags():
     return _BUILD_OPTS_FLAGS
+
+def available_build_opts_factory_flags():
+    return _BUILD_OPTS_FACTORY_FLAGS
 
 class BuildOpts(DefaultDict):
     """Small container class to keep all necessary options to build with a
@@ -52,7 +60,7 @@ class BuildOptsFactory:
     
     For example, you would create a BuildOptsFactory with a MKL BuildOpts
     instance, and the factory would return customized BuildOpts for blas,
-    lapack, etc..."""
+    lapack, 64 vs 32 bits, etc..."""
     def __init__(self, bld_opts):
         pass
 
