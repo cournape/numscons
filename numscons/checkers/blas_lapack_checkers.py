@@ -3,7 +3,6 @@
 
 # Module for custom, common checkers for numpy (and scipy)
 import sys
-import os.path
 from copy import deepcopy
 from distutils.util import get_platform
 
@@ -19,19 +18,20 @@ from configuration import add_info, BuildOpts, ConfigRes
 from perflib import CONFIG, checker
 from support import check_include_and_run
 
-def _check_perflib(perflibs, libname, context, autoadd, check_version):
+def _check(perflibs, context, libname, check_version, msg_template, test_src,
+           autoadd):
     """perflibs should be a list of perflib to check."""
-    def _check(func, name):
+    def _check_perflib(func, name):
         st, res = func(context, autoadd, check_version)
         if st:
-            cfgopts = res.cfgopts.cblas_config()
-            st = check_include_and_run(context, 'CBLAS (%s)' % name, 
-                                       cfgopts, [], cblas_src, autoadd)
+            cfgopts = res.cfgopts[libname]()
+            st = check_include_and_run(context, msg_template % name, 
+                                       cfgopts, [], test_src, autoadd)
             if st:
-                add_info(env, libname, res)
+                add_info(context.env, libname, res)
             return st
     for p in perflibs:
-        st = _check(checker(p), CONFIG[p].name)
+        st = _check_perflib(checker(p), CONFIG[p].name)
         if st:
             return st
 
@@ -41,20 +41,8 @@ def CheckCBLAS(context, autoadd = 1, check_version = 0):
     env = context.env
 
     def check(perflibs):
-        """perflibs should be a list of perflib to check."""
-        def _check(func, name):
-            st, res = func(context, autoadd, check_version)
-            if st:
-                cfgopts = res.cfgopts.cblas_config()
-                st = check_include_and_run(context, 'CBLAS (%s)' % name, 
-                                           cfgopts, [], cblas_src, autoadd)
-                if st:
-                    add_info(env, libname, res)
-                return st
-        for p in perflibs:
-            st = _check(checker(p), CONFIG[p].name)
-            if st:
-                return st
+        return _check(perflibs, context, libname, check_version, 'CBLAS (%s)',
+                      cblas_src, autoadd) 
 
     # If section cblas is in site.cfg, use those options. Otherwise, use default
     section = "cblas"
@@ -102,19 +90,8 @@ def CheckF77BLAS(context, autoadd = 1, check_version = 0):
     test_src = c_sgemm2 % {'func' : func_name}
 
     def check(perflibs):
-        def _check(func, name):
-            st, res = func(context, autoadd, check_version)
-            if st:
-                cfgopts = res.cfgopts.blas_config()
-                st = check_include_and_run(context, 'BLAS (%s)' % name, cfgopts,
-                        [], test_src, autoadd)
-                if st:
-                    add_info(env, libname, res)
-                return st
-        for p in perflibs:
-            st = _check(checker(p), CONFIG[p].name)
-            if st:
-                return st
+        return _check(perflibs, context, libname, check_version, 'BLAS (%s)',
+                      test_src, autoadd) 
 
     # If section blas is in site.cfg, use those options. Otherwise, use default
     section = "blas"
@@ -183,21 +160,8 @@ def CheckF77LAPACK(context, autoadd = 1, check_version = 0):
     test_src = lapack_sgesv % sgesv_string
 
     def check(perflibs):
-        def _check(func, name):
-            # func is the perflib checker, name the printed name for the check,
-            # and suplibs a list of libraries to link in addition.
-            st, res = func(context, autoadd, check_version)
-            if st:
-                cfgopts = res.cfgopts.lapack_config()
-                st = check_include_and_run(context, 'LAPACK (%s)' % name, cfgopts,
-                                           [], test_src, autoadd)
-                if st:
-                    add_info(env, libname, res)
-                return st
-        for p in perflibs:
-            st = _check(checker(p), CONFIG[p].name)
-            if st:
-                return st
+        return _check(perflibs, context, libname, check_version, 'LAPACK (%s)',
+                      test_src, autoadd) 
 
     # If section lapack is in site.cfg, use those options. Otherwise, use default
     section = "lapack"
@@ -260,19 +224,8 @@ def CheckCLAPACK(context, autoadd = 1, check_version = 0):
     env = context.env
 
     def check(perflibs):
-        def _check(func, name):
-            st, res = func(context, autoadd, check_version)
-            if st:
-                cfgopts = res.cfgopts.clapack_config()
-                st = check_include_and_run(context, 'CLAPACK (%s)' % name, 
-                                           res.cfgopts, [], clapack_src, autoadd)
-                if st:
-                    add_info(env, libname, res)
-                return st
-        for p in perflibs:
-            st = _check(checker(p), CONFIG[p].name)
-            if st:
-                return st
+        return _check(perflibs, context, libname, check_version, 'CLAPACK (%s)',
+                      clapack_src, autoadd) 
 
     # If section lapack is in site.cfg, use those options. Otherwise, use default
     section = "clapack"
