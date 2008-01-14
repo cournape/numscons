@@ -1,7 +1,7 @@
 #! /usr/bin/env python
 # Last Change: Sat Jan 12 07:00 PM 2008 J
 """This module contains the infrastructure to get all the necessary options for
-perflib checkers."""
+perflib checkers from the perflib configuration file."""
 
 from os.path import join as pjoin, dirname as pdirname
 from ConfigParser import SafeConfigParser, RawConfigParser
