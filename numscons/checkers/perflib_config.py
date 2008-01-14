@@ -60,7 +60,7 @@ class PerflibConfig:
 def build_config():
     # list_opts contain a list of all available options available in
     # perflib.cfg which can be a list.
-    list_opts = available_build_opts_factory_flags() + ('htc', 'ftc')
+    list_opts = available_build_opts_factory_flags()
 
     # str_opts contain a list of all available options available in perflib.cfg
     # which are strings and cannot be list.
@@ -76,7 +76,7 @@ def build_config():
     assert len(st) > 0
 
     def get_perflib_config(name):
-        yop = DefaultDict(avkeys = list_opts)
+        yop = DefaultDict.fromcallable(list_opts, lambda: [])
         opts = cfg.options(name)
 
         # Get mandatory options first
@@ -90,12 +90,7 @@ def build_config():
         # Now get all optional options 
         for i in opts:
             #yop[i] =  cfg.get(name, i, vars = defint)
-            yop[i] =  cfg.get(name, i)
-
-        for k in list_opts:
-            v = yop[k]
-            if v is not None:
-                yop[k] = v.split(',')
+            yop[i] =  cfg.get(name, i).split(',')
 
         return PerflibConfig(dispname, sitename, yop)
 
