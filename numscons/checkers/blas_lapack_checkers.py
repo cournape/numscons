@@ -16,15 +16,12 @@ from numscons.core.utils import rsplit
 from numscons.core.extension_scons import built_with_mstools, built_with_mingw
 
 from configuration import add_info, BuildOpts, ConfigRes
-from perflib import CheckMKL, CheckATLAS, CheckSunperf, CheckAccelerate, CONFIG
+from perflib import CONFIG, checker
 from support import check_include_and_run
 
-def CheckCBLAS(context, autoadd = 1, check_version = 0):
-    """This checker tries to find optimized library for cblas."""
-    libname = 'cblas'
-    env = context.env
-
-    def check(func, name):
+def _check_perflib(perflibs, libname, context, autoadd, check_version):
+    """perflibs should be a list of perflib to check."""
+    def _check(func, name):
         st, res = func(context, autoadd, check_version)
         if st:
             cfgopts = res.cfgopts.cblas_config()
@@ -33,6 +30,31 @@ def CheckCBLAS(context, autoadd = 1, check_version = 0):
             if st:
                 add_info(env, libname, res)
             return st
+    for p in perflibs:
+        st = _check(checker(p), CONFIG[p].name)
+        if st:
+            return st
+
+def CheckCBLAS(context, autoadd = 1, check_version = 0):
+    """This checker tries to find optimized library for cblas."""
+    libname = 'cblas'
+    env = context.env
+
+    def check(perflibs):
+        """perflibs should be a list of perflib to check."""
+        def _check(func, name):
+            st, res = func(context, autoadd, check_version)
+            if st:
+                cfgopts = res.cfgopts.cblas_config()
+                st = check_include_and_run(context, 'CBLAS (%s)' % name, 
+                                           cfgopts, [], cblas_src, autoadd)
+                if st:
+                    add_info(env, libname, res)
+                return st
+        for p in perflibs:
+            st = _check(checker(p), CONFIG[p].name)
+            if st:
+                return st
 
     # If section cblas is in site.cfg, use those options. Otherwise, use default
     section = "cblas"
@@ -49,25 +71,11 @@ def CheckCBLAS(context, autoadd = 1, check_version = 0):
             return st
     else:
         if sys.platform == 'darwin':
-            st = check(CheckAccelerate, 'Accelerate Framework')
-            if st:
-                return st
-            st = check(CheckVeclib, 'vecLib Framework')
+            st = check(('Accelerate', 'vecLib'))
             if st:
                 return st
         else:
-            # Check MKL
-            st = check(CheckMKL, 'MKL')
-            if st:
-                return st
-
-            # Check ATLAS
-            st = check(CheckATLAS, 'ATLAS')
-            if st:
-                return st
-
-            # Check Sunperf
-            st = check(CheckSunperf, 'Sunperf')
+            st = check(('MKL', 'ATLAS', 'Sunperf'))
             if st:
                 return st
 
@@ -93,15 +101,20 @@ def CheckF77BLAS(context, autoadd = 1, check_version = 0):
     func_name = env['F77_NAME_MANGLER']('sgemm')
     test_src = c_sgemm2 % {'func' : func_name}
 
-    def check(func, name):
-        st, res = func(context, autoadd, check_version)
-        if st:
-            cfgopts = res.cfgopts.blas_config()
-            st = check_include_and_run(context, 'BLAS (%s)' % name, cfgopts,
-                    [], test_src, autoadd)
+    def check(perflibs):
+        def _check(func, name):
+            st, res = func(context, autoadd, check_version)
             if st:
-                add_info(env, libname, res)
-            return st
+                cfgopts = res.cfgopts.blas_config()
+                st = check_include_and_run(context, 'BLAS (%s)' % name, cfgopts,
+                        [], test_src, autoadd)
+                if st:
+                    add_info(env, libname, res)
+                return st
+        for p in perflibs:
+            st = _check(checker(p), CONFIG[p].name)
+            if st:
+                return st
 
     # If section blas is in site.cfg, use those options. Otherwise, use default
     section = "blas"
@@ -117,27 +130,11 @@ def CheckF77BLAS(context, autoadd = 1, check_version = 0):
             return st
     else:
         if sys.platform == 'darwin':
-            # Check Accelerate
-            st = check(CheckAccelerate, 'Accelerate Framework')
-            if st:
-                return st
-
-            st = check(CheckVeclib, 'vecLib Framework')
+            st = check(('Accelerate', 'vecLib'))
             if st:
                 return st
         else:
-            # Check MKL
-            st = check(CheckMKL, 'MKL')
-            if st:
-                return st
-
-            # Check ATLAS
-            st = check(CheckATLAS, 'ATLAS')
-            if st:
-                return st
-
-            # Check Sunperf
-            st = check(CheckSunperf, 'Sunperf')
+            st = check(('MKL', 'ATLAS', 'Sunperf'))
             if st:
                 return st
 
@@ -185,17 +182,22 @@ def CheckF77LAPACK(context, autoadd = 1, check_version = 0):
     sgesv_string = env['F77_NAME_MANGLER']('sgesv')
     test_src = lapack_sgesv % sgesv_string
 
-    def check(func, name):
-        # func is the perflib checker, name the printed name for the check, and
-        # suplibs a list of libraries to link in addition.
-        st, res = func(context, autoadd, check_version)
-        if st:
-            cfgopts = res.cfgopts.lapack_config()
-            st = check_include_and_run(context, 'LAPACK (%s)' % name, cfgopts,
-                                       [], test_src, autoadd)
+    def check(perflibs):
+        def _check(func, name):
+            # func is the perflib checker, name the printed name for the check,
+            # and suplibs a list of libraries to link in addition.
+            st, res = func(context, autoadd, check_version)
             if st:
-                add_info(env, libname, res)
-            return st
+                cfgopts = res.cfgopts.lapack_config()
+                st = check_include_and_run(context, 'LAPACK (%s)' % name, cfgopts,
+                                           [], test_src, autoadd)
+                if st:
+                    add_info(env, libname, res)
+                return st
+        for p in perflibs:
+            st = _check(checker(p), CONFIG[p].name)
+            if st:
+                return st
 
     # If section lapack is in site.cfg, use those options. Otherwise, use default
     section = "lapack"
@@ -219,27 +221,11 @@ def CheckF77LAPACK(context, autoadd = 1, check_version = 0):
             return st
     else:
         if sys.platform == 'darwin':
-            st = check(CheckAccelerate, 'Accelerate Framework')
-            if st:
-                return st
-
-            st = check(CheckVeclib, 'vecLib Framework')
+            st = check(('Accelerate', 'vecLib'))
             if st:
                 return st
         else:
-            # Check MKL
-            # XXX: handle different versions of mkl (with different names)
-            st = check(CheckMKL, 'MKL')
-            if st:
-                return st
-
-            # Check ATLAS
-            st = check(CheckATLAS, 'ATLAS')
-            if st:
-                return st
-
-            # Check Sunperf
-            st = check(CheckSunperf, 'Sunperf')
+            st = check(('MKL', 'ATLAS', 'Sunperf'))
             if st:
                 return st
 
@@ -273,15 +259,20 @@ def CheckCLAPACK(context, autoadd = 1, check_version = 0):
     libname = 'clapack'
     env = context.env
 
-    def check(func, name):
-        st, res = func(context, autoadd, check_version)
-        if st:
-            cfgopts = res.cfgopts.clapack_config()
-            st = check_include_and_run(context, 'CLAPACK (%s)' % name, 
-                                       res.cfgopts, [], clapack_src, autoadd)
+    def check(perflibs):
+        def _check(func, name):
+            st, res = func(context, autoadd, check_version)
             if st:
-                add_info(env, libname, res)
-            return st
+                cfgopts = res.cfgopts.clapack_config()
+                st = check_include_and_run(context, 'CLAPACK (%s)' % name, 
+                                           res.cfgopts, [], clapack_src, autoadd)
+                if st:
+                    add_info(env, libname, res)
+                return st
+        for p in perflibs:
+            st = _check(checker(p), CONFIG[p].name)
+            if st:
+                return st
 
     # If section lapack is in site.cfg, use those options. Otherwise, use default
     section = "clapack"
@@ -295,7 +286,7 @@ def CheckCLAPACK(context, autoadd = 1, check_version = 0):
             pass
         else:
             # Check ATLAS
-            st = check(CheckATLAS, 'ATLAS')
+            st = check(('ATLAS'),)
             if st:
                 return st
 

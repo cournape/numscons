@@ -283,3 +283,15 @@ def CheckFFTW2(context, autoadd = 1, check_version = 0):
                   cfg.funcs, check_version, _mkl_version_checker, autoadd)
 
 IsFFTW2 = IsFactory('FFTW2').get_func()
+
+_PERFLIBS_CHECKERS = {
+    'MKL': CheckMKL,
+    'ATLAS': CheckATLAS,
+    'Accelerate': CheckAccelerate,
+    'vecLib': CheckVeclib,
+    'Sunperf': CheckSunperf,
+    'FFTW2': CheckFFTW2,
+    'FFTW3': CheckFFTW3}
+
+def checker(name):
+    return _PERFLIBS_CHECKERS[name]
