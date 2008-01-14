@@ -72,7 +72,7 @@ class BuildOptsFactory:
         for k in self._bld:
             self._bld[k] = self._data[k]
 
-    def get_core_config(self):
+    def core_config(self):
         return self._bld
 
     def _get_libs(self, supp):
@@ -84,16 +84,16 @@ class BuildOptsFactory:
         res['libs'] += tmp
         return res
 
-    def get_blas_config(self):
+    def blas_config(self):
         return self._get_libs(['blas_libs'])
 
-    def get_cblas_config(self):
+    def cblas_config(self):
         return self._get_libs(['cblas_libs'])
 
-    def get_lapack_config(self):
+    def lapack_config(self):
         return self._get_libs(['lapack_libs', 'blas_libs'])
 
-    def get_clapack_config(self):
+    def clapack_config(self):
         return self._get_libs(['clapack_libs', 'cblas_libs'])
 
     def __repr__(self):
@@ -132,8 +132,8 @@ if __name__ == '__main__':
             a[k] = mkl.values[k]
 
         b = BuildOptsFactory(a)
-        print b.get_core_config()
-        print b.get_blas_config()
-        print b.get_cblas_config()
-        print b.get_lapack_config()
-        print b.get_clapack_config()
+        print b.core_config()
+        print b.blas_config()
+        print b.cblas_config()
+        print b.lapack_config()
+        print b.clapack_config()
