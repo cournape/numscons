@@ -5,7 +5,7 @@
 import os
 import unittest
 
-from utils import pkg_to_path, _rsplit, DefaultDict
+from numscons.core.utils import pkg_to_path, _rsplit, DefaultDict
 
 class PkgToPathTester(unittest.TestCase):
     def setUp(self):
@@ -61,5 +61,16 @@ class DefaultDictTester(unittest.TestCase):
         b = DefaultDict(('1', '2'), [])
         assert b['1'] is b['2']
 
+    def test_copy(self):
+        from copy import copy
+        a = DefaultDict(('a', 'b'))
+        a['a'] = ['a']
+        a['b'] = ['b']
+        b = copy(a)
+        b['b'] += 'c'
+
+        assert not b['b'] == a['b']
+        assert b['a'] == a['a']
+        assert b['a'] is not a['a']
 if __name__ == "__main__":
     unittest.main()

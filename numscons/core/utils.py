@@ -7,7 +7,7 @@ library."""
 import os
 import re
 
-from copy import deepcopy
+from copy import deepcopy, copy
 
 _START_WITH_MINUS = re.compile('^\s*-')
 
@@ -75,6 +75,12 @@ class DefaultDict(dict):
         if not self.has_key(key):
             raise NonDefaultKeyError(key)
         dict.__setitem__(self, key, val)
+
+    def __copy__(self):
+        cpy = DefaultDict(self.keys())
+        for k in self.keys():
+            cpy[k] = copy(self[k])
+        return cpy
         
 def rsplit(s, sep, maxsplit = -1):
     """Equivalent of rsplit, but works on 2.3."""
