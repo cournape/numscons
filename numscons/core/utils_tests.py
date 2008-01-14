@@ -54,5 +54,12 @@ class DefaultDictTester(unittest.TestCase):
         except KeyError:
             pass
 
+    def test_fromcallable(self):
+        a = DefaultDict.fromcallable(('1', '2'), lambda: [])
+        assert not a['1'] is a['2']
+
+        b = DefaultDict(('1', '2'), [])
+        assert b['1'] is b['2']
+
 if __name__ == "__main__":
     unittest.main()

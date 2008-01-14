@@ -60,6 +60,14 @@ class NonDefaultKeyError(KeyError):
 class DefaultDict(dict):
     """Structure similar to a dictionary, with a restricted set of possible
     keys."""
+    @classmethod
+    def fromcallable(cls, avkeys, default = None):
+        res = cls(avkeys, default)
+        if default is not None:
+            for k in res:
+                res[k] = default()
+        return res
+
     def __init__(self, avkeys, default = None):
         dict.__init__(self, [(i, default) for i in avkeys])
 
