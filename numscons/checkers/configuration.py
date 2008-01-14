@@ -116,7 +116,7 @@ class ConfigRes:
         else:
             msg += ['  Using default configuration:']
 
-        msg += ['  %s : %s' % (k, i) for k, i in self.cfgopts.items() if len(i) > 0]
+        msg += [self.cfgopts.__repr__()]
         msg += ['  Version is : %s' % self.version]
         return '\n'.join(msg)
 

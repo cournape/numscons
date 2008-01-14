@@ -114,8 +114,8 @@ def check_code(context, name, section, opts_factory, headers_to_check,
     # Check version if requested
     if check_version:
         version = _check_version(context, opts, version_checker)
-        cfgres = ConfigRes(name, opts, found, version)
+        cfgres = ConfigRes(name, opts_factory, found, version)
     else:
-        cfgres = ConfigRes(name, opts, found, version = 'Not checked')
+        cfgres = ConfigRes(name, opts_factory, found, version = 'Not checked')
 
     return st, cfgres

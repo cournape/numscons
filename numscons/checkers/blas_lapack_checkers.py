@@ -24,13 +24,12 @@ def CheckCBLAS(context, autoadd = 1, check_version = 0):
     libname = 'cblas'
     env = context.env
 
-    def check(func, name, suplibs):
+    def check(func, name):
         st, res = func(context, autoadd, check_version)
         if st:
-            for lib in suplibs:
-                res.cfgopts['libs'].insert(0, lib)
+            cfgopts = res.cfgopts.cblas_config()
             st = check_include_and_run(context, 'CBLAS (%s)' % name, 
-                                       res.cfgopts, [], cblas_src, autoadd)
+                                       cfgopts, [], cblas_src, autoadd)
             if st:
                 add_info(env, libname, res)
             return st
@@ -50,25 +49,25 @@ def CheckCBLAS(context, autoadd = 1, check_version = 0):
             return st
     else:
         if sys.platform == 'darwin':
-            st = check(CheckAccelerate, 'Accelerate Framework', [])
+            st = check(CheckAccelerate, 'Accelerate Framework')
             if st:
                 return st
-            st = check(CheckVeclib, 'vecLib Framework', [])
+            st = check(CheckVeclib, 'vecLib Framework')
             if st:
                 return st
         else:
             # Check MKL
-            st = check(CheckMKL, 'MKL', [])
+            st = check(CheckMKL, 'MKL')
             if st:
                 return st
 
             # Check ATLAS
-            st = check(CheckATLAS, 'ATLAS', ['blas'])
+            st = check(CheckATLAS, 'ATLAS')
             if st:
                 return st
 
             # Check Sunperf
-            st = check(CheckSunperf, 'Sunperf', [])
+            st = check(CheckSunperf, 'Sunperf')
             if st:
                 return st
 
@@ -94,12 +93,11 @@ def CheckF77BLAS(context, autoadd = 1, check_version = 0):
     func_name = env['F77_NAME_MANGLER']('sgemm')
     test_src = c_sgemm2 % {'func' : func_name}
 
-    def check(func, name, suplibs):
+    def check(func, name):
         st, res = func(context, autoadd, check_version)
         if st:
-            for lib in suplibs:
-                res.cfgopts['libs'].insert(0, lib)
-            st = check_include_and_run(context, 'BLAS (%s)' % name, res.cfgopts,
+            cfgopts = res.cfgopts.blas_config()
+            st = check_include_and_run(context, 'BLAS (%s)' % name, cfgopts,
                     [], test_src, autoadd)
             if st:
                 add_info(env, libname, res)
@@ -120,26 +118,26 @@ def CheckF77BLAS(context, autoadd = 1, check_version = 0):
     else:
         if sys.platform == 'darwin':
             # Check Accelerate
-            st = check(CheckAccelerate, 'Accelerate Framework', [])
+            st = check(CheckAccelerate, 'Accelerate Framework')
             if st:
                 return st
 
-            st = check(CheckVeclib, 'vecLib Framework', [])
+            st = check(CheckVeclib, 'vecLib Framework')
             if st:
                 return st
         else:
             # Check MKL
-            st = check(CheckMKL, 'MKL', [])
+            st = check(CheckMKL, 'MKL')
             if st:
                 return st
 
             # Check ATLAS
-            st = check(CheckATLAS, 'ATLAS', ['f77blas'])
+            st = check(CheckATLAS, 'ATLAS')
             if st:
                 return st
 
             # Check Sunperf
-            st = check(CheckSunperf, 'Sunperf', [])
+            st = check(CheckSunperf, 'Sunperf')
             if st:
                 return st
 
@@ -187,14 +185,13 @@ def CheckF77LAPACK(context, autoadd = 1, check_version = 0):
     sgesv_string = env['F77_NAME_MANGLER']('sgesv')
     test_src = lapack_sgesv % sgesv_string
 
-    def check(func, name, suplibs):
+    def check(func, name):
         # func is the perflib checker, name the printed name for the check, and
         # suplibs a list of libraries to link in addition.
         st, res = func(context, autoadd, check_version)
         if st:
-            for lib in suplibs:
-                res.cfgopts['libs'].insert(0, lib)
-            st = check_include_and_run(context, 'LAPACK (%s)' % name, res.cfgopts,
+            cfgopts = res.cfgopts.lapack_config()
+            st = check_include_and_run(context, 'LAPACK (%s)' % name, cfgopts,
                                        [], test_src, autoadd)
             if st:
                 add_info(env, libname, res)
@@ -222,27 +219,27 @@ def CheckF77LAPACK(context, autoadd = 1, check_version = 0):
             return st
     else:
         if sys.platform == 'darwin':
-            st = check(CheckAccelerate, 'Accelerate Framework', [])
+            st = check(CheckAccelerate, 'Accelerate Framework')
             if st:
                 return st
 
-            st = check(CheckVeclib, 'vecLib Framework', [])
+            st = check(CheckVeclib, 'vecLib Framework')
             if st:
                 return st
         else:
             # Check MKL
             # XXX: handle different versions of mkl (with different names)
-            st = check(CheckMKL, 'MKL', ['lapack'])
+            st = check(CheckMKL, 'MKL')
             if st:
                 return st
 
             # Check ATLAS
-            st = check(CheckATLAS, 'ATLAS', ['lapack'])
+            st = check(CheckATLAS, 'ATLAS')
             if st:
                 return st
 
             # Check Sunperf
-            st = check(CheckSunperf, 'Sunperf', [])
+            st = check(CheckSunperf, 'Sunperf')
             if st:
                 return st
 
@@ -276,11 +273,10 @@ def CheckCLAPACK(context, autoadd = 1, check_version = 0):
     libname = 'clapack'
     env = context.env
 
-    def check(func, name, suplibs):
+    def check(func, name):
         st, res = func(context, autoadd, check_version)
         if st:
-            for lib in suplibs:
-                res.cfgopts['libs'].insert(0, lib)
+            cfgopts = res.cfgopts.clapack_config()
             st = check_include_and_run(context, 'CLAPACK (%s)' % name, 
                                        res.cfgopts, [], clapack_src, autoadd)
             if st:
@@ -299,7 +295,7 @@ def CheckCLAPACK(context, autoadd = 1, check_version = 0):
             pass
         else:
             # Check ATLAS
-            st = check(CheckATLAS, 'ATLAS', ['lapack_atlas'])
+            st = check(CheckATLAS, 'ATLAS')
             if st:
                 return st
 
