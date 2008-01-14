@@ -4,15 +4,13 @@
 # Module for custom, common checkers for numpy (and scipy)
 import sys
 from copy import deepcopy
-from distutils.util import get_platform
 
 from numscons.core.libinfo import get_config_from_section, get_config
-from numscons.testcode_snippets import cblas_sgemm as cblas_src, \
-        c_sgemm as sunperf_src, lapack_sgesv, blas_sgemm, c_sgemm2, \
+from numscons.testcode_snippets import \
+        cblas_sgemm as cblas_src, \
+        lapack_sgesv, c_sgemm2, \
         clapack_sgesv as clapack_src
 from numscons.fortran_scons import CheckF77Mangling, CheckF77Clib
-from numscons.core.utils import rsplit
-from numscons.core.extension_scons import built_with_mstools, built_with_mingw
 
 from configuration import add_info, BuildOpts, ConfigRes
 from perflib import CONFIG, checker
@@ -20,7 +18,9 @@ from support import check_include_and_run
 
 def _check(perflibs, context, libname, check_version, msg_template, test_src,
            autoadd):
-    """perflibs should be a list of perflib to check."""
+    """Generic perflib checker to be used in meta checkers.
+
+    perflibs should be a list of perflib to check."""
     def _check_perflib(func, name):
         st, res = func(context, autoadd, check_version)
         if st:
