@@ -72,6 +72,15 @@ class BuildOptsFactory:
         for k in self._bld:
             self._bld[k] = self._data[k]
 
+        self._cfgs = {
+            'blas':     self.blas_config,
+            'lapack':   self.lapack_config,
+            'cblas':    self.cblas_config,
+            'clapack':  self.clapack_config}
+
+    def __getitem__(self, k):
+        return self._cfgs[k]
+
     def core_config(self):
         return self._bld
 
@@ -128,12 +137,14 @@ if __name__ == '__main__':
     a = DefaultDict(avkeys = _BUILD_OPTS_FACTORY_FLAGS)
     for p in _PERFLIBS:
         mkl = CONFIG[p]
-        for k in mkl.values:
-            a[k] = mkl.values[k]
+        for k in mkl._values:
+            a[k] = mkl._values[k]
 
         b = BuildOptsFactory(a)
         print b.core_config()
         print b.blas_config()
+        print "========="
+        print b['blas']()
         print b.cblas_config()
         print b.lapack_config()
         print b.clapack_config()
