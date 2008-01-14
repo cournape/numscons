@@ -68,7 +68,7 @@ return 0;
 def CheckMKL(context, autoadd = 1, check_version = 0):
     cfg = CONFIG['MKL']
 
-    return _check(context, cfg.name, cfg.section, cfg.get_def_opts_copy(), cfg.headers,
+    return _check(context, cfg.name, cfg.section, cfg.opts_factory, cfg.headers,
                   cfg.funcs, check_version, _mkl_version_checker, autoadd)
 
 IsMKL = IsFactory('MKL').get_func()
@@ -108,7 +108,7 @@ def CheckATLAS(context, autoadd = 1, check_version = 0):
     """Check whether ATLAS is usable in C."""
     cfg = CONFIG['ATLAS']
 
-    return _check(context, cfg.name, cfg.section, cfg.get_def_opts_copy(), cfg.headers,
+    return _check(context, cfg.name, cfg.section, cfg.opts_factory, cfg.headers,
                   cfg.funcs, check_version, _atlas_version_checker, autoadd)
 
 IsATLAS = IsFactory('ATLAS').get_func()
@@ -138,7 +138,7 @@ def CheckAccelerate(context, autoadd = 1, check_version = 0):
 
     cfg = CONFIG['Accelerate']
 
-    return _check(context, cfg.name, cfg.section, cfg.get_def_opts_copy(), cfg.headers,
+    return _check(context, cfg.name, cfg.section, cfg.opts_factory, cfg.headers,
                   cfg.funcs, check_version, None, autoadd)
 
 IsAccelerate = IsFactory('Accelerate').get_func()
@@ -147,7 +147,7 @@ def CheckVeclib(context, autoadd = 1, check_version = 0):
     """Checker for Veclib framework (on Mac OS X < 10.3)."""
     cfg = CONFIG['vecLib']
 
-    return _check(context, cfg.name, cfg.section, cfg.get_def_opts_copy(), cfg.headers,
+    return _check(context, cfg.name, cfg.section, cfg.opts_factory, cfg.headers,
                   cfg.funcs, check_version, None, autoadd)
 
 IsVeclib = IsFactory('vecLib').get_func()
@@ -159,7 +159,7 @@ def CheckSunperf(context, autoadd = 1, check_version = 0):
     """Checker for sunperf."""
     cfg = CONFIG['Sunperf']
     
-    st, res = _check(context, cfg.name, cfg.section, cfg.get_def_opts_copy(), cfg.headers,
+    st, res = _check(context, cfg.name, cfg.section, cfg.opts_factory, cfg.headers,
                      cfg.funcs, check_version, None, autoadd)
     if not st:
         return st, res
@@ -270,7 +270,7 @@ def CheckFFTW3(context, autoadd = 1, check_version = 0):
     """This checker tries to find fftw3."""
     cfg = CONFIG['FFTW3']
     
-    return _check(context, cfg.name, cfg.section, cfg.get_def_opts_copy(), cfg.headers,
+    return _check(context, cfg.name, cfg.section, cfg.opts_factory, cfg.headers,
                   cfg.funcs, check_version, _mkl_version_checker, autoadd)
 
 IsFFTW3 = IsFactory('FFTW3').get_func()
@@ -279,7 +279,7 @@ def CheckFFTW2(context, autoadd = 1, check_version = 0):
     """This checker tries to find fftw2."""
     cfg = CONFIG['FFTW2']
     
-    return _check(context, cfg.name, cfg.section, cfg.get_def_opts_copy(), cfg.headers,
+    return _check(context, cfg.name, cfg.section, cfg.opts_factory, cfg.headers,
                   cfg.funcs, check_version, _mkl_version_checker, autoadd)
 
 IsFFTW2 = IsFactory('FFTW2').get_func()

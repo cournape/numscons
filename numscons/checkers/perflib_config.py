@@ -29,14 +29,12 @@ class PerflibConfig:
         self.name = dispname
         self.section = sitename
 
-        self.values = values
+        self._values = values
         self.headers = values['htc']
         self.funcs = values['ftc']
         #self.version_checker = version_checker
 
-        self.defopts = BuildOpts()
-        for opt in available_build_opts_flags():
-            self.defopts[opt] = values[opt]
+        self.opts_factory = BuildOptsFactory(values)
 
     def __str__(self):
         return self.__repr__()
@@ -50,9 +48,6 @@ class PerflibConfig:
 
     def get_def_opts(self):
         return self.defopts
-
-    def get_def_opts_copy(self):
-        return copy(self.defopts)
 
 #-------------------------------------------
 # Perflib specific configuration and helpers

@@ -19,7 +19,10 @@ def _get_site_cfg_customization(section, defopts):
     (cpppath, libs, libpath), found = get_config_from_section(siteconfig,
                                                               section)
     if found:
+        raise RuntimeError("customization not supported yet")
         opts = BuildOpts(cpppath = cpppath, libpath = libpath, libs = libs)
+        # XXX: if only some options are customized, other should be filled in
+        # from def opts.
         if len(libs) == 1 and len(libs[0]) == 0:
             opts['libs'] = defopts['libs']
     else:
@@ -72,7 +75,7 @@ def _check_version(context, opts, version_checker):
 
     return version
 
-def check_code(context, name, section, defopts, headers_to_check,
+def check_code(context, name, section, opts_factory, headers_to_check,
                funcs_to_check, check_version, version_checker, autoadd,
                rpath_is_libpath = True):
     """Generic implementation for perflib check.
@@ -89,9 +92,9 @@ def check_code(context, name, section, defopts, headers_to_check,
         return context.Result('Disabled from env through var %s !' % name), {}
 
     # Get site.cfg customization if any
-    opts, found = _get_site_cfg_customization(section, defopts)
+    opts, found = _get_site_cfg_customization(section, opts_factory.core_config())
     if opts is None:
-        opts = defopts
+        opts = opts_factory.core_config()
     if rpath_is_libpath:
         opts['rpath'] = deepcopy(opts['libpath'])
 
