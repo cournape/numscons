@@ -8,6 +8,24 @@ import ConfigParser
 
 from numscons.numdist import default_lib_dirs, default_include_dirs, \
                              default_src_dirs, get_standard_file
+from numscons.core.utils import DefaultDict
+
+# List of options that ConfigOpts can keep. If later additional variables
+# should be added (e.g. cpp flags, etc...), they should be added here.
+_SITE_OPTS_FLAGS = ('libraries', 'library_dirs', 'include_dirs')
+
+class ConfigOpts(DefaultDict):
+    """Small container class to keep all necessary options to build with a
+    given library/package, such as cflags, libs, library paths, etc..."""
+    _keys = _SITE_OPTS_FLAGS
+    def __init__(self):
+        DefaultDict.__init__(self, BuildOpts._keys)
+        for k in _keys:
+            self[k] = []
+
+    def __repr__(self):
+        msg = [r'%s : %s' % (k, i) for k, i in self.items() if len(i) > 0]
+        return '\n'.join(msg)
 
 # Think about a cache mechanism, to avoid reparsing the config file everytime.
 def get_config():
