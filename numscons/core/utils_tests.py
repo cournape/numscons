@@ -50,7 +50,8 @@ class DefaultDictTester(unittest.TestCase):
         d['a'] = 1 
         try:
             d['c'] = 2
-            raise AssertionError('Setting a non existing key succeeded, should have failed.')
+            raise AssertionError('Setting a non existing key succeeded, '\
+                                 'should have failed.')
         except KeyError:
             pass
 

@@ -51,10 +51,12 @@ def get_empty(dic, key):
     does."""
     try:
         return deepcopy(dic[key])
-    except KeyError, e:
+    except KeyError:
         return []
 
 class NonDefaultKeyError(KeyError):
+    """Exception raised when trying to set/get a value from a non default key
+    for DefaultDict instances."""
     pass
 
 class DefaultDict(dict):
@@ -62,6 +64,10 @@ class DefaultDict(dict):
     keys."""
     @classmethod
     def fromcallable(cls, avkeys, default = None):
+        """Class method to instanciate a DefaultDict using a callable for the
+        default value.
+
+        Example: DefaultDict.fromcallable(keys, lambda: [])"""
         res = cls(avkeys, default)
         if default is not None:
             for k in res:
@@ -120,17 +126,20 @@ import types
 from UserString import UserString
 # Don't "from types import ..." these because we need to get at the
 # types module later to look for UnicodeType.
+InstanceType    = types.InstanceType
 StringType      = types.StringType
 TupleType       = types.TupleType
 if hasattr(types, 'UnicodeType'):
     UnicodeType = types.UnicodeType
     def isstring(obj):
+        """Return true if argument is a string."""
         t = type(obj)
         return t is StringType \
             or t is UnicodeType \
             or (t is InstanceType and isinstance(obj, UserString))
 else:
     def isstring(obj):
+        """Return true if argument is a string."""
         t = type(obj)
         return t is StringType \
             or (t is InstanceType and isinstance(obj, UserString))
