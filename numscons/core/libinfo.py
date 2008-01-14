@@ -1,8 +1,13 @@
 #! /usr/bin/env python
 # Last Change: Sun Jan 06 09:00 PM 2008 J
 
-# Module for support to look for external code (replacement of
-# numpy.distutils.system_info). KEEP THIS INDEPENDANT OF SCONS !
+"""Module which implements support to look for external libraries info from
+site.cfg. This is meant to replace numpy.distutils.system_info for most
+libraries (for blas/lapack and co, please look in numscons.checkers subpackage
+instead)."""
+
+# KEEP THIS MODULE INDEPENDANT OF SCONS !.
+
 import os
 import ConfigParser
 
@@ -12,15 +17,18 @@ from numscons.core.utils import DefaultDict
 
 # List of options that ConfigOpts can keep. If later additional variables
 # should be added (e.g. cpp flags, etc...), they should be added here.
-_SITE_OPTS_FLAGS = ('libraries', 'library_dirs', 'include_dirs')
+_SITE_CONFIG_PATH_FLAGS = ('library_dirs', 'include_dirs')
+_SITE_CONFIG_NONPATH_FLAGS = ('libraries'),
+
+_SITE_OPTS_FLAGS = _SITE_CONFIG_PATH_FLAGS + _SITE_CONFIG_NONPATH_FLAGS
 
 class ConfigOpts(DefaultDict):
     """Small container class to keep all necessary options to build with a
     given library/package, such as cflags, libs, library paths, etc..."""
     _keys = _SITE_OPTS_FLAGS
     def __init__(self):
-        DefaultDict.__init__(self, BuildOpts._keys)
-        for k in _keys:
+        DefaultDict.__init__(self, self._keys)
+        for k in self._keys:
             self[k] = []
 
     def __repr__(self):
@@ -84,23 +92,18 @@ def get_config_from_section(siteconfig, section):
     """For the given siteconfig and section, return the found information.
     
     Returns a tuple (info, found), where:
-        info : tuple (cpppath, libs, libpath), containing a list of path or libraries
-        found: 1 if the section was found, 0 otherwise."""
+        info : ConfigOpts instance
+        found: True if the section was found, False otherwise."""
+    cfgopts = ConfigOpts()
+    found = False
     if siteconfig.has_section(section):
-        try:
-            libpath = get_paths(siteconfig.get(section, 'library_dirs'))
-        except ConfigParser.NoOptionError, e:
-            libpath = []
+        found = True
+        for opt in _SITE_CONFIG_PATH_FLAGS:
+            if siteconfig.has_option(section, opt):
+                cfgopts[opt] = get_paths(siteconfig.get(section, opt))
 
-        try:
-            cpppath = get_paths(siteconfig.get(section, 'include_dirs'))
-        except ConfigParser.NoOptionError, e:
-            cpppath = []
+        for opt in _SITE_CONFIG_NONPATH_FLAGS:
+            if siteconfig.has_option(section, opt):
+                cfgopts[opt] = parse_config_param(siteconfig.get(section, opt))
 
-        try:
-            libs = parse_config_param(siteconfig.get(section, 'libraries'))
-        except ConfigParser.NoOptionError, e:
-            libs = []
-        return (cpppath, libs, libpath), 1
-    else:
-        return ([], [], []), 0
+    return cfgopts, found

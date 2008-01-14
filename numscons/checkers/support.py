@@ -12,9 +12,12 @@ from configuration import ConfigRes, BuildOpts
 # Tools to save and restore environments construction variables (the ones often
 # altered for configuration tests)
 _arg2env = {'cpppath' : 'CPPPATH',
+            'include_dirs' : 'CPPPATH',
             'cflags' : 'CFLAGS',
             'libpath' : 'LIBPATH',
+            'library_dirs' : 'LIBPATH',
             'libs' : 'LIBS',
+            'libraries' : 'LIBS',
             'linkflags' : 'LINKFLAGS',
             'rpath' : 'RPATH',
             'frameworks' : 'FRAMEWORKS'}
