@@ -87,7 +87,7 @@ def CheckF77BLAS(context, autoadd = 1, check_version = 0):
 
     if not env.has_key('F77_LDFLAGS'):
         if not CheckF77Clib(context):
-            add_info(env, 'lapack', None)
+            add_info(env, 'blas', None)
             return 0
 
     func_name = env['F77_NAME_MANGLER']('sgemm')
