@@ -1,13 +1,9 @@
 #! /usr/bin/env python
 # Last Change: Tue Dec 04 02:00 PM 2007 J
 
-# This module defines some helper functions, to be used by high level checkers
-
-import os
+"""This module defines some helper functions, to be used by high level
+checkers."""
 from copy import deepcopy
-
-from numscons.core.libinfo import get_config_from_section, get_config
-from configuration import ConfigRes, BuildOpts
 
 # Tools to save and restore environments construction variables (the ones often
 # altered for configuration tests)
