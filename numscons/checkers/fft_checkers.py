@@ -23,28 +23,26 @@ def CheckFFT(context, autoadd = 1, check_version = 0):
     libname = 'fft'
     env = context.env
 
-    def check(func, name, suplibs):
+    def check(func, name):
         st, res = func(context, autoadd, check_version)
         # XXX: check for fft code ?
         if st:
-            for lib in suplibs:
-                res.cfgopts['libs'].append(lib)
             add_info(env, libname, res)
 
         return st
 
     # Check MKL
-    st = check(CheckMKL, 'MKL', [])
+    st = check(CheckMKL, 'MKL')
     if st:
         return st
 
     # Check fftw3
-    st = check(CheckFFTW3, 'fftw3', ['fftw3'])
+    st = check(CheckFFTW3, 'fftw3')
     if st:
         return st
 
     # Check fftw2
-    st = check(CheckFFTW2, 'fftw2', ['fftw'])
+    st = check(CheckFFTW2, 'fftw2')
     if st:
         return st
 
