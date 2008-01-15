@@ -23,13 +23,15 @@ def write_info(env):
 
 # List of options that BuildOpts can keep. If later additional variables should
 # be added (e.g. cpp flags, etc...), they should be added here.
-_BUILD_OPTS_FLAGS = ('cpppath', 'cflags', 'libpath', 'libs', 'linkflags',
-                     'rpath', 'frameworks')
+_BUILD_OPTS_FLAGS = ('include_dirs', 'cflags', 'library_dirs', 'libraries',
+                     'linkflags', 'rpath', 'frameworks')
 
 # List of options that BuildOptsFactory can keep. If later additional variables
 # should be added, they should be added here.
-_BUILD_OPTS_FACTORY_FLAGS = _BUILD_OPTS_FLAGS + ('cblas_libs', 'blas_libs',
-                            'clapack_libs', 'lapack_libs', 'htc', 'ftc')
+_BUILD_OPTS_FACTORY_FLAGS = \
+    _BUILD_OPTS_FLAGS + \
+    ('cblas_libraries', 'blas_libraries', 'clapack_libraries',
+     'lapack_libraries', 'htc', 'ftc')
 
 def available_build_opts_flags():
     return _BUILD_OPTS_FLAGS
@@ -84,26 +86,26 @@ class BuildOptsFactory:
     def core_config(self):
         return self._bld
 
-    def _get_libs(self, supp):
+    def _get_libraries(self, supp):
         res = copy(self._bld)
-        tmp = copy(res['libs'])
-        res['libs'] = []
+        tmp = copy(res['libraries'])
+        res['libraries'] = []
         for i in supp:
-            res['libs'] += self._data[i]
-        res['libs'] += tmp
+            res['libraries'] += self._data[i]
+        res['libraries'] += tmp
         return res
 
     def blas_config(self):
-        return self._get_libs(['blas_libs'])
+        return self._get_libraries(['blas_libraries'])
 
     def cblas_config(self):
-        return self._get_libs(['cblas_libs'])
+        return self._get_libraries(['cblas_libraries'])
 
     def lapack_config(self):
-        return self._get_libs(['lapack_libs', 'blas_libs'])
+        return self._get_libraries(['lapack_libraries', 'blas_libraries'])
 
     def clapack_config(self):
-        return self._get_libs(['clapack_libs', 'cblas_libs'])
+        return self._get_libraries(['clapack_libraries', 'cblas_libraries'])
 
     def __repr__(self):
         return self._data.__repr__()
