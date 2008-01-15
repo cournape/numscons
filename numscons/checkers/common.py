@@ -11,20 +11,15 @@ import os
 from copy import deepcopy
 
 from numscons.core.libinfo import get_config_from_section, get_config
-from configuration import ConfigRes, BuildOpts
+from configuration import ConfigRes
 from support import save_and_set, restore, check_symbol
 
 def _get_site_cfg_customization(section, defopts):
-    siteconfig, cfgfiles = get_config()
-    (cpppath, libs, libpath), found = get_config_from_section(siteconfig,
-                                                              section)
+    siteconfig = get_config()[0]
+    opts, found = get_config_from_section(siteconfig, section)
     if found:
-        raise RuntimeError("customization not supported yet")
-        opts = BuildOpts(cpppath = cpppath, libpath = libpath, libs = libs)
-        # XXX: if only some options are customized, other should be filled in
-        # from def opts.
-        if len(libs) == 1 and len(libs[0]) == 0:
-            opts['libs'] = defopts['libs']
+        if len(opts['libraries']) == 1 and len(opts['libraries'][0]) == 0:
+            opts['libraries'] = defopts['libraries']
     else:
         opts = None
 
@@ -92,7 +87,8 @@ def check_code(context, name, section, opts_factory, headers_to_check,
         return context.Result('Disabled from env through var %s !' % name), {}
 
     # Get site.cfg customization if any
-    opts, found = _get_site_cfg_customization(section, opts_factory.core_config())
+    opts, found = _get_site_cfg_customization(section,
+                                              opts_factory.core_config())
     if opts is None:
         opts = opts_factory.core_config()
     if rpath_is_libpath:
