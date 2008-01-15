@@ -14,13 +14,8 @@ from copy import deepcopy
 from os.path import join as pjoin
 from os.path import basename, dirname
 
-from numscons.core.libinfo import get_config_from_section, get_config
-from numscons.testcode_snippets import cblas_sgemm as cblas_src, \
-        c_sgemm as sunperf_src, lapack_sgesv
-
-from support import check_include_and_run, check_symbol
 from support import save_and_set, restore
-from configuration import BuildOpts, ConfigRes
+from configuration import ConfigRes
 from common import check_code as _check
 from perflib_config import IsFactory, GetVersionFactory, CONFIG
 
@@ -159,8 +154,8 @@ def CheckSunperf(context, autoadd = 1, check_version = 0):
     """Checker for sunperf."""
     cfg = CONFIG['Sunperf']
     
-    st, res = _check(context, cfg.name, cfg.section, cfg.opts_factory, cfg.headers,
-                     cfg.funcs, check_version, None, autoadd)
+    st, res = _check(context, cfg.name, cfg.section, cfg.opts_factory,
+                     cfg.headers, cfg.funcs, check_version, None, autoadd)
     if not st:
         return st, res
 
@@ -190,8 +185,8 @@ def CheckSunperf(context, autoadd = 1, check_version = 0):
         # XXX: does this scheme to get the program name always work ? Can
         # we use Scons to get the target name from the object name ?
         slast = str(context.lastTarget)
-        dir = dirname(slast)
-        test_prog = pjoin(dir, basename(slast).split('.')[0])
+        prdir = dirname(slast)
+        test_prog = pjoin(prdir, basename(slast).split('.')[0])
     
         cmd = context.env.subst('$LINKCOM', 
             		    target = context.env.File(test_prog),
@@ -206,7 +201,7 @@ def CheckSunperf(context, autoadd = 1, check_version = 0):
         st = 1
         pa = floupi(out)
         for k, v in pa.items():
-    	    opts[k].extend(deepcopy(v))
+            opts[k].extend(deepcopy(v))
         res = ConfigRes(cfg.name, opts, res.is_customized())
         context.Result('Succeeded !')
     else:
@@ -243,8 +238,8 @@ def floupi(out):
             elif token.startswith('-Y'):
                 n = token
                 t = lexer.get_token()
-		if t.startswith('P,'):
-		    t = t[2:]
+                if t.startswith('P,'):
+                    t = t[2:]
                 nt = t.split(os.pathsep)
                 keep['libpath'].extend(nt)
             elif token.startswith('-Qy'):
