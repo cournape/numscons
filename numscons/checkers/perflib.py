@@ -44,7 +44,7 @@ return 0;
 }
 """
 
-    opts['rpath'] = opts['libpath']
+    opts['rpath'] = opts['library_dirs']
     saved = save_and_set(env, opts)
     try:
         vst, out = context.TryRun(version_code, '.c')
@@ -81,7 +81,7 @@ ATL_buildinfo();
 return 0;
 }
 """
-    opts['rpath'] = opts['libpath']
+    opts['rpath'] = opts['library_dirs']
     saved = save_and_set(env, opts)
     try:
         vst, out = context.TryRun(version_code, '.c')
@@ -226,7 +226,7 @@ def floupi(out):
     lexer.whitespace_split = True
 
     accept_libs = ['sunperf', 'fui', 'fsu', 'mtsk', 'sunmath']
-    keep = dict(zip(['libs', 'libpath', 'rpath'], [[], [], []]))
+    keep = dict(zip(['libs', 'library_dirs', 'rpath'], [[], [], []]))
     t = lexer.get_token()
     while t:
         def parse(token):
@@ -241,7 +241,7 @@ def floupi(out):
                 if t.startswith('P,'):
                     t = t[2:]
                 nt = t.split(os.pathsep)
-                keep['libpath'].extend(nt)
+                keep['library_dirs'].extend(nt)
             elif token.startswith('-Qy'):
                 n = token
                 t = lexer.get_token()

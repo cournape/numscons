@@ -7,12 +7,9 @@ from copy import deepcopy
 
 # Tools to save and restore environments construction variables (the ones often
 # altered for configuration tests)
-_arg2env = {'cpppath' : 'CPPPATH',
-            'include_dirs' : 'CPPPATH',
+_arg2env = {'include_dirs' : 'CPPPATH',
             'cflags' : 'CFLAGS',
-            'libpath' : 'LIBPATH',
             'library_dirs' : 'LIBPATH',
-            'libs' : 'LIBS',
             'libraries' : 'LIBS',
             'linkflags' : 'LINKFLAGS',
             'rpath' : 'RPATH',
@@ -96,19 +93,20 @@ def check_include_and_run(context, name, opts, headers, run_src, autoadd = 1):
         - test that the given source code can be compiled. The source code
           should contain a simple program with the function.
 
+    XXX: this doc is not up-to-date
     Arguments:
         - name: name of the library
-        - cpppath: list of directories
+        - include_dirs: list of directories
         - headers: list of headers
         - run_src: the code for the run test
         - libs: list of libraries to link
-        - libpath: list of library path.
+        - library_dirs: list of library path.
         - linkflags: list of link flags to add."""
 
     context.Message('Checking for %s ... ' % name)
     env = context.env
 
-    ret = _check_headers(context, opts['cpppath'], opts['cflags'], headers,
+    ret = _check_headers(context, opts['include_dirs'], opts['cflags'], headers,
                          autoadd)
     if not ret:
         context.Result('Failed: %s include not found' % name)

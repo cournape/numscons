@@ -92,7 +92,7 @@ def check_code(context, name, section, opts_factory, headers_to_check,
     if opts is None:
         opts = opts_factory.core_config()
     if rpath_is_libpath:
-        opts['rpath'] = deepcopy(opts['libpath'])
+        opts['rpath'] = deepcopy(opts['library_dirs'])
 
     # Check whether the header is available (CheckHeader-like checker)
     st = _check_header(context, opts, headers_to_check)
