@@ -35,37 +35,37 @@ def _check(perflibs, context, libname, check_version, msg_template, test_src,
         if st:
             return st
 
+def _get_customization(context, section, libname, autoadd):
+    # If section cblas is in site.cfg, use those options. Otherwise, use default
+    siteconfig, cfgfiles = get_config()
+    cfg, found = get_config_from_section(siteconfig, section)
+    if found:
+        if check_include_and_run(context, '% (from site.cfg) ' % libname, cfg,
+                                 [], cblas_src, autoadd):
+            add_info(context.env, libname, ConfigRes('Generic %s' % libname,
+                     cfg, found))
+            return 1
+    return 0
+
 def CheckCBLAS(context, autoadd = 1, check_version = 0):
     """This checker tries to find optimized library for cblas."""
     libname = 'cblas'
+    section = 'cblas'
     env = context.env
 
     def check(perflibs):
         return _check(perflibs, context, libname, check_version, 'CBLAS (%s)',
                       cblas_src, autoadd) 
 
-    # If section cblas is in site.cfg, use those options. Otherwise, use default
-    section = "cblas"
-    siteconfig, cfgfiles = get_config()
-    (cpppath, libs, libpath), found = get_config_from_section(siteconfig, section)
-    if found:
-        # XXX: deepcopy rpath ?
-        cfg = BuildOpts(cpppath = cpppath, libs = libs, libpath = libpath,
-                         rpath = libpath)
-        st = check_include_and_run(context, 'CBLAS (from site.cfg) ', cfg,
-                                  [], cblas_src, autoadd)
-        if st:
-            add_info(env, libname, ConfigRes('Generic CBLAS', cfg, found))
-            return st
+    if _get_customization(context, section, libname, autoadd):
+        return 1
     else:
         if sys.platform == 'darwin':
-            st = check(('Accelerate', 'vecLib'))
-            if st:
-                return st
+            if check(('Accelerate', 'vecLib')):
+                return 1
         else:
-            st = check(('MKL', 'ATLAS', 'Sunperf'))
-            if st:
-                return st
+            if check(('MKL', 'ATLAS', 'Sunperf')):
+                return 1
 
     add_info(env, libname, None)
     return 0
@@ -73,6 +73,7 @@ def CheckCBLAS(context, autoadd = 1, check_version = 0):
 def CheckF77BLAS(context, autoadd = 1, check_version = 0):
     """This checker tries to find optimized library for blas (fortran F77)."""
     libname = 'blas'
+    section = "blas"
     env = context.env
 
     # Get Fortran things we need
@@ -93,27 +94,15 @@ def CheckF77BLAS(context, autoadd = 1, check_version = 0):
         return _check(perflibs, context, libname, check_version, 'BLAS (%s)',
                       test_src, autoadd) 
 
-    # If section blas is in site.cfg, use those options. Otherwise, use default
-    section = "blas"
-    siteconfig, cfgfiles = get_config()
-    (cpppath, libs, libpath), found = get_config_from_section(siteconfig, section)
-    if found:
-        cfg = BuildOpts(cpppath = cpppath, libs = libs, libpath = libpath,
-                         rpath = libpath)
-        st = check_include_and_run(context, 'BLAS (from site.cfg) ', cfg,
-                                  [], test_src, autoadd)
-        if st:
-            add_info(env, libname, ConfigRes('Generic BLAS', cfg, found))
-            return st
+    if _get_customization(context, section, libname, autoadd):
+        return 1
     else:
         if sys.platform == 'darwin':
-            st = check(('Accelerate', 'vecLib'))
-            if st:
-                return st
+            if check(('Accelerate', 'vecLib')):
+                return 1
         else:
-            st = check(('MKL', 'ATLAS', 'Sunperf'))
-            if st:
-                return st
+            if check(('MKL', 'ATLAS', 'Sunperf')):
+                return 1
 
     def check_generic_blas():
         name = 'Generic'
@@ -143,6 +132,7 @@ def CheckF77LAPACK(context, autoadd = 1, check_version = 0):
         - Mac OS X: Accelerate, and then vecLib.
         - Others: MKL, then ATLAS."""
     libname = 'lapack'
+    section = "lapack"
     env = context.env
 
     if not env.has_key('F77_NAME_MANGLER'):
@@ -163,35 +153,16 @@ def CheckF77LAPACK(context, autoadd = 1, check_version = 0):
         return _check(perflibs, context, libname, check_version, 'LAPACK (%s)',
                       test_src, autoadd) 
 
-    # If section lapack is in site.cfg, use those options. Otherwise, use default
-    section = "lapack"
-    siteconfig, cfgfiles = get_config()
-    (cpppath, libs, libpath), found = get_config_from_section(siteconfig, section)
-    if found:
-        # XXX: handle def library names correctly
-        if len(libs) == 1 and len(libs[0]) == 0:
-            libs = ['lapack', 'blas']
-        cfg = BuildOpts(cpppath = cpppath, libs = libs, libpath = libpath,
-                         rpath = deepcopy(libpath))
-
-        # fortrancfg is used to merge info from fortran checks and site.cfg
-        fortrancfg = deepcopy(cfg)
-        fortrancfg['linkflags'].extend(env['F77_LDFLAGS'])
-
-        st = check_include_and_run(context, 'LAPACK (from site.cfg) ', fortrancfg,
-                                  [], test_src, autoadd)
-        if st:
-            add_info(env, libname, ConfigRes('Generic LAPACK', cfg, found))
-            return st
+    # XXX: handle F77_LDFLAGS
+    if _get_customization(context, section, libname, autoadd):
+        return 1
     else:
         if sys.platform == 'darwin':
-            st = check(('Accelerate', 'vecLib'))
-            if st:
-                return st
+            if check(('Accelerate', 'vecLib')):
+                return 1
         else:
-            st = check(('MKL', 'ATLAS', 'Sunperf'))
-            if st:
-                return st
+            if check(('MKL', 'ATLAS', 'Sunperf')):
+                return 1
 
     def check_generic_lapack():
         name = 'Generic'
@@ -221,27 +192,21 @@ def CheckCLAPACK(context, autoadd = 1, check_version = 0):
         - Mac OS X: Accelerate, and then vecLib.
         - Others: MKL, then ATLAS."""
     libname = 'clapack'
+    section = "clapack"
     env = context.env
 
     def check(perflibs):
         return _check(perflibs, context, libname, check_version, 'CLAPACK (%s)',
                       clapack_src, autoadd) 
 
-    # If section lapack is in site.cfg, use those options. Otherwise, use default
-    section = "clapack"
-    siteconfig, cfgfiles = get_config()
-    (cpppath, libs, libpath), found = get_config_from_section(siteconfig, section)
-    if found:
-        # XXX: handle section
-        pass
+    if _get_customization(context, section, libname, autoadd):
+        return 1
     else:
         if sys.platform == 'darwin':
             pass
         else:
-            # Check ATLAS
-            st = check(('ATLAS'),)
-            if st:
-                return st
+            if check(('ATLAS',)):
+                return 1
 
     add_info(env, libname, None)
     return 0
