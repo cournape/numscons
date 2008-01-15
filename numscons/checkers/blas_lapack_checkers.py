@@ -3,7 +3,6 @@
 
 # Module for custom, common checkers for numpy (and scipy)
 import sys
-from copy import deepcopy
 
 from numscons.core.libinfo import get_config_from_section, get_config
 from numscons.testcode_snippets import \
@@ -12,7 +11,7 @@ from numscons.testcode_snippets import \
         clapack_sgesv as clapack_src
 from numscons.fortran_scons import CheckF77Mangling, CheckF77Clib
 
-from configuration import add_info, BuildOpts, ConfigRes
+from configuration import add_info, ConfigRes
 from perflib import CONFIG, checker
 from support import check_include_and_run
 
@@ -36,7 +35,7 @@ def _check(perflibs, context, libname, check_version, msg_template, test_src,
             return st
 
 def _get_customization(context, section, libname, autoadd):
-    # If section cblas is in site.cfg, use those options. Otherwise, use default
+    # If section is in site.cfg, use those options. Otherwise, use default
     siteconfig, cfgfiles = get_config()
     cfg, found = get_config_from_section(siteconfig, section)
     if found:
@@ -77,15 +76,13 @@ def CheckF77BLAS(context, autoadd = 1, check_version = 0):
     env = context.env
 
     # Get Fortran things we need
-    if not env.has_key('F77_NAME_MANGLER'):
-        if not CheckF77Mangling(context):
-            add_info(env, libname, None)
-            return 0
+    if not env.has_key('F77_NAME_MANGLER') and not CheckF77Mangling(context):
+        add_info(env, libname, None)
+        return 0
 
-    if not env.has_key('F77_LDFLAGS'):
-        if not CheckF77Clib(context):
-            add_info(env, 'blas', None)
-            return 0
+    if not env.has_key('F77_LDFLAGS') and not CheckF77Clib(context):
+        add_info(env, libname, None)
+        return 0
 
     func_name = env['F77_NAME_MANGLER']('sgemm')
     test_src = c_sgemm2 % {'func' : func_name}
@@ -115,9 +112,8 @@ def CheckF77BLAS(context, autoadd = 1, check_version = 0):
         return st
 
     # Check generic blas last
-    st = check_generic_blas()
-    if st:
-        return st
+    if check_generic_blas():
+        return 1
 
     add_info(env, libname, None)
     return 0
