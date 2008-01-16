@@ -1,5 +1,5 @@
 #! /usr/bin/env python
-# Last Change: Sat Jan 12 07:00 PM 2008 J
+# Last Change: Wed Jan 16 07:00 PM 2008 J
 """This module contains the infrastructure to get all the necessary options for
 perflib checkers from the perflib configuration file."""
 
@@ -108,10 +108,10 @@ class IsFactory:
             raise RuntimeError("name %s is unknown")
 
         def f(env, libname):
-            if env['NUMPY_PKG_CONFIG'][libname] is None:
+            if env['NUMPY_PKG_CONFIG']['LIB'][libname] is None:
                 return 0 == 1
             else:
-                return env['NUMPY_PKG_CONFIG'][libname].name == \
+                return env['NUMPY_PKG_CONFIG']['LIB'][libname].name == \
                        CONFIG[name].name
         self.func = f
 
@@ -127,11 +127,11 @@ class GetVersionFactory:
             raise RuntimeError("name %s is unknown")
 
         def f(env, libname):
-            if env['NUMPY_PKG_CONFIG'][libname] is None or \
-               not env['NUMPY_PKG_CONFIG'][libname].name == CONFIG[name].name:
+            if env['NUMPY_PKG_CONFIG']['LIB'][libname] is None or \
+               not env['NUMPY_PKG_CONFIG']['LIB'][libname].name == CONFIG[name].name:
                 return 'No version info'
             else:
-                return env['NUMPY_PKG_CONFIG'][libname].version
+                return env['NUMPY_PKG_CONFIG']['LIB'][libname].version
         self.func = f
 
     def get_func(self):

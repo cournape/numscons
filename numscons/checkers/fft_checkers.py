@@ -1,5 +1,5 @@
 #! /usr/bin/env python
-# Last Change: Tue Dec 04 03:00 PM 2007 J
+# Last Change: Wed Jan 16 07:00 PM 2008 J
 
 # Module for custom, common checkers for numpy (and scipy)
 import sys
@@ -14,7 +14,7 @@ from distutils.util import get_platform
 # from numpy.distutils.scons.fortran_scons import CheckF77Mangling, CheckF77Clib
 from perflib import CheckMKL, CheckFFTW3, CheckFFTW2
 from support import check_include_and_run
-from configuration import BuildOpts, ConfigRes, add_info
+from configuration import BuildOpts, ConfigRes, add_lib_info
 
 __all__ = ['CheckFFT']
 
@@ -27,7 +27,7 @@ def CheckFFT(context, autoadd = 1, check_version = 0):
         st, res = func(context, autoadd, check_version)
         # XXX: check for fft code ?
         if st:
-            add_info(env, libname, res)
+            add_lib_info(env, libname, res)
 
         return st
 
@@ -46,5 +46,5 @@ def CheckFFT(context, autoadd = 1, check_version = 0):
     if st:
         return st
 
-    add_info(env, libname, None)
+    add_lib_info(env, libname, None)
     return 0

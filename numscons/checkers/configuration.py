@@ -1,19 +1,23 @@
 #! /usr/bin/env python
-# Last Change: Sat Jan 12 06:00 PM 2008 J
+# Last Change: Wed Jan 16 07:00 PM 2008 J
 import os
 from copy import deepcopy, copy
 
 from numscons.core.utils import DefaultDict
 
-def add_info(env, name, opt):
-    cfg = env['NUMPY_PKG_CONFIG']
+def add_perflib_info(env, name, opt):
+    cfg = env['NUMPY_PKG_CONFIG']['PERFLIB']
+    cfg[name] = opt
+
+def add_lib_info(env, name, opt):
+    cfg = env['NUMPY_PKG_CONFIG']['LIB']
     cfg[name] = opt
 
 def write_info(env):
     dir = os.path.dirname(env['NUMPY_PKG_CONFIG_FILE'])
     if not os.path.exists(dir):
         os.makedirs(dir)
-    cfg = env['NUMPY_PKG_CONFIG']
+    cfg = env['NUMPY_PKG_CONFIG']['PERFLIB']
     config_str = {}
     for k, i in cfg.items():
         config_str[k] = str(i)

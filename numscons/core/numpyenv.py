@@ -311,7 +311,7 @@ def set_site_config(env):
     env['NUMPY_SITE_CONFIG'] = config
 
     # This will be used to keep configuration information on a per package basis
-    env['NUMPY_PKG_CONFIG'] = {}
+    env['NUMPY_PKG_CONFIG'] = {'PERFLIB' : {}, 'LIB' : {}}
     env['NUMPY_PKG_CONFIG_FILE'] = pjoin(get_scons_configres_dir(), 
                                          env['src_dir'], 
                                          get_scons_configres_filename())

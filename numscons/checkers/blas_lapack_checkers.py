@@ -1,5 +1,5 @@
 #! /usr/bin/env python
-# Last Change: Tue Dec 04 03:00 PM 2007 J
+# Last Change: Wed Jan 16 07:00 PM 2008 J
 
 # Module for custom, common checkers for numpy (and scipy)
 import sys
@@ -11,7 +11,7 @@ from numscons.testcode_snippets import \
         clapack_sgesv as clapack_src
 from numscons.fortran_scons import CheckF77Mangling, CheckF77Clib
 
-from configuration import add_info, ConfigRes
+from configuration import add_lib_info, ConfigRes
 from perflib import CONFIG, checker
 from support import check_include_and_run
 
@@ -30,7 +30,7 @@ def _check(perflibs, context, libname, check_version, msg_template, test_src,
             st = check_include_and_run(context, msg_template % name, 
                                        cfgopts, [], test_src, autoadd)
             if st:
-                add_info(context.env, libname, res)
+                add_lib_info(context.env, libname, res)
             return st
     for p in perflibs:
         if _check_perflib(p):
@@ -43,7 +43,7 @@ def _get_customization(context, section, libname, autoadd):
     if found:
         if check_include_and_run(context, '% (from site.cfg) ' % libname, cfg,
                                  [], cblas_src, autoadd):
-            add_info(context.env, libname, ConfigRes('Generic %s' % libname,
+            add_lib_info(context.env, libname, ConfigRes('Generic %s' % libname,
                      cfg, found))
             return 1
     return 0
@@ -66,7 +66,7 @@ def CheckCBLAS(context, autoadd = 1, check_version = 0):
         elif check(('MKL', 'ATLAS', 'Sunperf')):
             return 1
 
-    add_info(env, libname, None)
+    add_lib_info(env, libname, None)
     return 0
 
 def CheckF77BLAS(context, autoadd = 1, check_version = 0):
@@ -77,11 +77,11 @@ def CheckF77BLAS(context, autoadd = 1, check_version = 0):
 
     # Get Fortran things we need
     if not env.has_key('F77_NAME_MANGLER') and not CheckF77Mangling(context):
-        add_info(env, libname, None)
+        add_lib_info(env, libname, None)
         return 0
 
     if not env.has_key('F77_LDFLAGS') and not CheckF77Clib(context):
-        add_info(env, libname, None)
+        add_lib_info(env, libname, None)
         return 0
 
     func_name = env['F77_NAME_MANGLER']('sgemm')
@@ -103,7 +103,7 @@ def CheckF77BLAS(context, autoadd = 1, check_version = 0):
     if check(('GenericBlas',)):
         return 1
 
-    add_info(env, libname, None)
+    add_lib_info(env, libname, None)
     return 0
 
 def CheckF77LAPACK(context, autoadd = 1, check_version = 0):
@@ -121,12 +121,12 @@ def CheckF77LAPACK(context, autoadd = 1, check_version = 0):
 
     if not env.has_key('F77_NAME_MANGLER'):
         if not CheckF77Mangling(context):
-            add_info(env, 'lapack', None)
+            add_lib_info(env, 'lapack', None)
             return 0
     
     if not env.has_key('F77_LDFLAGS'):
         if not CheckF77Clib(context):
-            add_info(env, 'lapack', None)
+            add_lib_info(env, 'lapack', None)
             return 0
     
     # Get the mangled name of our test function
@@ -150,7 +150,7 @@ def CheckF77LAPACK(context, autoadd = 1, check_version = 0):
     if check(('GenericLapack',)):
         return 1
 
-    add_info(env, libname, None)
+    add_lib_info(env, libname, None)
     return 0
 
 def CheckCLAPACK(context, autoadd = 1, check_version = 0):
@@ -178,5 +178,5 @@ def CheckCLAPACK(context, autoadd = 1, check_version = 0):
         elif check(('ATLAS',)):
             return 1
 
-    add_info(env, libname, None)
+    add_lib_info(env, libname, None)
     return 0
