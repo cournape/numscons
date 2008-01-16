@@ -1,5 +1,5 @@
 #! /usr/bin/env python
-# Last Change: Wed Jan 16 08:00 PM 2008 J
+# Last Change: Wed Jan 16 09:00 PM 2008 J
 
 """This module defines checkers for performances libs providing standard API,
 such as MKL (Intel), ATLAS, Sunperf (solaris and linux), Accelerate (Mac OS X),
@@ -11,6 +11,8 @@ as BLAS, CBLAS, LAPACK checkers."""
 
 from copy import deepcopy
 
+from numscons.core.utils import partial
+
 from configuration import ConfigRes, add_perflib_info
 from common import check_code
 from perflib_config import IsFactory, GetVersionFactory, CONFIG
@@ -21,16 +23,23 @@ def _check(context, cfg, check_version, version_checker, autoadd):
     return check_code(context, cfg.name, cfg.section, cfg.opts_factory,
                       cfg.headers, cfg.funcs, check_version,
                       mkl_version_checker, autoadd)
+
+class CheckPerflibFactory:
+    def __init__(self, name):
+        def checker(context, autoadd = 1, check_version = 0):
+            cfg = CONFIG[name]
+
+            st, res =  _check(context, cfg, check_version, mkl_version_checker,
+                              autoadd)
+            if st:
+                add_perflib_info(context.env, name, res)
+            return st, res
+        self.checker = checker
+
 #--------------
 # MKL checker
 #--------------
-def CheckMKL(context, autoadd = 1, check_version = 0):
-    cfg = CONFIG['MKL']
-
-    st, res =  _check(context, cfg, check_version, mkl_version_checker, autoadd)
-    if st:
-        add_perflib_info(context.env, 'MKL', res)
-    return st, res
+CheckMKL = CheckPerflibFactory('MKL').checker
 
 IsMKL = IsFactory('MKL').get_func()
 GetMKLVersion = GetVersionFactory('MKL').get_func()
@@ -38,14 +47,7 @@ GetMKLVersion = GetVersionFactory('MKL').get_func()
 #---------------
 # ATLAS Checker
 #---------------
-def CheckATLAS(context, autoadd = 1, check_version = 0):
-    """Check whether ATLAS is usable in C."""
-    cfg = CONFIG['ATLAS']
-
-    st, res = _check(context, cfg, check_version, atlas_version_checker, autoadd)
-    if st:
-        add_perflib_info(context.env, 'ATLAS', res)
-    return st, res
+CheckATLAS = CheckPerflibFactory('ATLAS').checker
 
 IsATLAS = IsFactory('ATLAS').get_func()
 GetATLASVersion = GetVersionFactory('ATLAS').get_func()
@@ -53,43 +55,18 @@ GetATLASVersion = GetVersionFactory('ATLAS').get_func()
 #------------------------------
 # Mac OS X Frameworks checkers
 #------------------------------
-def CheckAccelerate(context, autoadd = 1, check_version = 0):
-    """Checker for Accelerate framework (on Mac OS X >= 10.3). """
-    # According to
-    # http://developer.apple.com/hardwaredrivers/ve/vector_libraries.html:
-    #
-    #   This page contains a continually expanding set of vector libraries
-    #   that are available to the AltiVec programmer through the Accelerate
-    #   framework on MacOS X.3, Panther. On earlier versions of MacOS X,
-    #   these were available in vecLib.framework. The currently available
-    #   libraries are described below.
-
-    #XXX: get_platform does not seem to work...
-    #if get_platform()[-4:] == 'i386':
-    #    is_intel = 1
-    #    cflags.append('-msse3')
-    #else:
-    #    is_intel = 0
-    #    cflags.append('-faltivec')
-
-    cfg = CONFIG['Accelerate']
-
-    st, res = _check(context, cfg, check_version, None, autoadd)
-    if st:
-        add_perflib_info(context.env, 'Accelerate', res)
-    return st, res
-
+# According to
+# http://developer.apple.com/hardwaredrivers/ve/vector_libraries.html:
+#
+#   This page contains a continually expanding set of vector libraries
+#   that are available to the AltiVec programmer through the Accelerate
+#   framework on MacOS X.3, Panther. On earlier versions of MacOS X,
+#   these were available in vecLib.framework. The currently available
+#   libraries are described below.
+CheckAccelerate = CheckPerflibFactory('Accelerate').checker
 IsAccelerate = IsFactory('Accelerate').get_func()
 
-def CheckVeclib(context, autoadd = 1, check_version = 0):
-    """Checker for Veclib framework (on Mac OS X < 10.3)."""
-    cfg = CONFIG['vecLib']
-
-    st, res = _check(context, cfg, check_version, None, autoadd)
-    if st:
-        add_perflib_info(context.env, 'vecLib', res)
-    return st, res
-
+CheckVeclib = CheckPerflibFactory('vecLib').checker
 IsVeclib = IsFactory('vecLib').get_func()
 
 #-----------------
@@ -141,25 +118,11 @@ def CheckGenericLapack(context, autoadd = 1, check_version = 0):
 #--------------------
 # FFT related perflib
 #--------------------
-def CheckFFTW3(context, autoadd = 1, check_version = 0):
-    """This checker tries to find fftw3."""
-    cfg = CONFIG['FFTW3']
-    
-    st, res = _check(context, cfg, check_version, None, autoadd)
-    if st:
-        add_perflib_info(context.env, 'FFTW3', res)
-    return st, res
+CheckFFTW3 = CheckPerflibFactory('FFTW3').checker
 
 IsFFTW3 = IsFactory('FFTW3').get_func()
 
-def CheckFFTW2(context, autoadd = 1, check_version = 0):
-    """This checker tries to find fftw2."""
-    cfg = CONFIG['FFTW2']
-    
-    st, res = _check(context, cfg, check_version, None, autoadd)
-    if st:
-        add_perflib_info(context.env, 'FFTW2', res)
-    return st, res
+CheckFFTW2 = CheckPerflibFactory('FFTW3').checker
 
 IsFFTW2 = IsFactory('FFTW2').get_func()
 
