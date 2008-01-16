@@ -18,6 +18,7 @@ def _get_site_cfg_customization(section, defopts):
     siteconfig = get_config()[0]
     opts, found = get_config_from_section(siteconfig, section)
     if found:
+        # FIXME: this is totally bogus
         if len(opts['libraries']) == 1 and len(opts['libraries'][0]) == 0:
             opts['libraries'] = defopts['libraries']
     else:
@@ -86,11 +87,11 @@ def check_code(context, name, section, opts_factory, headers_to_check,
     if os.environ.has_key(name) and os.environ[name] == 'None':
         return context.Result('Disabled from env through var %s !' % name), {}
 
+    core_config = opts_factory.core_config()
     # Get site.cfg customization if any
-    opts, found = _get_site_cfg_customization(section,
-                                              opts_factory.core_config())
-    if opts is None:
-        opts = opts_factory.core_config()
+    opts, found = _get_site_cfg_customization(section, core_config)
+    if not found:
+        opts = core_config
     if rpath_is_libpath:
         opts['rpath'] = deepcopy(opts['library_dirs'])
 
