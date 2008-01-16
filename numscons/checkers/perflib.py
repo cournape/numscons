@@ -1,5 +1,5 @@
 #! /usr/bin/env python
-# Last Change: Sat Jan 12 06:00 PM 2008 J
+# Last Change: Wed Jan 16 07:00 PM 2008 J
 
 """This module defines checkers for performances libs providing standard API,
 such as MKL (Intel), ATLAS, Sunperf (solaris and linux), Accelerate (Mac OS X),
@@ -15,7 +15,7 @@ from os.path import join as pjoin
 from os.path import basename, dirname
 
 from support import save_and_set, restore
-from configuration import ConfigRes
+from configuration import ConfigRes, add_perflib_info
 from common import check_code as _check
 from perflib_config import IsFactory, GetVersionFactory, CONFIG
 
@@ -63,8 +63,11 @@ return 0;
 def CheckMKL(context, autoadd = 1, check_version = 0):
     cfg = CONFIG['MKL']
 
-    return _check(context, cfg.name, cfg.section, cfg.opts_factory, cfg.headers,
-                  cfg.funcs, check_version, _mkl_version_checker, autoadd)
+    st, res =  _check(context, cfg.name, cfg.section, cfg.opts_factory, cfg.headers,
+                      cfg.funcs, check_version, _mkl_version_checker, autoadd)
+    if st:
+        add_perflib_info(context.env, 'MKL', res)
+    return st, res
 
 IsMKL = IsFactory('MKL').get_func()
 GetMKLVersion = GetVersionFactory('MKL').get_func()
@@ -103,8 +106,11 @@ def CheckATLAS(context, autoadd = 1, check_version = 0):
     """Check whether ATLAS is usable in C."""
     cfg = CONFIG['ATLAS']
 
-    return _check(context, cfg.name, cfg.section, cfg.opts_factory, cfg.headers,
-                  cfg.funcs, check_version, _atlas_version_checker, autoadd)
+    st, res = _check(context, cfg.name, cfg.section, cfg.opts_factory, cfg.headers,
+                     cfg.funcs, check_version, _atlas_version_checker, autoadd)
+    if st:
+        add_perflib_info(context.env, 'ATLAS', res)
+    return st, res
 
 IsATLAS = IsFactory('ATLAS').get_func()
 GetATLASVersion = GetVersionFactory('ATLAS').get_func()
@@ -133,8 +139,11 @@ def CheckAccelerate(context, autoadd = 1, check_version = 0):
 
     cfg = CONFIG['Accelerate']
 
-    return _check(context, cfg.name, cfg.section, cfg.opts_factory, cfg.headers,
-                  cfg.funcs, check_version, None, autoadd)
+    st, res = _check(context, cfg.name, cfg.section, cfg.opts_factory, cfg.headers,
+                     cfg.funcs, check_version, _atlas_version_checker, autoadd)
+    if st:
+        add_perflib_info(context.env, 'Accelerate', res)
+    return st, res
 
 IsAccelerate = IsFactory('Accelerate').get_func()
 
@@ -142,8 +151,11 @@ def CheckVeclib(context, autoadd = 1, check_version = 0):
     """Checker for Veclib framework (on Mac OS X < 10.3)."""
     cfg = CONFIG['vecLib']
 
-    return _check(context, cfg.name, cfg.section, cfg.opts_factory, cfg.headers,
-                  cfg.funcs, check_version, None, autoadd)
+    st, res = _check(context, cfg.name, cfg.section, cfg.opts_factory, cfg.headers,
+                     cfg.funcs, check_version, _atlas_version_checker, autoadd)
+    if st:
+        add_perflib_info(context.env, 'vecLib', res)
+    return st, res
 
 IsVeclib = IsFactory('vecLib').get_func()
 
@@ -154,8 +166,8 @@ def CheckSunperf(context, autoadd = 1, check_version = 0):
     """Checker for sunperf."""
     cfg = CONFIG['Sunperf']
     
-    st, res = _check(context, cfg.name, cfg.section, cfg.opts_factory,
-                     cfg.headers, cfg.funcs, check_version, None, autoadd)
+    st, res = _check(context, cfg.name, cfg.section, cfg.opts_factory, cfg.headers,
+                     cfg.funcs, check_version, _atlas_version_checker, autoadd)
     if not st:
         return st, res
 
@@ -203,6 +215,7 @@ def CheckSunperf(context, autoadd = 1, check_version = 0):
         for k, v in pa.items():
             opts[k].extend(deepcopy(v))
         res = ConfigRes(cfg.name, opts, res.is_customized())
+        add_perflib_info(context.env, 'Sunperf', res)
         context.Result('Succeeded !')
     else:
         st = 0
@@ -262,13 +275,17 @@ def CheckGenericBlas(context, autoadd = 1, check_version = 0):
     """Generic (fortran) blas checker."""
     cfg = CONFIG['GenericBlas']
 
-    return 1, ConfigRes("Generic", cfg.opts_factory, 0)
+    res = ConfigRes("Generic", cfg.opts_factory, 0)
+    add_perflib_info(context.env, 'GenericBlas', res)
+    return 1, res
 
 def CheckGenericLapack(context, autoadd = 1, check_version = 0):
     """Generic (fortran) lapack checker."""
     cfg = CONFIG['GenericLapack']
 
-    return 1, ConfigRes("Generic", cfg.opts_factory, 0)
+    res = ConfigRes("Generic", cfg.opts_factory, 0)
+    add_perflib_info(context.env, 'GenericLapack', res)
+    return 1, res
 
 #--------------------
 # FFT related perflib
@@ -277,8 +294,11 @@ def CheckFFTW3(context, autoadd = 1, check_version = 0):
     """This checker tries to find fftw3."""
     cfg = CONFIG['FFTW3']
     
-    return _check(context, cfg.name, cfg.section, cfg.opts_factory, cfg.headers,
-                  cfg.funcs, check_version, _mkl_version_checker, autoadd)
+    st, res = _check(context, cfg.name, cfg.section, cfg.opts_factory, cfg.headers,
+                     cfg.funcs, check_version, _atlas_version_checker, autoadd)
+    if st:
+        add_perflib_info(context.env, 'FFTW3', res)
+    return st, res
 
 IsFFTW3 = IsFactory('FFTW3').get_func()
 
@@ -286,8 +306,11 @@ def CheckFFTW2(context, autoadd = 1, check_version = 0):
     """This checker tries to find fftw2."""
     cfg = CONFIG['FFTW2']
     
-    return _check(context, cfg.name, cfg.section, cfg.opts_factory, cfg.headers,
-                  cfg.funcs, check_version, _mkl_version_checker, autoadd)
+    st, res = _check(context, cfg.name, cfg.section, cfg.opts_factory, cfg.headers,
+                     cfg.funcs, check_version, _atlas_version_checker, autoadd)
+    if st:
+        add_perflib_info(context.env, 'FFTW2', res)
+    return st, res
 
 IsFFTW2 = IsFactory('FFTW2').get_func()
 
