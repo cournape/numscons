@@ -25,6 +25,38 @@ def write_info(env):
     f.writelines("config = %s" % str(config_str))
     f.close()
 
+class PerflibInfo:
+    """Instances of this class will keep all informations about a perflib (MKL,
+    etc...). 
+
+    The goal is that the first time a perflib checker is called, it will create
+    an instance of this class, put it into a scons environment, and next time
+    the perflib is called, it will retrieve all info from the object.
+
+    It will also be used to retrieve info from scons scripts (such as version,
+    etc...).
+
+    As such, this class handle both caching and information sharing."""
+    def __init__(self):
+        # Necessary info:
+        # - is customized ?
+        # - Version
+        # - BO Factory (needed by meta checkers)
+        pass
+
+class MetalibInfo:
+    """Instances of this class will keep all informations about a meta lib
+    (BLAS, etc...). 
+
+    This will primaly be used to generate build info, retrived from numpy/scipy
+    through show_config function.."""
+    def __init__(self):
+        # Necessary info:
+        # - Perflib
+        # - BO effectively used 
+        # - is customized ?
+        pass
+
 # List of options that BuildOpts can keep. If later additional variables should
 # be added (e.g. cpp flags, etc...), they should be added here.
 _BUILD_OPTS_FLAGS = ('include_dirs', 'cflags', 'library_dirs', 'libraries',
