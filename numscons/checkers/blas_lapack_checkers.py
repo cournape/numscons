@@ -20,7 +20,10 @@ def _check(perflibs, context, libname, check_version, msg_template, test_src,
     """Generic perflib checker to be used in meta checkers.
 
     perflibs should be a list of perflib to check."""
-    def _check_perflib(func, name):
+    def _check_perflib(pname):
+        """pname is the name of the perflib."""
+        func = checker(pname)
+        name = CONFIG[pname].name
         st, res = func(context, autoadd, check_version)
         if st:
             cfgopts = res.cfgopts[libname]()
@@ -30,9 +33,8 @@ def _check(perflibs, context, libname, check_version, msg_template, test_src,
                 add_info(context.env, libname, res)
             return st
     for p in perflibs:
-        st = _check_perflib(checker(p), CONFIG[p].name)
-        if st:
-            return st
+        if _check_perflib(p):
+            return 1
 
 def _get_customization(context, section, libname, autoadd):
     # If section is in site.cfg, use those options. Otherwise, use default
@@ -59,12 +61,10 @@ def CheckCBLAS(context, autoadd = 1, check_version = 0):
     if _get_customization(context, section, libname, autoadd):
         return 1
     else:
-        if sys.platform == 'darwin':
-            if check(('Accelerate', 'vecLib')):
-                return 1
-        else:
-            if check(('MKL', 'ATLAS', 'Sunperf')):
-                return 1
+        if sys.platform == 'darwin' and check(('Accelerate', 'vecLib')):
+            return 1
+        elif check(('MKL', 'ATLAS', 'Sunperf')):
+            return 1
 
     add_info(env, libname, None)
     return 0
@@ -94,25 +94,13 @@ def CheckF77BLAS(context, autoadd = 1, check_version = 0):
     if _get_customization(context, section, libname, autoadd):
         return 1
     else:
-        if sys.platform == 'darwin':
-            if check(('Accelerate', 'vecLib')):
-                return 1
-        else:
-            if check(('MKL', 'ATLAS', 'Sunperf')):
-                return 1
-
-    def check_generic_blas():
-        name = 'Generic'
-        cfg = CONFIG['GenericBlas']
-        res = ConfigRes(name, cfg.defopts, 0)
-        st = check_include_and_run(context, 'BLAS (%s)' % name, res.cfgopts,
-                                   [], test_src, autoadd)
-        if st:
-            add_info(env, libname, res)
-        return st
+        if sys.platform == 'darwin' and check(('Accelerate', 'vecLib')):
+            return 1
+        elif check(('MKL', 'ATLAS', 'Sunperf')):
+            return 1
 
     # Check generic blas last
-    if check_generic_blas():
+    if check(('GenericBlas',)):
         return 1
 
     add_info(env, libname, None)
@@ -153,27 +141,14 @@ def CheckF77LAPACK(context, autoadd = 1, check_version = 0):
     if _get_customization(context, section, libname, autoadd):
         return 1
     else:
-        if sys.platform == 'darwin':
-            if check(('Accelerate', 'vecLib')):
-                return 1
-        else:
-            if check(('MKL', 'ATLAS', 'Sunperf')):
-                return 1
-
-    def check_generic_lapack():
-        name = 'Generic'
-        cfg = CONFIG['GenericLapack']
-        res = ConfigRes(name, cfg.defopts, 0)
-        st = check_include_and_run(context, 'LAPACK (%s)' % name, res.cfgopts,
-                                   [], test_src, autoadd)
-        if st:
-            add_info(env, libname, res)
-        return st
+        if sys.platform == 'darwin' and check(('Accelerate', 'vecLib')):
+            return 1
+        elif check(('MKL', 'ATLAS', 'Sunperf')):
+            return 1
 
     # Check generic blas last
-    st = check_generic_lapack()
-    if st:
-        return st
+    if check(('GenericLapack',)):
+        return 1
 
     add_info(env, libname, None)
     return 0
@@ -200,9 +175,8 @@ def CheckCLAPACK(context, autoadd = 1, check_version = 0):
     else:
         if sys.platform == 'darwin':
             pass
-        else:
-            if check(('ATLAS',)):
-                return 1
+        elif check(('ATLAS',)):
+            return 1
 
     add_info(env, libname, None)
     return 0

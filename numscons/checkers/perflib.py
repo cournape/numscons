@@ -258,6 +258,18 @@ def floupi(out):
 
 IsSunperf = IsFactory('Sunperf').get_func()
 
+def CheckGenericBlas(context, autoadd = 1, check_version = 0):
+    """Generic (fortran) blas checker."""
+    cfg = CONFIG['GenericBlas']
+
+    return 1, ConfigRes("Generic", cfg.opts_factory, 0)
+
+def CheckGenericLapack(context, autoadd = 1, check_version = 0):
+    """Generic (fortran) lapack checker."""
+    cfg = CONFIG['GenericLapack']
+
+    return 1, ConfigRes("Generic", cfg.opts_factory, 0)
+
 #--------------------
 # FFT related perflib
 #--------------------
@@ -280,6 +292,8 @@ def CheckFFTW2(context, autoadd = 1, check_version = 0):
 IsFFTW2 = IsFactory('FFTW2').get_func()
 
 _PERFLIBS_CHECKERS = {
+    'GenericBlas': CheckGenericBlas,
+    'GenericLapack': CheckGenericLapack,
     'MKL': CheckMKL,
     'ATLAS': CheckATLAS,
     'Accelerate': CheckAccelerate,

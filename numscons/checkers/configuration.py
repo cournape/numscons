@@ -128,7 +128,10 @@ class ConfigRes:
             msg += ['  Using default configuration:']
 
         msg += [self.cfgopts.__repr__()]
-        msg += ['  Version is : %s' % self.version]
+        if self.version:
+            msg += ['  Version is : %s' % self.version]
+        else:
+            msg += ['  Version is : Unknown or not checked']
         return '\n'.join(msg)
 
     def __str__(self):
