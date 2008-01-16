@@ -12,19 +12,22 @@ as BLAS, CBLAS, LAPACK checkers."""
 from copy import deepcopy
 
 from configuration import ConfigRes, add_perflib_info
-from common import check_code as _check
+from common import check_code
 from perflib_config import IsFactory, GetVersionFactory, CONFIG
 from version_checkers import atlas_version_checker, mkl_version_checker
 from misc import get_sunperf_link_options
 
+def _check(context, cfg, checker_version, version_checker, autoadd):
+    return check_code(context, cfg.name, cfg.section, cfg.opts_factory,
+                      cfg.headers, cfg.funcs, check_version,
+                      mkl_version_checker, autoadd)
 #--------------
 # MKL checker
 #--------------
 def CheckMKL(context, autoadd = 1, check_version = 0):
     cfg = CONFIG['MKL']
 
-    st, res =  _check(context, cfg.name, cfg.section, cfg.opts_factory, cfg.headers,
-                      cfg.funcs, check_version, mkl_version_checker, autoadd)
+    st, res =  _check(context, cfg, check_version, mkl_version_checker, autoadd)
     if st:
         add_perflib_info(context.env, 'MKL', res)
     return st, res
@@ -39,8 +42,7 @@ def CheckATLAS(context, autoadd = 1, check_version = 0):
     """Check whether ATLAS is usable in C."""
     cfg = CONFIG['ATLAS']
 
-    st, res = _check(context, cfg.name, cfg.section, cfg.opts_factory, cfg.headers,
-                     cfg.funcs, check_version, atlas_version_checker, autoadd)
+    st, res = _check(context, cfg, check_version, atlas_version_checker, autoadd)
     if st:
         add_perflib_info(context.env, 'ATLAS', res)
     return st, res
@@ -72,8 +74,7 @@ def CheckAccelerate(context, autoadd = 1, check_version = 0):
 
     cfg = CONFIG['Accelerate']
 
-    st, res = _check(context, cfg.name, cfg.section, cfg.opts_factory, cfg.headers,
-                     cfg.funcs, check_version, None, autoadd)
+    st, res = _check(context, cfg, check_version, None, autoadd)
     if st:
         add_perflib_info(context.env, 'Accelerate', res)
     return st, res
@@ -84,8 +85,7 @@ def CheckVeclib(context, autoadd = 1, check_version = 0):
     """Checker for Veclib framework (on Mac OS X < 10.3)."""
     cfg = CONFIG['vecLib']
 
-    st, res = _check(context, cfg.name, cfg.section, cfg.opts_factory, cfg.headers,
-                     cfg.funcs, check_version, None, autoadd)
+    st, res = _check(context, cfg, check_version, None, autoadd)
     if st:
         add_perflib_info(context.env, 'vecLib', res)
     return st, res
@@ -99,8 +99,7 @@ def CheckSunperf(context, autoadd = 1, check_version = 0):
     """Checker for sunperf."""
     cfg = CONFIG['Sunperf']
     
-    st, res = _check(context, cfg.name, cfg.section, cfg.opts_factory, cfg.headers,
-                     cfg.funcs, check_version, None, autoadd)
+    st, res = _check(context, cfg, check_version, None, autoadd)
     if not st:
         return st, res
 
@@ -146,8 +145,7 @@ def CheckFFTW3(context, autoadd = 1, check_version = 0):
     """This checker tries to find fftw3."""
     cfg = CONFIG['FFTW3']
     
-    st, res = _check(context, cfg.name, cfg.section, cfg.opts_factory, cfg.headers,
-                     cfg.funcs, check_version, None, autoadd)
+    st, res = _check(context, cfg, check_version, None, autoadd)
     if st:
         add_perflib_info(context.env, 'FFTW3', res)
     return st, res
@@ -158,8 +156,7 @@ def CheckFFTW2(context, autoadd = 1, check_version = 0):
     """This checker tries to find fftw2."""
     cfg = CONFIG['FFTW2']
     
-    st, res = _check(context, cfg.name, cfg.section, cfg.opts_factory, cfg.headers,
-                     cfg.funcs, check_version, None, autoadd)
+    st, res = _check(context, cfg, check_version, None, autoadd)
     if st:
         add_perflib_info(context.env, 'FFTW2', res)
     return st, res
