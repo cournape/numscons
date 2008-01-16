@@ -88,7 +88,7 @@ def build_config():
     return ret
         
 # A dictionary which keys are the name of the perflib (same than perflib.cfg
-# section name) and values a PerflibConfig instance.
+# section name) and values a _PerflibInfo instance.
 CONFIG = build_config()
 
 class IsFactory:
