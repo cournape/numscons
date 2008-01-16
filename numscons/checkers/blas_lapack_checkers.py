@@ -119,15 +119,13 @@ def CheckF77LAPACK(context, autoadd = 1, check_version = 0):
     section = "lapack"
     env = context.env
 
-    if not env.has_key('F77_NAME_MANGLER'):
-        if not CheckF77Mangling(context):
-            add_lib_info(env, 'lapack', None)
-            return 0
+    if not env.has_key('F77_NAME_MANGLER') and not CheckF77Mangling(context):
+        add_lib_info(env, 'lapack', None)
+        return 0
     
-    if not env.has_key('F77_LDFLAGS'):
-        if not CheckF77Clib(context):
-            add_lib_info(env, 'lapack', None)
-            return 0
+    if not env.has_key('F77_LDFLAGS') and not CheckF77Clib(context):
+        add_lib_info(env, 'lapack', None)
+        return 0
     
     # Get the mangled name of our test function
     sgesv_string = env['F77_NAME_MANGLER']('sgesv')
