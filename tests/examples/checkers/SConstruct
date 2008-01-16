@@ -68,4 +68,4 @@ if do_check == 1:
         print "No LIBS in env"
 
 config.Finish()
-
+print env.Dump('NUMPY_PKG_CONFIG')

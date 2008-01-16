@@ -1,5 +1,5 @@
 #! /usr/bin/env python
-# Last Change: Wed Jan 16 07:00 PM 2008 J
+# Last Change: Wed Jan 16 08:00 PM 2008 J
 
 """This module defines checkers for performances libs providing standard API,
 such as MKL (Intel), ATLAS, Sunperf (solaris and linux), Accelerate (Mac OS X),
@@ -18,6 +18,7 @@ from support import save_and_set, restore
 from configuration import ConfigRes, add_perflib_info
 from common import check_code as _check
 from perflib_config import IsFactory, GetVersionFactory, CONFIG
+from version_checkers import atlas_version_checker, mkl_version_checker
 
 from numscons.core.utils import popen_wrapper
 from numscons.testcode_snippets import cblas_sgemm
@@ -25,46 +26,11 @@ from numscons.testcode_snippets import cblas_sgemm
 #--------------
 # MKL checker
 #--------------
-def _mkl_version_checker(context, opts):
-    env = context.env
-    version_code = r"""
-#include <stdio.h>
-#include <mkl.h>
-
-int main(void)
-{
-MKLVersion ver;
-MKLGetVersion(&ver);
-
-printf("Full version: %d.%d.%d\n", ver.MajorVersion,
-       ver.MinorVersion,
-       ver.BuildNumber);
-
-return 0;
-}
-"""
-
-    opts['rpath'] = opts['library_dirs']
-    saved = save_and_set(env, opts)
-    try:
-        vst, out = context.TryRun(version_code, '.c')
-    finally:
-        restore(env, saved)
-
-    if vst:
-        m = re.search(r'Full version: (\d+[.]\d+[.]\d+)', out)
-        if m:
-            version = m.group(1)
-    else:
-        version = ''
-
-    return vst, version
-
 def CheckMKL(context, autoadd = 1, check_version = 0):
     cfg = CONFIG['MKL']
 
     st, res =  _check(context, cfg.name, cfg.section, cfg.opts_factory, cfg.headers,
-                      cfg.funcs, check_version, _mkl_version_checker, autoadd)
+                      cfg.funcs, check_version, mkl_version_checker, autoadd)
     if st:
         add_perflib_info(context.env, 'MKL', res)
     return st, res
@@ -75,39 +41,12 @@ GetMKLVersion = GetVersionFactory('MKL').get_func()
 #---------------
 # ATLAS Checker
 #---------------
-def _atlas_version_checker(context, opts):
-    env = context.env
-    version_code = """
-void ATL_buildinfo(void);
-int main(void) {
-ATL_buildinfo();
-return 0;
-}
-"""
-    opts['rpath'] = opts['library_dirs']
-    saved = save_and_set(env, opts)
-    try:
-        vst, out = context.TryRun(version_code, '.c')
-    finally:
-        restore(env, saved)
-
-    if vst:
-        m = re.search('ATLAS version (?P<version>\d+[.]\d+[.]\d+)', out)
-        if m:
-            version = m.group(1)
-        else:
-            version = ''
-    else:
-        version = ''
-
-    return vst, version
-
 def CheckATLAS(context, autoadd = 1, check_version = 0):
     """Check whether ATLAS is usable in C."""
     cfg = CONFIG['ATLAS']
 
     st, res = _check(context, cfg.name, cfg.section, cfg.opts_factory, cfg.headers,
-                     cfg.funcs, check_version, _atlas_version_checker, autoadd)
+                     cfg.funcs, check_version, atlas_version_checker, autoadd)
     if st:
         add_perflib_info(context.env, 'ATLAS', res)
     return st, res
@@ -140,7 +79,7 @@ def CheckAccelerate(context, autoadd = 1, check_version = 0):
     cfg = CONFIG['Accelerate']
 
     st, res = _check(context, cfg.name, cfg.section, cfg.opts_factory, cfg.headers,
-                     cfg.funcs, check_version, _atlas_version_checker, autoadd)
+                     cfg.funcs, check_version, None, autoadd)
     if st:
         add_perflib_info(context.env, 'Accelerate', res)
     return st, res
@@ -152,7 +91,7 @@ def CheckVeclib(context, autoadd = 1, check_version = 0):
     cfg = CONFIG['vecLib']
 
     st, res = _check(context, cfg.name, cfg.section, cfg.opts_factory, cfg.headers,
-                     cfg.funcs, check_version, _atlas_version_checker, autoadd)
+                     cfg.funcs, check_version, None, autoadd)
     if st:
         add_perflib_info(context.env, 'vecLib', res)
     return st, res
@@ -167,7 +106,7 @@ def CheckSunperf(context, autoadd = 1, check_version = 0):
     cfg = CONFIG['Sunperf']
     
     st, res = _check(context, cfg.name, cfg.section, cfg.opts_factory, cfg.headers,
-                     cfg.funcs, check_version, _atlas_version_checker, autoadd)
+                     cfg.funcs, check_version, None, autoadd)
     if not st:
         return st, res
 
@@ -295,7 +234,7 @@ def CheckFFTW3(context, autoadd = 1, check_version = 0):
     cfg = CONFIG['FFTW3']
     
     st, res = _check(context, cfg.name, cfg.section, cfg.opts_factory, cfg.headers,
-                     cfg.funcs, check_version, _atlas_version_checker, autoadd)
+                     cfg.funcs, check_version, None, autoadd)
     if st:
         add_perflib_info(context.env, 'FFTW3', res)
     return st, res
@@ -307,7 +246,7 @@ def CheckFFTW2(context, autoadd = 1, check_version = 0):
     cfg = CONFIG['FFTW2']
     
     st, res = _check(context, cfg.name, cfg.section, cfg.opts_factory, cfg.headers,
-                     cfg.funcs, check_version, _atlas_version_checker, autoadd)
+                     cfg.funcs, check_version, None, autoadd)
     if st:
         add_perflib_info(context.env, 'FFTW2', res)
     return st, res
