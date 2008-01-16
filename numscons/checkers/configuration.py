@@ -1,7 +1,13 @@
 #! /usr/bin/env python
 # Last Change: Wed Jan 16 07:00 PM 2008 J
+
+"""This module implements the functionality to:
+    - keep all necessary build informations about perflib and meta lib, so that
+      those info can be passed from one function to the other.
+    - add/retrieve info about checked meta-lib for show_config functionality.
+"""
 import os
-from copy import deepcopy, copy
+from copy import copy
 
 from numscons.core.utils import DefaultDict
 
@@ -14,9 +20,9 @@ def add_lib_info(env, name, opt):
     cfg[name] = opt
 
 def write_info(env):
-    dir = os.path.dirname(env['NUMPY_PKG_CONFIG_FILE'])
-    if not os.path.exists(dir):
-        os.makedirs(dir)
+    cfgdir = os.path.dirname(env['NUMPY_PKG_CONFIG_FILE'])
+    if not os.path.exists(cfgdir):
+        os.makedirs(cfgdir)
     cfg = env['NUMPY_PKG_CONFIG']['PERFLIB']
     config_str = {}
     for k, i in cfg.items():
@@ -79,22 +85,14 @@ class BuildOpts(DefaultDict):
     """Small container class to keep all necessary options to build with a
     given library/package, such as cflags, libs, library paths, etc..."""
     _keys = _BUILD_OPTS_FLAGS
-    @classmethod
-    def fromcallable(cls, default = None):
-        return DefaultDict.fromcallable(BuildOpts._keys, default)
-
     def __init__(self, default = None):
-        DefaultDict.__init__(self, BuildOpts._keys, default)
+        DefaultDict.__init__(self, self._keys, default)
+        for k in self._keys:
+            self[k] = []
 
     def __repr__(self):
         msg = [r'%s : %s' % (k, i) for k, i in self.items() if len(i) > 0]
         return '\n'.join(msg)
-
-    def __copy__(self):
-        cpy = BuildOpts()
-        for k in self.keys():
-            cpy[k] = deepcopy(self[k])
-        return cpy 
 
 class BuildOptsFactory:
     """This class can return cutomized BuildOpts instances according to some
@@ -178,8 +176,8 @@ if __name__ == '__main__':
     a = DefaultDict(avkeys = _BUILD_OPTS_FACTORY_FLAGS)
     for p in _PERFLIBS:
         mkl = CONFIG[p]
-        for k in mkl._values:
-            a[k] = mkl._values[k]
+        for key in mkl._values:
+            a[key] = mkl._values[key]
 
         b = BuildOptsFactory(a)
         print b.core_config()
