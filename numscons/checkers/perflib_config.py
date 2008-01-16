@@ -1,18 +1,17 @@
 #! /usr/bin/env python
-# Last Change: Wed Jan 16 07:00 PM 2008 J
+# Last Change: Wed Jan 16 09:00 PM 2008 J
 """This module contains the infrastructure to get all the necessary options for
 perflib checkers from the perflib configuration file."""
 
 from os.path import join as pjoin, dirname as pdirname
-from ConfigParser import SafeConfigParser, RawConfigParser
-from copy import copy
+from ConfigParser import SafeConfigParser
 
 from numscons.numdist import default_lib_dirs
 
 from numscons.core.utils import DefaultDict
-from configuration import available_build_opts_flags,\
-                          available_build_opts_factory_flags, \
-                          BuildOptsFactory, BuildOpts
+from configuration import available_build_opts_factory_flags, BuildOptsFactory
+
+__all__ = ['CONFIG', 'IsFactory', 'GetVersionFactory']
 
 _PERFLIBS = ('GenericBlas', 'GenericLapack', 'MKL', 'ATLAS', 'Accelerate',
              'vecLib', 'Sunperf', 'FFTW2', 'FFTW3')
@@ -20,7 +19,7 @@ _PERFLIBS = ('GenericBlas', 'GenericLapack', 'MKL', 'ATLAS', 'Accelerate',
 #------------------------
 # Generic functionalities
 #------------------------
-class PerflibConfig:
+class _PerflibInfo:
     """A class which contain all the information for a given performance
     library, including build options (cflags, libs, path, etc....) and meta
     information (name, version, how to check)."""
@@ -40,14 +39,11 @@ class PerflibConfig:
         return self.__repr__()
 
     def __repr__(self):
-        repr = ["Display name: %s" % self.name]
-        repr += ["Section name: %s" % self.section]
-        repr += ["Headers to check : %s" % self.headers]
-        repr += ["Funcs to check : %s" % self.funcs]
-        return '\n'.join(repr)
-
-    def get_def_opts(self):
-        return self.defopts
+        rep = ["Display name: %s" % self.name]
+        rep += ["Section name: %s" % self.section]
+        rep += ["Headers to check : %s" % self.headers]
+        rep += ["Funcs to check : %s" % self.funcs]
+        return '\n'.join(rep)
 
 #-------------------------------------------
 # Perflib specific configuration and helpers
@@ -56,10 +52,6 @@ def build_config():
     # list_opts contain a list of all available options available in
     # perflib.cfg which can be a list.
     list_opts = available_build_opts_factory_flags()
-
-    # str_opts contain a list of all available options available in perflib.cfg
-    # which are strings and cannot be list.
-    str_opts = ('dispname', 'sitename')
 
     #defint = {'atlas_def_libs' : 
     #          ','.join([pjoin(i, 'atlas') for i in default_lib_dirs])}
@@ -87,7 +79,7 @@ def build_config():
             #yop[i] =  cfg.get(name, i, vars = defint)
             yop[i] =  cfg.get(name, i).split(',')
 
-        return PerflibConfig(dispname, sitename, yop)
+        return _PerflibInfo(dispname, sitename, yop)
 
     ret = {}
     for i in _PERFLIBS:
@@ -104,7 +96,7 @@ class IsFactory:
         """Name should be one key of CONFIG."""
         try:
             CONFIG[name]
-        except KeyError, e:
+        except KeyError:
             raise RuntimeError("name %s is unknown")
 
         def f(env, libname):
@@ -123,7 +115,7 @@ class GetVersionFactory:
         """Name should be one key of CONFIG."""
         try:
             CONFIG[name]
-        except KeyError, e:
+        except KeyError:
             raise RuntimeError("name %s is unknown")
 
         def f(env, libname):

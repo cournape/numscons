@@ -99,6 +99,9 @@ def CheckSunperf(context, autoadd = 1, check_version = 0):
 
 IsSunperf = IsFactory('Sunperf').get_func()
 
+#---------------------
+# Generic BLAS checker
+#---------------------
 def CheckGenericBlas(context, autoadd = 1, check_version = 0):
     """Generic (fortran) blas checker."""
     cfg = CONFIG['GenericBlas']
@@ -107,6 +110,9 @@ def CheckGenericBlas(context, autoadd = 1, check_version = 0):
     add_perflib_info(context.env, 'GenericBlas', res)
     return 1, res
 
+#-----------------------
+# Generic Lapack checker
+#-----------------------
 def CheckGenericLapack(context, autoadd = 1, check_version = 0):
     """Generic (fortran) lapack checker."""
     cfg = CONFIG['GenericLapack']
