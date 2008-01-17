@@ -12,8 +12,13 @@ from copy import copy
 from numscons.core.utils import DefaultDict
 
 def add_perflib_info(env, name, opt):
+    assert opt is not None
     cfg = env['NUMPY_PKG_CONFIG']['PERFLIB']
     cfg[name] = opt
+
+def add_empty_perflib_info(env, name):
+    cfg = env['NUMPY_PKG_CONFIG']['PERFLIB']
+    cfg[name] = None
 
 def add_lib_info(env, name, opt):
     cfg = env['NUMPY_PKG_CONFIG']['LIB']
@@ -43,15 +48,14 @@ class PerflibInfo:
     etc...).
 
     As such, this class handle both caching and information sharing."""
-    def __init__(self, name, opts_factory, is_customized = False, version =
+    def __init__(self, opts_factory, is_customized = False, version =
                  None):
         self.is_customized = is_customized
         self.opts_factory = opts_factory
         self.version = version
-        self.name = name
 
     def __repr__(self):
-        msg = ['Using %s' % self.name]
+        msg = []
         if self.is_customized:
             msg += ['- Customized from site.cfg -']
         else:

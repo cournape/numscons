@@ -11,7 +11,8 @@ import os
 from copy import copy
 
 from numscons.core.libinfo import get_config_from_section, get_config
-from configuration import ConfigRes
+from configuration import ConfigRes, add_perflib_info, PerflibInfo, \
+                          add_empty_perflib_info
 from support import save_and_set, restore, check_symbol
 
 def _get_site_cfg_customization(section, defopts_factory):
@@ -81,7 +82,8 @@ def check_code(context, name, section, opts_factory, headers_to_check,
 
     # Is customized from user environment ?
     if os.environ.has_key(name) and os.environ[name] == 'None':
-        return context.Result('Disabled from env through var %s !' % name), {}
+        add_empty_perflib_info(context.env, name)
+        return context.Result('Disabled from env through var %s !' % name), None
 
     # Get site.cfg customization if any
     found = _get_site_cfg_customization(section, opts_factory)
@@ -92,13 +94,15 @@ def check_code(context, name, section, opts_factory, headers_to_check,
     # Check whether the header is available (CheckHeader-like checker)
     st = _check_header(context, opts, headers_to_check)
     if not st:
-        return st, ConfigRes(name, opts, found)
+        add_empty_perflib_info(context.env, name)
+        return st, None
 
     # Check whether the library is available (CheckLib-like checker)
     st = _check_symbol(context, opts, headers_to_check, funcs_to_check, 
                        autoadd)
     if not st:
-        return st, ConfigRes(name, opts, found)
+        add_empty_perflib_info(context.env, name)
+        return st, None
 
     context.Result(st)
 
@@ -106,7 +110,10 @@ def check_code(context, name, section, opts_factory, headers_to_check,
     if check_version:
         version = _check_version(context, opts, version_checker)
         cfgres = ConfigRes(name, opts_factory, found, version)
+        add_perflib_info(context.env, name, 
+                         PerflibInfo(opts_factory, found, version))
     else:
         cfgres = ConfigRes(name, opts_factory, found, version = 'Not checked')
+        add_perflib_info(context.env, name, PerflibInfo(opts_factory, found))
 
     return st, cfgres

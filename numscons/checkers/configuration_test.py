@@ -75,10 +75,10 @@ class test_PerflibInfo(unittest.TestCase):
         self.fa = CONFIG['MKL']
 
     def test_init(self):
-        a = PerflibInfo('MKL', self.fa)
+        a = PerflibInfo(self.fa)
 
     def test_print(self):
-        print PerflibInfo('MKL', self.fa)
+        print PerflibInfo(self.fa)
 
 class test_MetalibInfo(unittest.TestCase):
     def setUp(self):
