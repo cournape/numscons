@@ -112,7 +112,8 @@ _BUILD_OPTS_FLAGS = ('include_dirs', 'cflags', 'library_dirs', 'libraries',
 # should be added, they should be added here.
 _BUILD_OPTS_FACTORY_FLAGS = \
     _BUILD_OPTS_FLAGS + \
-    ('cblas_libs', 'blas_libs', 'clapack_libs', 'lapack_libs', 'htc', 'ftc')
+    ('cblas_libs', 'blas_libs', 'clapack_libs', 'lapack_libs', 'fft_libs',
+     'htc', 'ftc')
 
 def available_build_opts_flags():
     return _BUILD_OPTS_FLAGS
@@ -148,6 +149,7 @@ class BuildConfigFactory:
             self._bld[k] = self._data[k]
 
         self._cfgs = {
+            'fft':      self.fft_config,
             'blas':     self.blas_config,
             'lapack':   self.lapack_config,
             'cblas':    self.cblas_config,
@@ -179,6 +181,9 @@ class BuildConfigFactory:
 
     def clapack_config(self):
         return self._get_libraries(['clapack_libs', 'cblas_libs'])
+
+    def fft_config(self):
+        return self._get_libraries(['fft_libs'])
 
     def __repr__(self):
         return '\n\t'.join(['%s: %s' % (k, v) 
