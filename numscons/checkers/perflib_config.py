@@ -96,40 +96,21 @@ CONFIG = build_config()
 class IsFactory:
     def __init__(self, name):
         """Name should be one key of CONFIG."""
-        try:
-            CONFIG[name]
-        except KeyError:
-            raise RuntimeError("name %s is unknown")
-
-        def f(env, libname):
-            if env['NUMPY_PKG_CONFIG']['LIB'][libname] is None:
-                return 0 == 1
+        def func(env, libname): 
+            cache = env['NUMPY_PKG_CONFIG']['LIB'][libname]
+            if cache:
+                return cache.uses_perflib(name)
             else:
-                return env['NUMPY_PKG_CONFIG']['LIB'][libname].name == \
-                       CONFIG[name].name
-        self.func = f
+                return False
 
-    def get_func(self):
-        return self.func
+        self.func = func
 
 class GetVersionFactory:
     def __init__(self, name):
         """Name should be one key of CONFIG."""
-        try:
-            CONFIG[name]
-        except KeyError:
-            raise RuntimeError("name %s is unknown")
-
-        def f(env, libname):
-            if env['NUMPY_PKG_CONFIG']['LIB'][libname] is None or \
-               not env['NUMPY_PKG_CONFIG']['LIB'][libname].name == CONFIG[name].name:
-                return 'No version info'
-            else:
-                return env['NUMPY_PKG_CONFIG']['LIB'][libname].version
-        self.func = f
-
-    def get_func(self):
-        return self.func
+        def func(env):
+            return env['NUMPY_PKG_CONFIG']['PERFLIB'][name].version
+        self.func = func
 
 if __name__ == '__main__':
     for k, v in CONFIG.items():

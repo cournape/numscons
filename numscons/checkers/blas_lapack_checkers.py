@@ -11,7 +11,8 @@ from numscons.testcode_snippets import \
         clapack_sgesv as clapack_src
 from numscons.fortran_scons import CheckF77Mangling, CheckF77Clib
 
-from configuration import add_lib_info, ConfigRes, get_cached_perflib_info
+from configuration import add_lib_info, ConfigRes, get_cached_perflib_info, \
+                          MetalibInfo
 from perflib import CONFIG, checker
 from support import check_include_and_run
 
@@ -31,7 +32,7 @@ def _check(perflibs, context, libname, check_version, msg_template, test_src,
             st = check_include_and_run(context, msg_template % name, 
                                        cfgopts, [], test_src, autoadd)
             if st:
-                add_lib_info(context.env, libname, res)
+                add_lib_info(context.env, libname, MetalibInfo(pname, cfgopts))
             return st
     for p in perflibs:
         if _check_perflib(p):

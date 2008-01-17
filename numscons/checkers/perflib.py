@@ -41,16 +41,16 @@ class CheckPerflibFactory:
 #--------------
 CheckMKL = CheckPerflibFactory('MKL').checker
 
-IsMKL = IsFactory('MKL').get_func()
-GetMKLVersion = GetVersionFactory('MKL').get_func()
+IsMKL = IsFactory('MKL').func
+GetMKLVersion = GetVersionFactory('MKL').func
 
 #---------------
 # ATLAS Checker
 #---------------
 CheckATLAS = CheckPerflibFactory('ATLAS').checker
 
-IsATLAS = IsFactory('ATLAS').get_func()
-GetATLASVersion = GetVersionFactory('ATLAS').get_func()
+IsATLAS = IsFactory('ATLAS').func
+GetATLASVersion = GetVersionFactory('ATLAS').func
 
 #------------------------------
 # Mac OS X Frameworks checkers
@@ -64,10 +64,10 @@ GetATLASVersion = GetVersionFactory('ATLAS').get_func()
 #   these were available in vecLib.framework. The currently available
 #   libraries are described below.
 CheckAccelerate = CheckPerflibFactory('Accelerate').checker
-IsAccelerate = IsFactory('Accelerate').get_func()
+IsAccelerate = IsFactory('Accelerate').func
 
 CheckVeclib = CheckPerflibFactory('vecLib').checker
-IsVeclib = IsFactory('vecLib').get_func()
+IsVeclib = IsFactory('vecLib').func
 
 #-----------------
 # Sunperf checker
@@ -97,7 +97,7 @@ def CheckSunperf(context, autoadd = 1, check_version = 0):
 
     return st, res
 
-IsSunperf = IsFactory('Sunperf').get_func()
+IsSunperf = IsFactory('Sunperf').func
 
 #---------------------
 # Generic BLAS checker
@@ -126,11 +126,11 @@ def CheckGenericLapack(context, autoadd = 1, check_version = 0):
 #--------------------
 CheckFFTW3 = CheckPerflibFactory('FFTW3').checker
 
-IsFFTW3 = IsFactory('FFTW3').get_func()
+IsFFTW3 = IsFactory('FFTW3').func
 
 CheckFFTW2 = CheckPerflibFactory('FFTW3').checker
 
-IsFFTW2 = IsFactory('FFTW2').get_func()
+IsFFTW2 = IsFactory('FFTW2').func
 
 _PERFLIBS_CHECKERS = {
     'GenericBlas': CheckGenericBlas,

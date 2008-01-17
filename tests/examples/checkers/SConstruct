@@ -48,10 +48,10 @@ if do_check == 1:
     st = config.CheckFFT(autoadd = 0)
 
     if IsMKL(env, 'blas'):
-        print "blas is MKL (%s)" % GetMKLVersion(env, 'blas')
+        print "blas is MKL (%s)" % GetMKLVersion(env)
 
     if IsATLAS(env, 'blas'):
-        print "blas is ATLAS (%s)" % GetATLASVersion(env, 'blas')
+        print "blas is ATLAS (%s)" % GetATLASVersion(env)
 
     if IsFFTW3(env, 'fft'):
         print "fft is fftw3"

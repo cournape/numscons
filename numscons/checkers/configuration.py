@@ -88,16 +88,20 @@ class MetalibInfo:
 
     This will primaly be used to generate build info, retrived from numpy/scipy
     through show_config function.."""
-    def __init__(self, name, perflib_name, bld_opts, is_customized = False):
-        self.name = name
+    def __init__(self, perflib_name, bld_opts, is_customized = False):
         self.pname = perflib_name
         self.is_customized = is_customized
         self.opts = bld_opts
 
     def __repr__(self):
-        msg = ['%s: uses %s' % (self.name, self.pname)]
+        msg = ['uses %s' % self.pname]
         msg += [repr(self.opts)]
         return '\n\t'.join(msg)
+
+    def uses_perflib(self, pname):
+        """Return true is the lib uses pname as the underlying performance
+        library."""
+        return pname == self.pname
 
 # List of options that BuildOpts can keep. If later additional variables should
 # be added (e.g. cpp flags, etc...), they should be added here.
