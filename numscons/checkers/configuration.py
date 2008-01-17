@@ -42,7 +42,7 @@ def write_info(env):
     cfgdir = os.path.dirname(env['NUMPY_PKG_CONFIG_FILE'])
     if not os.path.exists(cfgdir):
         os.makedirs(cfgdir)
-    cfg = env['NUMPY_PKG_CONFIG']['PERFLIB']
+    cfg = env['NUMPY_PKG_CONFIG']['LIB']
     config_str = {}
     for k, i in cfg.items():
         config_str[k] = str(i)
