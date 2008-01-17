@@ -103,12 +103,12 @@ class MetalibInfo:
         library."""
         return pname == self.pname
 
-# List of options that BuildOpts can keep. If later additional variables should
+# List of options that BuildConfig can keep. If later additional variables should
 # be added (e.g. cpp flags, etc...), they should be added here.
 _BUILD_OPTS_FLAGS = ('include_dirs', 'cflags', 'library_dirs', 'libraries',
                      'linkflags', 'rpath', 'frameworks')
 
-# List of options that BuildOptsFactory can keep. If later additional variables
+# List of options that BuildConfigFactory can keep. If later additional variables
 # should be added, they should be added here.
 _BUILD_OPTS_FACTORY_FLAGS = \
     _BUILD_OPTS_FLAGS + \
@@ -120,7 +120,7 @@ def available_build_opts_flags():
 def available_build_opts_factory_flags():
     return _BUILD_OPTS_FACTORY_FLAGS
 
-class BuildOpts(DefaultDict):
+class BuildConfig(DefaultDict):
     """Small container class to keep all necessary options to build with a
     given library/package, such as cflags, libs, library paths, etc..."""
     _keys = _BUILD_OPTS_FLAGS
@@ -133,17 +133,17 @@ class BuildOpts(DefaultDict):
         msg = [r'%s : %s' % (k, i) for k, i in self.items() if len(i) > 0]
         return '\n'.join(msg)
 
-class BuildOptsFactory:
-    """This class can return cutomized BuildOpts instances according to some
+class BuildConfigFactory:
+    """This class can return cutomized BuildConfig instances according to some
     options.
     
-    For example, you would create a BuildOptsFactory with a MKL BuildOpts
-    instance, and the factory would return customized BuildOpts for blas,
+    For example, you would create a BuildConfigFactory with a MKL BuildConfig
+    instance, and the factory would return customized BuildConfig for blas,
     lapack, 64 vs 32 bits, etc..."""
     def __init__(self, bld_opts):
         self._data = bld_opts
 
-        self._bld = BuildOpts()
+        self._bld = BuildConfig()
         for k in self._bld:
             self._bld[k] = self._data[k]
 
@@ -188,8 +188,8 @@ class BuildOptsFactory:
         """Given a dictionary cfg, replace all its value with the one of cfg,
         for every key in cfg.
         
-        Example: you have a BuildOptsFactory instance, and you want to modify
-        some of its options from a BuildOpts instance (obtained from site.cfg
+        Example: you have a BuildConfigFactory instance, and you want to modify
+        some of its options from a BuildConfig instance (obtained from site.cfg
         customization)."""
         for k, v in cfg.items():
             self._bld[k] = v
@@ -198,8 +198,8 @@ class BuildOptsFactory:
         """Given a dictionary cfg, merge all its value with the one of cfg, for
         every key in cfg.
         
-        Example: you have a BuildOptsFactory instance, and you want to modify
-        some of its options from a BuildOpts instance (obtained from site.cfg
+        Example: you have a BuildConfigFactory instance, and you want to modify
+        some of its options from a BuildConfig instance (obtained from site.cfg
         customization)."""
         if append:
             for k, v in cfg.items():

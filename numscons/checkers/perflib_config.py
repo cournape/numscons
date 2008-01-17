@@ -9,7 +9,7 @@ from ConfigParser import SafeConfigParser
 from numscons.numdist import default_lib_dirs
 
 from numscons.core.utils import DefaultDict
-from configuration import available_build_opts_factory_flags, BuildOptsFactory
+from configuration import available_build_opts_factory_flags, BuildConfigFactory
 
 __all__ = ['CONFIG', 'IsFactory', 'GetVersionFactory']
 
@@ -35,7 +35,7 @@ class _PerflibConfig:
         self.funcs = values['ftc']
         #self.version_checker = version_checker
 
-        self.opts_factory = BuildOptsFactory(values)
+        self.opts_factory = BuildConfigFactory(values)
 
     def __str__(self):
         return self.__repr__()

@@ -14,7 +14,7 @@ from distutils.util import get_platform
 # from numpy.distutils.scons.fortran_scons import CheckF77Mangling, CheckF77Clib
 from perflib import CheckMKL, CheckFFTW3, CheckFFTW2, checker
 from support import check_include_and_run
-from configuration import BuildOpts, add_lib_info, MetalibInfo, \
+from configuration import BuildConfig, add_lib_info, MetalibInfo, \
                           get_cached_perflib_info
 
 __all__ = ['CheckFFT']

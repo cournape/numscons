@@ -15,7 +15,7 @@ from configuration import PerflibInfo
 from support import save_and_set, restore, check_symbol
 
 def _get_site_cfg_customization(section, defopts_factory):
-    """defopts_factory should be an instance of BuildOptsFactory."""
+    """defopts_factory should be an instance of BuildConfigFactory."""
     siteconfig = get_config()[0]
     opts, found = get_config_from_section(siteconfig, section)
     defopts_factory.merge(opts)
