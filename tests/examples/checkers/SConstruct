@@ -34,7 +34,7 @@ config = env.NumpyConfigure(custom_tests =
     'CheckFFT' : CheckFFT})
 
 if do_check == 1:
-    st = config.CheckATLAS(autoadd = 0)
+    st = config.CheckATLAS(autoadd = 0, check_version = True)
     st = config.CheckMKL(autoadd = 0)
     st = config.CheckAccelerate(autoadd = 0)
     st = config.CheckSunperf(autoadd = 0)

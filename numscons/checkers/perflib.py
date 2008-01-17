@@ -22,15 +22,15 @@ from misc import get_sunperf_link_options
 def _check(context, cfg, check_version, version_checker, autoadd):
     return check_code(context, cfg.name, cfg.section, cfg.opts_factory,
                       cfg.headers, cfg.funcs, check_version,
-                      mkl_version_checker, autoadd)
+                      version_checker, autoadd)
 
 class CheckPerflibFactory:
     def __init__(self, name):
         def checker(context, autoadd = 1, check_version = 0):
             cfg = CONFIG[name]
 
-            ret = _check(context, cfg, check_version, mkl_version_checker,
-                         autoadd)
+            ret = _check(context, cfg, check_version,
+                         version_checker(name), autoadd)
             if ret is not None:
                 add_perflib_info(context.env, name, ret)
                 return 1
@@ -146,5 +146,19 @@ _PERFLIBS_CHECKERS = {
     'FFTW2': CheckFFTW2,
     'FFTW3': CheckFFTW3}
 
+_PERFLIBS_VERSION_CHECKERS = {
+    'MKL': mkl_version_checker,
+    'GenericBlas': None,
+    'GenericLapack': None,
+    'ATLAS': atlas_version_checker,
+    'Accelerate': None,
+    'vecLib': None,
+    'Sunperf': None,
+    'FFTW2': None,
+    'FFTW3': None}
+
 def checker(name):
     return _PERFLIBS_CHECKERS[name]
+
+def version_checker(name):
+    return _PERFLIBS_VERSION_CHECKERS[name]
