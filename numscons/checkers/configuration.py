@@ -43,7 +43,8 @@ class PerflibInfo:
     etc...).
 
     As such, this class handle both caching and information sharing."""
-    def __init__(self, opts_factory, is_cutomized = False, version = None):
+    def __init__(self, name, opts_factory, is_customized = False, version =
+                 None):
         # Necessary info:
         # - is customized ?
         # - Version
@@ -51,6 +52,21 @@ class PerflibInfo:
         self.is_customized = is_customized
         self.opts_factory = opts_factory
         self.version = version
+        self.name = name
+
+    def __repr__(self):
+        msg = ['Using %s' % self.name]
+        if self.is_customized:
+            msg += ['- Customized from site.cfg -']
+        else:
+            msg += ['- Using default configuration -']
+
+        if self.version:
+            msg += ['- version is : %s' % self.version]
+        else:
+            msg += ['- Version is : Unknown or not checked -']
+        return '\n\t'.join(msg)
+
 
 class MetalibInfo:
     """Instances of this class will keep all informations about a meta lib

@@ -8,7 +8,7 @@ import unittest
 
 from numscons.core.utils import DefaultDict
 from numscons.checkers.configuration import BuildOpts, BuildOptsFactory, \
-                                            available_build_opts_factory_flags
+    available_build_opts_factory_flags, PerflibInfo
 
 class test_BuildOpts(unittest.TestCase):
     def test_default(self):
@@ -46,3 +46,14 @@ class test_BuildOptsFactory(unittest.TestCase):
         #print self.fa._data
         for k, v in b.items():
             assert cfg[k] == v
+
+class test_PerflibInfo(unittest.TestCase):
+    def setUp(self):
+        from numscons.checkers.perflib_config import CONFIG
+        self.fa = CONFIG['MKL']
+
+    def test_init(self):
+        a = PerflibInfo('MKL', self.fa)
+
+    def test_print(self):
+        print PerflibInfo('MKL', self.fa)
