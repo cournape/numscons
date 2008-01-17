@@ -86,8 +86,8 @@ class BuildOpts(DefaultDict):
     """Small container class to keep all necessary options to build with a
     given library/package, such as cflags, libs, library paths, etc..."""
     _keys = _BUILD_OPTS_FLAGS
-    def __init__(self, default = None):
-        DefaultDict.__init__(self, self._keys, default)
+    def __init__(self):
+        DefaultDict.__init__(self, self._keys)
         for k in self._keys:
             self[k] = []
 
@@ -153,7 +153,7 @@ class BuildOptsFactory:
         some of its options from a BuildOpts instance (obtained from site.cfg
         customization)."""
         for k, v in cfg.items():
-            self._data[k] = v
+            self._bld[k] = v
 
 class ConfigRes:
     def __init__(self, name, cfgopts, origin, version = None):
@@ -186,22 +186,4 @@ if __name__ == '__main__':
     from numscons.checkers.perflib_config import CONFIG, _PERFLIBS
     a = DefaultDict(avkeys = _BUILD_OPTS_FACTORY_FLAGS)
     for p in _PERFLIBS:
-        mkl = CONFIG[p]
-        for key in mkl._values:
-            a[key] = mkl._values[key]
-
-        b = BuildOptsFactory(a)
-        print "====================="
-        print b.core_config()
-        print b.blas_config()
-        print b['blas']()
-        print b.cblas_config()
-        print b.lapack_config()
-        print b.clapack_config()
-
-    mkl = CONFIG['MKL']
-        
-    print mkl.opts_factory
-    a = {'lapack_libs': ['mkl_lapack']}
-    mkl.opts_factory.replace(a)
-    print mkl.opts_factory
+        print CONFIG[p].opts_factory
