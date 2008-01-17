@@ -18,8 +18,7 @@ def _get_site_cfg_customization(section, defopts_factory):
     """defopts_factory should be an instance of BuildOptsFactory."""
     siteconfig = get_config()[0]
     opts, found = get_config_from_section(siteconfig, section)
-    if found:
-        defopts_factory.replace(opts)
+    defopts_factory.merge(opts)
 
     return found
 
