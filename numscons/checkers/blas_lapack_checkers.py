@@ -11,7 +11,7 @@ from numscons.testcode_snippets import \
         clapack_sgesv as clapack_src
 from numscons.fortran_scons import CheckF77Mangling, CheckF77Clib
 
-from configuration import add_lib_info, ConfigRes
+from configuration import add_lib_info, ConfigRes, get_cached_perflib_info
 from perflib import CONFIG, checker
 from support import check_include_and_run
 
@@ -26,7 +26,8 @@ def _check(perflibs, context, libname, check_version, msg_template, test_src,
         name = CONFIG[pname].name
         st, res = func(context, autoadd, check_version)
         if st:
-            cfgopts = res.cfgopts[libname]()
+            cache = get_cached_perflib_info(context.env, pname)
+            cfgopts = cache.opts_factory[libname]()
             st = check_include_and_run(context, msg_template % name, 
                                        cfgopts, [], test_src, autoadd)
             if st:

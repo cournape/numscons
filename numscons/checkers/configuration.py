@@ -13,6 +13,7 @@ from numscons.core.utils import DefaultDict
 
 def add_perflib_info(env, name, opt):
     assert opt is not None
+    assert isinstance(opt, PerflibInfo)
     cfg = env['NUMPY_PKG_CONFIG']['PERFLIB']
     cfg[name] = opt
 
@@ -23,6 +24,19 @@ def add_empty_perflib_info(env, name):
 def add_lib_info(env, name, opt):
     cfg = env['NUMPY_PKG_CONFIG']['LIB']
     cfg[name] = opt
+
+class CacheError(RuntimeError):
+    pass
+
+def get_cached_perflib_info(env, name):
+    try:
+        cached = env['NUMPY_PKG_CONFIG']['PERFLIB'][name]
+    except KeyError:
+        msg = "perflib %s was not in cache; you should call the "\
+              "corresponding  checker first" % name
+        raise CacheError(msg)
+
+    return cached
 
 def write_info(env):
     cfgdir = os.path.dirname(env['NUMPY_PKG_CONFIG_FILE'])
@@ -57,9 +71,9 @@ class PerflibInfo:
     def __repr__(self):
         msg = []
         if self.is_customized:
-            msg += ['- Customized from site.cfg -']
+            msg += ['\n\t- Customized from site.cfg -']
         else:
-            msg += ['- Using default configuration -']
+            msg += ['\n\t- Using default configuration -']
 
         if self.version:
             msg += ['- version is : %s' % self.version]

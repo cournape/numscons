@@ -13,7 +13,7 @@ from copy import deepcopy
 
 from numscons.core.utils import partial
 
-from configuration import ConfigRes, add_perflib_info
+from configuration import ConfigRes, add_perflib_info, PerflibInfo
 from common import check_code
 from perflib_config import IsFactory, GetVersionFactory, CONFIG
 from version_checkers import atlas_version_checker, mkl_version_checker
@@ -31,8 +31,8 @@ class CheckPerflibFactory:
 
             st, res =  _check(context, cfg, check_version, mkl_version_checker,
                               autoadd)
-            if st:
-                add_perflib_info(context.env, name, res)
+            #if st:
+            #    add_perflib_info(context.env, name, res)
             return st, res
         self.checker = checker
 
@@ -90,7 +90,7 @@ def CheckSunperf(context, autoadd = 1, check_version = 0):
         for k, v in flags.items():
             opts[k].extend(deepcopy(v))
         res = ConfigRes(cfg.name, opts, res.is_customized())
-        add_perflib_info(context.env, 'Sunperf', res)
+        add_perflib_info(context.env, 'Sunperf', PerflibInfo(cfg.opts_factory))
         context.Result('Succeeded !')
     else:
         context.Result('Failed !')
@@ -107,7 +107,7 @@ def CheckGenericBlas(context, autoadd = 1, check_version = 0):
     cfg = CONFIG['GenericBlas']
 
     res = ConfigRes("Generic", cfg.opts_factory, 0)
-    add_perflib_info(context.env, 'GenericBlas', res)
+    add_perflib_info(context.env, 'GenericBlas', PerflibInfo(cfg.opts_factory))
     return 1, res
 
 #-----------------------
@@ -118,7 +118,7 @@ def CheckGenericLapack(context, autoadd = 1, check_version = 0):
     cfg = CONFIG['GenericLapack']
 
     res = ConfigRes("Generic", cfg.opts_factory, 0)
-    add_perflib_info(context.env, 'GenericLapack', res)
+    add_perflib_info(context.env, 'GenericLapack', PerflibInfo(cfg.opts_factory))
     return 1, res
 
 #--------------------
