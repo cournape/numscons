@@ -79,7 +79,7 @@ def parse_config_param(var):
     """Given var, the output of ConfirParser.get(section, name), returns a list
     of each item of its content."""
     varl = var.split(',')
-    return [i.strip() for i in varl]
+    return [i.strip() for i in varl if len(i) > 0]
 
 def get_paths(var):
     """Given var, the output of ConfirParser.get(section, name), returns a list
