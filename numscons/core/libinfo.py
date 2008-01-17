@@ -96,14 +96,24 @@ def get_config_from_section(siteconfig, section):
         found: True if the section was found, False otherwise."""
     cfgopts = ConfigOpts()
     found = False
+    defaults = siteconfig.defaults()
+    if len(defaults) > 0:
+        # the customization file has a default section: we add all its options
+        # into cfgopts (only the ones which make sense)
+        for k, v in defaults.items():
+            if k in _SITE_CONFIG_PATH_FLAGS:
+                cfgopts[k].extend(get_paths(v))
+            elif k in _SITE_CONFIG_NONPATH_FLAGS:
+                cfgopts[k].extend(parse_config_param(v))
+
     if siteconfig.has_section(section):
         found = True
         for opt in _SITE_CONFIG_PATH_FLAGS:
             if siteconfig.has_option(section, opt):
-                cfgopts[opt] = get_paths(siteconfig.get(section, opt))
+                cfgopts[opt].extend(get_paths(siteconfig.get(section, opt)))
 
         for opt in _SITE_CONFIG_NONPATH_FLAGS:
             if siteconfig.has_option(section, opt):
-                cfgopts[opt] = parse_config_param(siteconfig.get(section, opt))
+                cfgopts[opt].extend(parse_config_param(siteconfig.get(section, opt)))
 
     return cfgopts, found
