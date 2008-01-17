@@ -171,6 +171,21 @@ class BuildOptsFactory:
         for k, v in cfg.items():
             self._bld[k] = v
 
+    def merge(self, cfg, append = False):
+        """Given a dictionary cfg, merge all its value with the one of cfg, for
+        every key in cfg.
+        
+        Example: you have a BuildOptsFactory instance, and you want to modify
+        some of its options from a BuildOpts instance (obtained from site.cfg
+        customization)."""
+        if append:
+            for k, v in cfg.items():
+                self._bld[k] += v
+        else:
+            for k, v in cfg.items():
+                swap = copy(self._bld[k])
+                self._bld[k] = v + self._bld[k]
+
 class ConfigRes:
     def __init__(self, name, cfgopts, origin, version = None):
         self.name = name

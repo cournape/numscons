@@ -47,6 +47,28 @@ class test_BuildOptsFactory(unittest.TestCase):
         for k, v in b.items():
             assert cfg[k] == v
 
+    def test_merge(self):
+        tmp = BuildOpts()
+        tmp['libraries'] = ['1']
+        fa = BuildOptsFactory(tmp)
+
+        tmp = BuildOpts()
+        tmp['libraries'] = ['2']
+        fa.merge(tmp)
+        cfg = fa.core_config()
+        assert cfg['libraries'] == ['2', '1']
+
+    def test_merge2(self):
+        tmp = BuildOpts()
+        tmp['libraries'] = ['1']
+        fa = BuildOptsFactory(tmp)
+
+        tmp = BuildOpts()
+        tmp['libraries'] = ['2']
+        fa.merge(tmp, append = True)
+        cfg = fa.core_config()
+        assert cfg['libraries'] == ['1', '2']
+
 class test_PerflibInfo(unittest.TestCase):
     def setUp(self):
         from numscons.checkers.perflib_config import CONFIG
