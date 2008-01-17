@@ -34,15 +34,21 @@ config = env.NumpyConfigure(custom_tests =
     'CheckFFT' : CheckFFT})
 
 if do_check == 1:
-    st, opts = config.CheckATLAS(autoadd = 0)
-    st, opts = config.CheckMKL(autoadd = 0)
-    st, opts = config.CheckAccelerate(autoadd = 0)
-    st, opts = config.CheckSunperf(autoadd = 0)
-    st, opts = config.CheckFFTW2(autoadd = 0)
-    st, opts = config.CheckFFTW3(autoadd = 0)
+    st = config.CheckATLAS(autoadd = 0)
+    st = config.CheckMKL(autoadd = 0)
+    st = config.CheckAccelerate(autoadd = 0)
+    st = config.CheckSunperf(autoadd = 0)
+    st = config.CheckFFTW2(autoadd = 0)
+    st = config.CheckFFTW3(autoadd = 0)
+
+    for k, v in env['NUMPY_PKG_CONFIG']['PERFLIB'].items():
+        print "PERFLIB %s is %s" % (k, v)
+
     st = config.CheckF77BLAS(autoadd = 0, check_version = True)
     st = config.CheckCBLAS(autoadd = 0)
+    print "========= LAPACK ============="
     st = config.CheckF77LAPACK(autoadd = 0)
+    print "========= CLAPACK ============="
     st = config.CheckCLAPACK(autoadd = 0)
     st = config.CheckF77Mangling()
     st = config.CheckFFT(autoadd = 0)

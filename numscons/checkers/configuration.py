@@ -208,36 +208,3 @@ class BuildOptsFactory:
             for k, v in cfg.items():
                 swap = copy(self._bld[k])
                 self._bld[k] = v + self._bld[k]
-
-class ConfigRes:
-    def __init__(self, name, cfgopts, origin, version = None):
-        self.name = name
-        self.cfgopts = cfgopts
-        self.origin = origin
-        self.version = version
-
-    def is_customized(self):
-        return bool(self.origin)
-
-    def __repr__(self):
-        msg = ['Using %s' % self.name]
-        if self.is_customized():
-            msg += [  'Customized items site.cfg:']
-        else:
-            msg += ['  Using default configuration:']
-
-        msg += [self.cfgopts.__repr__()]
-        if self.version:
-            msg += ['  Version is : %s' % self.version]
-        else:
-            msg += ['  Version is : Unknown or not checked']
-        return '\n'.join(msg)
-
-    def __str__(self):
-        return self.__repr__()
-
-if __name__ == '__main__':
-    from numscons.checkers.perflib_config import CONFIG, _PERFLIBS
-    a = DefaultDict(avkeys = _BUILD_OPTS_FACTORY_FLAGS)
-    for p in _PERFLIBS:
-        print CONFIG[p].opts_factory

@@ -111,9 +111,3 @@ class GetVersionFactory:
         def func(env):
             return env['NUMPY_PKG_CONFIG']['PERFLIB'][name].version
         self.func = func
-
-if __name__ == '__main__':
-    for k, v in CONFIG.items():
-        print "++++++++++++++++++"
-        print k
-        print v

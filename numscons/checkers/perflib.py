@@ -13,7 +13,7 @@ from copy import deepcopy
 
 from numscons.core.utils import partial
 
-from configuration import ConfigRes, add_perflib_info, PerflibInfo
+from configuration import add_perflib_info, PerflibInfo
 from common import check_code
 from perflib_config import IsFactory, GetVersionFactory, CONFIG
 from version_checkers import atlas_version_checker, mkl_version_checker
@@ -29,11 +29,13 @@ class CheckPerflibFactory:
         def checker(context, autoadd = 1, check_version = 0):
             cfg = CONFIG[name]
 
-            st, res =  _check(context, cfg, check_version, mkl_version_checker,
-                              autoadd)
-            #if st:
-            #    add_perflib_info(context.env, name, res)
-            return st, res
+            ret = _check(context, cfg, check_version, mkl_version_checker,
+                         autoadd)
+            if ret is not None:
+                add_perflib_info(context.env, name, ret)
+                return 1
+            else:
+                return 0
         self.checker = checker
 
 #--------------
@@ -76,26 +78,29 @@ def CheckSunperf(context, autoadd = 1, check_version = 0):
     """Checker for sunperf."""
     cfg = CONFIG['Sunperf']
     
-    st, res = _check(context, cfg, check_version, None, autoadd)
-    if not st:
-        return st, res
+    ret = _check(context, cfg, check_version, None, autoadd)
+    if not ret:
+        return 0
 
     # We are not done: the option -xlic_lib=sunperf is not used by the linker
     # for shared libraries, I have no idea why. So if the test is succesfull,
     # we need more work to get the link options necessary to make the damn
     # thing work.
+
+    # XXX: 
+    raise NotImplementedError("CheckSunperf has to be updated")
     st, flags = get_sunperf_link_options(context, res)
     if st:
         opts = res.cfgopts
         for k, v in flags.items():
             opts[k].extend(deepcopy(v))
-        res = ConfigRes(cfg.name, opts, res.is_customized())
+        #res = ConfigRes(cfg.name, opts, res.is_customized())
         add_perflib_info(context.env, 'Sunperf', PerflibInfo(cfg.opts_factory))
         context.Result('Succeeded !')
     else:
         context.Result('Failed !')
 
-    return st, res
+    return st
 
 IsSunperf = IsFactory('Sunperf').func
 
@@ -106,9 +111,8 @@ def CheckGenericBlas(context, autoadd = 1, check_version = 0):
     """Generic (fortran) blas checker."""
     cfg = CONFIG['GenericBlas']
 
-    res = ConfigRes("Generic", cfg.opts_factory, 0)
     add_perflib_info(context.env, 'GenericBlas', PerflibInfo(cfg.opts_factory))
-    return 1, res
+    return 1
 
 #-----------------------
 # Generic Lapack checker
@@ -117,9 +121,8 @@ def CheckGenericLapack(context, autoadd = 1, check_version = 0):
     """Generic (fortran) lapack checker."""
     cfg = CONFIG['GenericLapack']
 
-    res = ConfigRes("Generic", cfg.opts_factory, 0)
     add_perflib_info(context.env, 'GenericLapack', PerflibInfo(cfg.opts_factory))
-    return 1, res
+    return 1
 
 #--------------------
 # FFT related perflib
