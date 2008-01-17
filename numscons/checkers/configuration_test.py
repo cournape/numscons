@@ -58,7 +58,7 @@ class test_BuildOptsFactory(unittest.TestCase):
         cfg = fa.core_config()
         assert cfg['libraries'] == ['2', '1']
 
-    def test_merge2(self):
+    def test_merge_append(self):
         tmp = BuildOpts()
         tmp['libraries'] = ['1']
         fa = BuildOptsFactory(tmp)

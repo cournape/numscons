@@ -159,7 +159,8 @@ class BuildOptsFactory:
         return self._get_libraries(['clapack_libs', 'cblas_libs'])
 
     def __repr__(self):
-        return self._data.__repr__()
+        return '\n\t'.join(['%s: %s' % (k, v) 
+                            for k, v in self._data.items() if len(v) > 0])
 
     def replace(self, cfg):
         """Given a dictionary cfg, replace all its value with the one of cfg,
