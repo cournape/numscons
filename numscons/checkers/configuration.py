@@ -188,9 +188,7 @@ class BuildConfigFactory:
         """Given a dictionary cfg, replace all its value with the one of cfg,
         for every key in cfg.
         
-        Example: you have a BuildConfigFactory instance, and you want to modify
-        some of its options from a BuildConfig instance (obtained from site.cfg
-        customization)."""
+        Similar to merge, but replace values instead of merging.""" 
         for k, v in cfg.items():
             self._bld[k] = v
 
