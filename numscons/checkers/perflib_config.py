@@ -19,10 +19,12 @@ _PERFLIBS = ('GenericBlas', 'GenericLapack', 'MKL', 'ATLAS', 'Accelerate',
 #------------------------
 # Generic functionalities
 #------------------------
-class _PerflibInfo:
-    """A class which contain all the information for a given performance
-    library, including build options (cflags, libs, path, etc....) and meta
-    information (name, version, how to check)."""
+class _PerflibConfig:
+    """A class which contain all the information read from the configuration
+    file (perflib.cfg). 
+    
+    For a given performance library, this includes build options (cflags, libs,
+    path, etc....) and meta information (name, version, how to check)."""
     def __init__(self, dispname, sitename, values):
         """Initialize the configuration."""
         self.name = dispname
@@ -79,7 +81,7 @@ def build_config():
             #yop[i] =  cfg.get(name, i, vars = defint)
             yop[i] =  cfg.get(name, i).split(',')
 
-        return _PerflibInfo(dispname, sitename, yop)
+        return _PerflibConfig(dispname, sitename, yop)
 
     ret = {}
     for i in _PERFLIBS:
@@ -88,7 +90,7 @@ def build_config():
     return ret
         
 # A dictionary which keys are the name of the perflib (same than perflib.cfg
-# section name) and values a _PerflibInfo instance.
+# section name) and values a _PerflibConfig instance.
 CONFIG = build_config()
 
 class IsFactory:
