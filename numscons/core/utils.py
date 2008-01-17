@@ -83,7 +83,7 @@ class DefaultDict(dict):
         dict.__setitem__(self, key, val)
 
     def __copy__(self):
-        cpy = DefaultDict(self.keys())
+        cpy = self.__class__(self.keys())
         for k in self.keys():
             cpy[k] = copy(self[k])
         return cpy
