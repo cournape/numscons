@@ -43,12 +43,14 @@ class PerflibInfo:
     etc...).
 
     As such, this class handle both caching and information sharing."""
-    def __init__(self):
+    def __init__(self, opts_factory, is_cutomized = False, version = None):
         # Necessary info:
         # - is customized ?
         # - Version
         # - BO Factory (needed by meta checkers)
-        pass
+        self.is_customized = is_customized
+        self.opts_factory = opts_factory
+        self.version = version
 
 class MetalibInfo:
     """Instances of this class will keep all informations about a meta lib
@@ -143,6 +145,16 @@ class BuildOptsFactory:
     def __repr__(self):
         return self._data.__repr__()
 
+    def replace(self, cfg):
+        """Given a dictionary cfg, replace all its value with the one of cfg,
+        for every key in cfg.
+        
+        Example: you have a BuildOptsFactory instance, and you want to modify
+        some of its options from a BuildOpts instance (obtained from site.cfg
+        customization)."""
+        for k, v in cfg.items():
+            self._data[k] = v
+
 class ConfigRes:
     def __init__(self, name, cfgopts, origin, version = None):
         self.name = name
@@ -179,10 +191,17 @@ if __name__ == '__main__':
             a[key] = mkl._values[key]
 
         b = BuildOptsFactory(a)
+        print "====================="
         print b.core_config()
         print b.blas_config()
-        print "========="
         print b['blas']()
         print b.cblas_config()
         print b.lapack_config()
         print b.clapack_config()
+
+    mkl = CONFIG['MKL']
+        
+    print mkl.opts_factory
+    a = {'lapack_libs': ['mkl_lapack']}
+    mkl.opts_factory.replace(a)
+    print mkl.opts_factory
