@@ -68,4 +68,5 @@ if do_check == 1:
         print "No LIBS in env"
 
 config.Finish()
-print env.Dump('NUMPY_PKG_CONFIG')
+for k, v in env['NUMPY_PKG_CONFIG']['PERFLIB'].items():
+    print "PERFLIB %s is %s" % (k, v)
