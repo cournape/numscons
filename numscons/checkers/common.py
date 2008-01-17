@@ -8,23 +8,20 @@ customization using site.cfg, as well being disabled from the user environment
 (e.g. ATLAS=None)."""
 
 import os
-from copy import deepcopy
+from copy import copy
 
 from numscons.core.libinfo import get_config_from_section, get_config
 from configuration import ConfigRes
 from support import save_and_set, restore, check_symbol
 
-def _get_site_cfg_customization(section, defopts):
+def _get_site_cfg_customization(section, defopts_factory):
+    """defopts_factory should be an instance of BuildOptsFactory."""
     siteconfig = get_config()[0]
     opts, found = get_config_from_section(siteconfig, section)
     if found:
-        # FIXME: this is totally bogus
-        if len(opts['libraries']) == 1 and len(opts['libraries'][0]) == 0:
-            opts['libraries'] = defopts['libraries']
-    else:
-        opts = None
+        defopts_factory.replace(opts)
 
-    return opts, found
+    return found
 
 def _check_header(context, opts, headers_to_check):
     saved = save_and_set(context.env, opts)
@@ -87,13 +84,11 @@ def check_code(context, name, section, opts_factory, headers_to_check,
     if os.environ.has_key(name) and os.environ[name] == 'None':
         return context.Result('Disabled from env through var %s !' % name), {}
 
-    core_config = opts_factory.core_config()
     # Get site.cfg customization if any
-    opts, found = _get_site_cfg_customization(section, core_config)
-    if not found:
-        opts = core_config
+    found = _get_site_cfg_customization(section, opts_factory)
+    opts = opts_factory.core_config()
     if rpath_is_libpath:
-        opts['rpath'] = deepcopy(opts['library_dirs'])
+        opts['rpath'] = copy(opts['library_dirs'])
 
     # Check whether the header is available (CheckHeader-like checker)
     st = _check_header(context, opts, headers_to_check)
