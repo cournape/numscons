@@ -1,5 +1,5 @@
 #! /usr/bin/env python
-# Last Change: Wed Jan 16 07:00 PM 2008 J
+# Last Change: Fri Jan 18 02:00 PM 2008 J
 
 """This module implements the functionality to:
     - keep all necessary build informations about perflib and meta lib, so that
@@ -155,12 +155,6 @@ class BuildConfigFactory:
             'cblas':    self.cblas_config,
             'clapack':  self.clapack_config}
 
-    def __getitem__(self, k):
-        return self._cfgs[k]
-
-    def core_config(self):
-        return self._bld
-
     def _get_libraries(self, supp):
         res = copy(self._bld)
         tmp = copy(res['libraries'])
@@ -169,6 +163,12 @@ class BuildConfigFactory:
             res['libraries'] += self._data[i]
         res['libraries'] += tmp
         return res
+
+    #--------------------------------------------------------------------
+    # Functions to get a special configuration (for blas, lapack, etc...)
+    #--------------------------------------------------------------------
+    def core_config(self):
+        return self._bld
 
     def blas_config(self):
         return self._get_libraries(['blas_libs'])
@@ -185,10 +185,9 @@ class BuildConfigFactory:
     def fft_config(self):
         return self._get_libraries(['fft_libs'])
 
-    def __repr__(self):
-        return '\n\t'.join(['%s: %s' % (k, v) 
-                            for k, v in self._data.items() if len(v) > 0])
-
+    #----------------------------------------------------------------
+    # Functions useful to merge informations from another BuildConfig
+    #----------------------------------------------------------------
     def replace(self, cfg):
         """Given a dictionary cfg, replace all its value with the one of cfg,
         for every key in cfg.
@@ -211,3 +210,11 @@ class BuildConfigFactory:
             for k, v in cfg.items():
                 swap = copy(self._bld[k])
                 self._bld[k] = v + self._bld[k]
+
+    def __repr__(self):
+        return '\n\t'.join(['%s: %s' % (k, v) 
+                            for k, v in self._data.items() if len(v) > 0])
+
+    def __getitem__(self, k):
+        return self._cfgs[k]
+
