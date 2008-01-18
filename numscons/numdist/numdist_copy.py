@@ -1,10 +1,10 @@
-# Last Change: Sun Jan 06 08:00 PM 2008 J
+# Last Change: Fri Jan 18 05:00 PM 2008 J
 
 """This module contains all the duplicate functions we need from
 numpy.distutils and cannot use because of bootstrapping problems."""
 import sys
 import os.path
-import distutils
+import distutils.sysconfig
 
 if sys.platform == 'win32':
     default_lib_dirs = ['C:\\',
