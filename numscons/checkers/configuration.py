@@ -103,13 +103,13 @@ class MetalibInfo:
         library."""
         return pname == self.pname
 
-# List of options that BuildConfig can keep. If later additional variables should
-# be added (e.g. cpp flags, etc...), they should be added here.
+# List of options that BuildConfig can keep. If later additional variables
+# should be added (e.g. cpp flags, etc...), they should be added here.
 _BUILD_OPTS_FLAGS = ('include_dirs', 'cflags', 'library_dirs', 'libraries',
                      'linkflags', 'rpath', 'frameworks')
 
-# List of options that BuildConfigFactory can keep. If later additional variables
-# should be added, they should be added here.
+# List of options that BuildConfigFactory can keep. If later additional
+# variables should be added, they should be added here.
 _BUILD_OPTS_FACTORY_FLAGS = \
     _BUILD_OPTS_FLAGS + \
     ('cblas_libs', 'blas_libs', 'clapack_libs', 'lapack_libs', 'fft_libs',
@@ -208,7 +208,6 @@ class BuildConfigFactory:
                 self._bld[k] += v
         else:
             for k, v in cfg.items():
-                swap = copy(self._bld[k])
                 self._bld[k] = v + self._bld[k]
 
     def __repr__(self):

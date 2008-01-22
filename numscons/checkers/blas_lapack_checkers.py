@@ -20,7 +20,8 @@ def _check(perflibs, context, libname, check_version, msg_template, test_src,
            autoadd):
     """Generic perflib checker to be used in meta checkers.
 
-    perflibs should be a list of perflib to check."""
+    perflibs should be a list of perflib to check (the names which can be used
+    are the keys of CONFIG."""
     def _check_perflib(pname):
         """pname is the name of the perflib."""
         func = checker(pname)

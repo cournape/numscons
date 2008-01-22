@@ -13,6 +13,8 @@ from configuration import available_build_opts_factory_flags, BuildConfigFactory
 
 __all__ = ['CONFIG', 'IsFactory', 'GetVersionFactory']
 
+# List of perflibs supported: this must correspond to the sections in
+# perflib.cfg
 _PERFLIBS = ('GenericBlas', 'GenericLapack', 'MKL', 'ATLAS', 'Accelerate',
              'vecLib', 'Sunperf', 'FFTW2', 'FFTW3')
 
