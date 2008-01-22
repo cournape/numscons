@@ -8,7 +8,7 @@ import unittest
 
 from numscons.core.utils import DefaultDict
 from numscons.checkers.configuration import BuildConfig, BuildConfigFactory, \
-    available_build_opts_factory_flags
+    build_config_factory_flags
 
 class test_BuildConfig(unittest.TestCase):
     def test_default(self):
@@ -27,7 +27,7 @@ class test_BuildConfig(unittest.TestCase):
 class test_BuildConfigFactory(unittest.TestCase):
     def setUp(self):
         bld = DefaultDict.fromcallable(
-                avkeys = available_build_opts_factory_flags(),
+                avkeys = build_config_factory_flags(),
                 default = lambda: [])
         self.fa = BuildConfigFactory(bld)
 

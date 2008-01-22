@@ -9,7 +9,7 @@ from ConfigParser import SafeConfigParser
 from numscons.numdist import default_lib_dirs
 
 from numscons.core.utils import DefaultDict
-from configuration import available_build_opts_factory_flags, BuildConfigFactory
+from configuration import build_config_factory_flags, BuildConfigFactory
 
 __all__ = ['CONFIG', 'IsFactory', 'GetVersionFactory']
 
@@ -55,7 +55,7 @@ class _PerflibConfig:
 def build_config():
     # list_opts contain a list of all available options available in
     # perflib.cfg which can be a list.
-    list_opts = available_build_opts_factory_flags()
+    list_opts = build_config_factory_flags()
 
     #defint = {'atlas_def_libs' : 
     #          ','.join([pjoin(i, 'atlas') for i in default_lib_dirs])}

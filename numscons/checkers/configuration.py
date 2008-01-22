@@ -16,15 +16,14 @@ _BUILD_OPTS_FLAGS = ('include_dirs', 'cflags', 'library_dirs', 'libraries',
 
 # List of options that BuildConfigFactory can keep. If later additional
 # variables should be added, they should be added here.
-_BUILD_OPTS_FACTORY_FLAGS = \
-    _BUILD_OPTS_FLAGS + \
+_BUILD_OPTS_FACTORY_FLAGS = _BUILD_OPTS_FLAGS + \
     ('cblas_libs', 'blas_libs', 'clapack_libs', 'lapack_libs', 'fft_libs',
      'htc', 'ftc')
 
-def available_build_opts_flags():
+def build_config_flags():
     return _BUILD_OPTS_FLAGS
 
-def available_build_opts_factory_flags():
+def build_config_factory_flags():
     return _BUILD_OPTS_FACTORY_FLAGS
 
 class BuildConfig(DefaultDict):
