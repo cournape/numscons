@@ -17,7 +17,7 @@ expect_v12 = {
     'library_dirs': ['/opt/SUNWspro/lib', '/opt/SUNWspro/prod/lib',
                      '/usr/ccs/lib', '/lib', '/usr/lib']}
 
-class test_SunPerfLinkParse(unittest.TestCase):
+class TestSunperfParser(unittest.TestCase):
     def test_v12(self):
         """Test parse of output from sun studio 12."""
         res = sunperf_parser_link(output_v12)

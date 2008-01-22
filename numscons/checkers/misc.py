@@ -1,5 +1,6 @@
 #! /usr/bin/env python
 # Last Change: Wed Jan 16 08:00 PM 2008 J
+"""misc module: everything which has not other place to go."""
 import shlex
 import os
 from os.path import join as pjoin, basename, dirname
@@ -70,6 +71,10 @@ def sunperf_parser_link(out):
     t = lexer.get_token()
     while t:
         def parse(token):
+            """Parse one token of linker output.
+
+            token is expected to be the return value of shlex.get_token
+            method."""
             if token.startswith('-l'):
                 n = token.split('-l')[1]
                 if n in accept_libs:
