@@ -11,8 +11,8 @@ from numscons.testcode_snippets import \
         clapack_sgesv as clapack_src
 from numscons.fortran_scons import CheckF77Mangling, CheckF77Clib
 
-from configuration import add_lib_info, get_cached_perflib_info, \
-                          MetalibInfo
+from perflib_info import add_lib_info, get_cached_perflib_info, \
+                         MetalibInfo
 from perflib import CONFIG, checker
 from support import check_include_and_run
 

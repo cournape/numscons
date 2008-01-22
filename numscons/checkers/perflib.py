@@ -13,7 +13,7 @@ from copy import deepcopy
 
 from numscons.core.utils import partial
 
-from configuration import add_perflib_info, PerflibInfo
+from perflib_info import add_perflib_info, PerflibInfo
 from common import check_code
 from perflib_config import IsFactory, GetVersionFactory, CONFIG
 from version_checkers import atlas_version_checker, mkl_version_checker

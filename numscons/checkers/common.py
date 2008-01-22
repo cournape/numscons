@@ -11,7 +11,7 @@ import os
 from copy import copy
 
 from numscons.core.libinfo import get_config_from_section, get_config
-from configuration import PerflibInfo
+from perflib_info import PerflibInfo
 from support import save_and_set, restore, check_symbol
 
 def _get_site_cfg_customization(section, defopts_factory):
