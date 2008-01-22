@@ -5,7 +5,7 @@
 
 import re
 
-from support import save_and_set, restore
+from numscons.checkers.support import save_and_set, restore
 
 def mkl_version_checker(context, opts):
     env = context.env

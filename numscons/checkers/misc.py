@@ -8,7 +8,7 @@ from os.path import join as pjoin, basename, dirname
 from numscons.testcode_snippets import cblas_sgemm
 from numscons.core.utils import popen_wrapper
 
-from support import save_and_set, restore
+from numscons.checkers.support import save_and_set, restore
 
 def get_sunperf_link_options(context, config):
     """If successefull, returns the link flags.

@@ -5,9 +5,6 @@
     - add/retrieve info about checked meta-lib for show_config functionality.
 """
 import os
-from copy import copy
-
-from numscons.core.utils import DefaultDict
 
 def add_perflib_info(env, name, opt):
     assert opt is not None

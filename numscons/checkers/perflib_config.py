@@ -6,10 +6,8 @@ perflib checkers from the perflib configuration file."""
 from os.path import join as pjoin, dirname as pdirname
 from ConfigParser import SafeConfigParser
 
-from numscons.numdist import default_lib_dirs
-
 from numscons.core.utils import DefaultDict
-from configuration import build_config_factory_flags, BuildConfigFactory
+from numscons.checkers.configuration import build_config_factory_flags, BuildConfigFactory
 
 __all__ = ['CONFIG', 'IsFactory', 'GetVersionFactory']
 

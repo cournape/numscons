@@ -9,11 +9,13 @@ library specific check if possible, or other heuristics.
 Generally, you don't use those directly: they are used in 'meta' checkers, such
 as BLAS, CBLAS, LAPACK checkers."""
 
-from perflib_info import add_perflib_info, PerflibInfo
-from common import check_code
-from perflib_config import IsFactory, GetVersionFactory, CONFIG
-from version_checkers import atlas_version_checker, mkl_version_checker
-from misc import get_sunperf_link_options
+from numscons.checkers.perflib_info import add_perflib_info, PerflibInfo
+from numscons.checkers.common import check_code
+from numscons.checkers.perflib_config import IsFactory, GetVersionFactory, \
+     CONFIG
+from numscons.checkers.version_checkers import atlas_version_checker, \
+     mkl_version_checker
+from numscons.checkers.misc import get_sunperf_link_options
 
 def _check(context, cfg, check_version, version_checker, autoadd):
     return check_code(context, cfg.name, cfg.section, cfg.opts_factory,
