@@ -24,10 +24,7 @@ Goals:
 
 Cleaning checkers modules:
     - Refactor site config customization in blas/lapack checker
-    - Get rid of ResConfig: put necessary info in env instead
-    - Simplify Is* and Get*Version (use CPP define instead)
-    - Clean sun perflib code
-    - Have test for fortran + perflib
+    - Have test for fortran
 
 Things to implement / problems to solve:
     - Make 'real' python extension builders
