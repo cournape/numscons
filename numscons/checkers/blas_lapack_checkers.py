@@ -1,7 +1,8 @@
 #! /usr/bin/env python
 # Last Change: Wed Jan 16 07:00 PM 2008 J
 
-# Module for custom, common checkers for numpy (and scipy)
+"""Module for blas/lapack/cblas/clapack checkers. Use perflib checkers
+implementations if available."""
 import sys
 
 from numscons.core.libinfo import get_config_from_section, get_config
@@ -11,10 +12,10 @@ from numscons.testcode_snippets import \
         clapack_sgesv as clapack_src
 from numscons.fortran_scons import CheckF77Mangling, CheckF77Clib
 
-from perflib_info import add_lib_info, get_cached_perflib_info, \
-                         MetalibInfo
-from perflib import CONFIG, checker
-from support import check_include_and_run
+from numscons.checkers.perflib_info import add_lib_info, \
+     get_cached_perflib_info, MetalibInfo
+from numscons.checkers.perflib import CONFIG, checker
+from numscons.checkers.support import check_include_and_run
 
 def _check(perflibs, context, libname, check_version, msg_template, test_src,
            autoadd):
@@ -40,8 +41,8 @@ def _check(perflibs, context, libname, check_version, msg_template, test_src,
             return 1
 
 def _get_customization(context, section, libname, autoadd):
-    # If section is in site.cfg, use those options. Otherwise, use default
-    siteconfig, cfgfiles = get_config()
+    """Check whether customization is available through config files."""
+    siteconfig = get_config()[0]
     cfg, found = get_config_from_section(siteconfig, section)
     if found:
         if check_include_and_run(context, '% (from site.cfg) ' % libname, cfg,
