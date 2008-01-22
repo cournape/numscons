@@ -8,7 +8,7 @@ import unittest
 
 from numscons.core.utils import DefaultDict
 from numscons.checkers.configuration import BuildConfig, BuildConfigFactory, \
-    available_build_opts_factory_flags, PerflibInfo, MetalibInfo
+    available_build_opts_factory_flags
 
 class test_BuildConfig(unittest.TestCase):
     def test_default(self):
@@ -68,25 +68,3 @@ class test_BuildConfigFactory(unittest.TestCase):
         fa.merge(tmp, append = True)
         cfg = fa.core_config()
         assert cfg['libraries'] == ['1', '2']
-
-class test_PerflibInfo(unittest.TestCase):
-    def setUp(self):
-        from numscons.checkers.perflib_config import CONFIG
-        self.fa = CONFIG['MKL']
-
-    def test_init(self):
-        a = PerflibInfo(self.fa)
-
-    def test_print(self):
-        print PerflibInfo(self.fa)
-
-class test_MetalibInfo(unittest.TestCase):
-    def setUp(self):
-        from numscons.checkers.perflib_config import CONFIG
-        self.cfg = CONFIG['MKL'].opts_factory.core_config()
-
-    def test_init(self):
-        a = MetalibInfo('blas', 'MKL', self.cfg)
-
-    def test_print(self):
-        print MetalibInfo('blas', 'MKL', self.cfg)
