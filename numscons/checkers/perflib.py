@@ -89,12 +89,10 @@ def CheckSunperf(context, autoadd = 1, check_version = 0):
 
     # XXX: 
     raise NotImplementedError("CheckSunperf has to be updated")
-    st, flags = get_sunperf_link_options(context, res)
+    opts = cfg.core_config()
+    st, flags = get_sunperf_link_options(context, opts)
     if st:
-        opts = res.cfgopts
-        for k, v in flags.items():
-            opts[k].extend(deepcopy(v))
-        #res = ConfigRes(cfg.name, opts, res.is_customized())
+        cfg.merge(flags)
         add_perflib_info(context.env, 'Sunperf', PerflibInfo(cfg.opts_factory))
         context.Result('Succeeded !')
     else:

@@ -10,7 +10,7 @@ from numscons.core.utils import popen_wrapper
 
 from support import save_and_set, restore
 
-def get_sunperf_link_options(context, res):
+def get_sunperf_link_options(context, config):
     """If successefull, returns the link flags.
     
     Returns:
@@ -22,7 +22,7 @@ def get_sunperf_link_options(context, res):
     """
     context.Message('Getting link options of sunperf ... ')
 
-    opts = res.cfgopts
+    opts = config
     test_code = cblas_sgemm
     env = context.env
     saved = save_and_set(env, opts)
