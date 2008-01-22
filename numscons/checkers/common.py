@@ -11,8 +11,8 @@ import os
 from copy import copy
 
 from numscons.core.libinfo import get_config_from_section, get_config
-from perflib_info import PerflibInfo
-from support import save_and_set, restore, check_symbol
+from numscons.checkers.perflib_info import PerflibInfo
+from numscons.checkers.support import save_and_set, restore, check_symbol
 
 def _get_site_cfg_customization(section, defopts_factory):
     """defopts_factory should be an instance of BuildConfigFactory."""
@@ -23,6 +23,10 @@ def _get_site_cfg_customization(section, defopts_factory):
     return found
 
 def _check_header(context, opts, headers_to_check):
+    """Check if a program with the given list of headers can compile with the
+    given options.
+
+    Returns 1 if successfull, 0 otherwise."""
     saved = save_and_set(context.env, opts)
     try:
         src_code = [r'#include <%s>' % h for h in headers_to_check]
@@ -38,6 +42,10 @@ def _check_header(context, opts, headers_to_check):
     return st
 
 def _check_symbol(context, opts, headers_to_check, funcs_to_check, autoadd):
+    """Check if a program with the given list of headers and the given
+    functions can compile and link with the given options.
+
+    Returns 1 if successfull, 0 otherwise."""
     saved = save_and_set(context.env, opts)
     try:
         for sym in funcs_to_check:
@@ -56,6 +64,7 @@ def _check_symbol(context, opts, headers_to_check, funcs_to_check, autoadd):
     return st
 
 def _check_version(context, opts, version_checker):
+    """Check version using the given callable."""
     if version_checker:
         vst, v = version_checker(context, opts)
         if vst:
