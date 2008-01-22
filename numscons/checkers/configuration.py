@@ -4,7 +4,6 @@
 """This module implements the functionality to keep all necessary build
 informations about perflib and meta lib, so that those info can be passed from
 one function to the other.  """
-import os
 from copy import copy
 
 from numscons.core.utils import DefaultDict
