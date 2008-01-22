@@ -6,6 +6,8 @@
 """
 import os
 
+__all__ = ['write_info']
+
 def add_perflib_info(env, name, opt):
     assert opt is not None
     assert isinstance(opt, PerflibInfo)

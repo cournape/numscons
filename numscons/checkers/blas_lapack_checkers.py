@@ -17,6 +17,8 @@ from numscons.checkers.perflib_info import add_lib_info, \
 from numscons.checkers.perflib import CONFIG, checker
 from numscons.checkers.support import check_include_and_run
 
+__all__ = ['CheckF77BLAS', 'CheckF77LAPACK', 'CheckCBLAS', 'CheckCLAPACK']
+
 def _check(perflibs, context, libname, check_version, msg_template, test_src,
            autoadd):
     """Generic perflib checker to be used in meta checkers.

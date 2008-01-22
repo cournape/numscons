@@ -6,6 +6,7 @@ distutils. It is intented as a replacement of numpy.distutils to build numpy
 with more flexibility, and in a more robust mannter."""
 
 import core
+from core import *
 __all__ = core.__all__
 
 # XXX those are needed by the scons command only...
@@ -13,8 +14,6 @@ from core.misc import get_scons_path, get_scons_build_dir, \
                       get_scons_configres_dir, get_scons_configres_filename
 from core.libinfo import get_paths as scons_get_paths
 
-from checkers import CheckF77BLAS, CheckCBLAS, CheckCLAPACK, CheckF77LAPACK, CheckFFT
-from checkers.perflib_info import write_info
 from fortran_scons import CheckF77Mangling
 #import tools
 

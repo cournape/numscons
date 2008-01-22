@@ -17,6 +17,9 @@ from numscons.checkers.version_checkers import atlas_version_checker, \
      mkl_version_checker
 from numscons.checkers.misc import get_sunperf_link_options
 
+__all__ = ['IsMKL', 'IsATLAS', 'IsVeclib', 'IsAccelerate', 'IsSunperf',
+           'GetMKLVersion', 'GetATLASVersion', 'IsFFTW2', 'IsFFTW3']
+
 def _check(context, cfg, check_version, version_checker, autoadd):
     return check_code(context, cfg.name, cfg.section, cfg.opts_factory,
                       cfg.headers, cfg.funcs, check_version,
