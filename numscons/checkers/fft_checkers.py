@@ -1,21 +1,10 @@
 #! /usr/bin/env python
 # Last Change: Wed Jan 16 07:00 PM 2008 J
 
-# Module for custom, common checkers for numpy (and scipy)
-import sys
-import os.path
-from copy import deepcopy
-from distutils.util import get_platform
-
-# from numpy.distutils.scons.core.libinfo import get_config_from_section, get_config
-# from numpy.distutils.scons.testcode_snippets import cblas_sgemm as cblas_src, \
-#         c_sgemm as sunperf_src, lapack_sgesv, blas_sgemm, c_sgemm2, \
-#         clapack_sgesv as clapack_src
-# from numpy.distutils.scons.fortran_scons import CheckF77Mangling, CheckF77Clib
-from perflib import CheckMKL, CheckFFTW3, CheckFFTW2, checker
-from support import check_include_and_run
-from configuration import BuildConfig
-from perflib_info import add_lib_info, MetalibInfo, get_cached_perflib_info
+"""Module for fft checkers."""
+from numscons.checkers.perflib import checker
+from numscons.checkers.perflib_info import add_lib_info, MetalibInfo, \
+     get_cached_perflib_info
 
 __all__ = ['CheckFFT']
 
