@@ -1,5 +1,5 @@
 #! /usr/bin/env python
-# Last Change: .
+# Last Change: Wed Jan 23 07:00 PM 2008 J
 
 """numscons is a package which enable building python extensions within
 distutils. It is intented as a replacement of numpy.distutils to build numpy
@@ -26,6 +26,7 @@ from core.numpyenv import GetNumpyEnvironment
 from checkers import CheckF77BLAS, CheckCBLAS, CheckCLAPACK, CheckF77LAPACK, CheckFFT
 from checkers import NumpyCheckLibAndHeader
 from checkers import CheckF77Mangling, CheckF77Clib
+from checkers import write_info
 
 # XXX: this is ugly, better find the mathlibs with a checker 
 # XXX: this had nothing to do here, too...
