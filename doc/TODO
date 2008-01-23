@@ -23,7 +23,8 @@ Goals:
     - 0.5: clean numscons.core, in particular builders
 
 Cleaning checkers modules:
-    - Refactor site config customization in blas/lapack checker
+    - Refactor site config custom: remove duplicate between core.libinfo and
+      checkers.perflib_info
     - Have test for fortran
 
 Things to implement / problems to solve:
