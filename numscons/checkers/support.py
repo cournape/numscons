@@ -6,7 +6,7 @@
 import os
 from copy import deepcopy
 
-from numscons.core.libinfo import get_config_from_section, get_config
+from numscons.core.siteconfig import get_config_from_section, get_config
 from numscons.core.utils import DefaultDict
 
 # Tools to save and restore environments construction variables (the ones often

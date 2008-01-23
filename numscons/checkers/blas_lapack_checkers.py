@@ -7,7 +7,7 @@ import os.path
 from copy import deepcopy
 from distutils.util import get_platform
 
-from numscons.core.libinfo import get_config_from_section, get_config
+from numscons.core.siteconfig import get_config_from_section, get_config
 from numscons.testcode_snippets import cblas_sgemm as cblas_src, \
         c_sgemm as sunperf_src, lapack_sgesv, blas_sgemm, c_sgemm2, \
         clapack_sgesv as clapack_src

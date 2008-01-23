@@ -7,12 +7,11 @@ import ConfigParser
 import os
 from copy import deepcopy
 
-from numscons.core.libinfo import get_config_from_section, get_config
-from numscons.checkers.support import ConfigOpts, save_and_set, \
-                                                   restore, check_symbol
+from numscons.core.siteconfig import get_config_from_section, get_config, \
+                                     get_paths, parse_config_param
 
-from libinfo import get_config, get_paths, parse_config_param
-from utils import get_empty
+from numscons.checkers.support import ConfigOpts, save_and_set, \
+                                      restore, check_symbol
 
 _SYMBOL_DEF_STR = """
 #ifdef __cplusplus

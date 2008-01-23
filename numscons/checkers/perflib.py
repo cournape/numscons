@@ -12,7 +12,7 @@ from copy import deepcopy
 from os.path import join as pjoin
 from os.path import basename, dirname
 
-from numscons.core.libinfo import get_config_from_section, get_config
+from numscons.core.siteconfig import get_config_from_section, get_config
 from numscons.testcode_snippets import cblas_sgemm as cblas_src, \
         c_sgemm as sunperf_src, lapack_sgesv
 

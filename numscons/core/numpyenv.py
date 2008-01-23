@@ -12,7 +12,7 @@ from numscons.core.default import tool_list
 from numscons.core.compiler_config import get_cc_config, get_f77_config
 from numscons.core.custom_builders import NumpySharedLibrary, NumpyCtypes, \
      NumpyPythonExtension, NumpyStaticExtLibrary
-from numscons.core.libinfo import get_config
+from numscons.core.siteconfig import get_config
 from numscons.core.extension_scons import PythonExtension, built_with_mstools, \
      createStaticExtLibraryBuilder
 from numscons.core.utils import pkg_to_path, partial

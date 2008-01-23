@@ -1,7 +1,7 @@
 # XXX those are needed by the scons command only...
 from core.misc import get_scons_path, get_scons_build_dir, \
                       get_scons_configres_dir, get_scons_configres_filename
-from core.libinfo import get_paths as scons_get_paths
+#from core.libinfo import get_paths as scons_get_paths
 
 # XXX those should not be needed by the scons command only...
 from core.extension import get_python_inc, get_pythonlib_dir
