@@ -87,10 +87,10 @@ def CheckSunperf(context, autoadd = 1, check_version = 0):
     # for shared libraries, I have no idea why. So if the test is succesfull,
     # we need more work to get the link options necessary to make the damn
     # thing work.
-    opts = cfg.core_config()
+    opts = cfg.opts_factory.core_config()
     st, flags = get_sunperf_link_options(context, opts)
     if st:
-        cfg.merge(flags)
+        cfg.opts_factory.merge(flags)
         add_perflib_info(context.env, 'Sunperf', PerflibInfo(cfg.opts_factory))
         context.Result('Succeeded !')
     else:

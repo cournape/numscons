@@ -67,7 +67,7 @@ def sunperf_parser_link(out):
     lexer.whitespace_split = True
 
     accept_libs = ['sunperf', 'fui', 'fsu', 'mtsk', 'sunmath']
-    keep = dict(zip(['libs', 'library_dirs', 'rpath'], [[], [], []]))
+    keep = dict(zip(['libraries', 'library_dirs', 'rpath'], [[], [], []]))
     t = lexer.get_token()
     while t:
         def parse(token):
@@ -78,7 +78,7 @@ def sunperf_parser_link(out):
             if token.startswith('-l'):
                 n = token.split('-l')[1]
                 if n in accept_libs:
-                    keep['libs'].append(n)
+                    keep['libraries'].append(n)
                 t = lexer.get_token()
             elif token.startswith('-Y'):
                 n = token
