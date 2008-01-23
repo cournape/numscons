@@ -15,6 +15,11 @@ as construction variables."""
 _OPTIONS = ['optim', 'warn', 'debug_sym', 'debug', 'thread', 'extra',
             'link_optim']
 
+class NoCompilerConfig(Exception):
+    """This exception is throw when no configuration for a compiler was
+    found."""
+    pass
+
 class Config:
     """Place holder for compiler configuration."""
     def __init__(self):
@@ -77,13 +82,13 @@ def get_config(name, language):
         cfgfname = pjoin(pdirname(__file__), "fcompiler.cfg")
         cmpcfg = F77CompilerConfig
     else:
-        raise ValueError("language %s not recognized !" % language)
+        raise NoCompilerConfig("language %s not recognized !" % language)
 
     st = config.read(cfgfname)
     if len(st) < 1:
         raise IOError("config file %s not found" % cfgfname)
     if not config.has_section(name):
-        raise ValueError("compiler %s has no configuration" % name)
+        raise NoCompilerConfig("compiler %s has no configuration" % name)
 
     cfg = Config()
 
