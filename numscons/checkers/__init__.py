@@ -2,3 +2,4 @@ from blas_lapack_checkers import CheckCLAPACK, CheckCBLAS, CheckF77BLAS, CheckF7
 from fft_checkers import CheckFFT
 
 from perflib import IsMKL, IsATLAS, IsVeclib, IsAccelerate, IsSunperf, IsFFTW3, IsFFTW2
+from simple_check import NumpyCheckLibAndHeader

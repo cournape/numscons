@@ -8,10 +8,12 @@ from core.extension import get_python_inc, get_pythonlib_dir
 
 # Those functions really belong to the public API
 from core.numpyenv import GetNumpyEnvironment
-from core.libinfo_scons import NumpyCheckLibAndHeader
 
 from checkers import CheckF77BLAS, CheckCBLAS, CheckCLAPACK, CheckF77LAPACK, CheckFFT
+from checkers import NumpyCheckLibAndHeader
+
 from fortran_scons import CheckF77Mangling
+
 #import tools
 
 # XXX: this is ugly, better find the mathlibs with a checker 
