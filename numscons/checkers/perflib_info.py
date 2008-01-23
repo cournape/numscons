@@ -1,5 +1,5 @@
 #! /usr/bin/env python
-# Last Change: Fri Jan 18 02:00 PM 2008 J
+# Last Change: Wed Jan 23 09:00 PM 2008 J
 
 """This module implements the functionality to:
     - add/retrieve info about checked meta-lib for show_config functionality.
@@ -44,7 +44,7 @@ def write_info(env):
     for k, i in cfg.items():
         config_str[k] = str(i)
     f = open(env['NUMPY_PKG_CONFIG_FILE'], 'w')
-    f.writelines("config = %s" % str(config_str))
+    f.writelines("%s" % str(config_str))
     f.close()
 
 class PerflibInfo:
