@@ -9,7 +9,8 @@ from os.path import join as pjoin, dirname as pdirname, basename as pbasename
 from distutils.sysconfig import get_config_vars
 
 from numscons.core.default import tool_list
-from numscons.core.compiler_config import get_cc_config, get_f77_config
+from numscons.core.compiler_config import get_cc_config, get_f77_config,\
+     NoCompilerConfig, Config, CompilerConfig, F77CompilerConfig
 from numscons.core.custom_builders import NumpySharedLibrary, NumpyCtypes, \
      NumpyPythonExtension, NumpyStaticExtLibrary
 from numscons.core.siteconfig import get_config
@@ -80,12 +81,20 @@ def GetNumpyOptions(args):
 
 def customize_cc(name, env):
     """Customize env options related to the given tool (C compiler)."""
-    cfg = get_cc_config(name)
+    try:
+        cfg = get_cc_config(name)
+    except NoCompilerConfig, e:
+	print "compiler %s has no customization available" % name
+	cfg = CompilerConfig(Config())
     env.AppendUnique(**cfg.get_flags_dict())
 
 def customize_f77(name, env):
     """Customize env options related to the given tool (F77 compiler)."""
-    cfg = get_f77_config(name)
+    try:
+        cfg = get_f77_config(name)
+    except NoCompilerConfig, e:
+	cfg = F77CompilerConfig(Config())
+	print "compiler %s has no customization available" % name
     env.AppendUnique(**cfg.get_flags_dict())
 
 def finalize_env(env):
