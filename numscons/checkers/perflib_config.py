@@ -1,53 +1,64 @@
 #! /usr/bin/env python
-# Last Change: Sun Jan 06 08:00 PM 2008 J
-from os.path import join as pjoin, dirname as pdirname
-from ConfigParser import SafeConfigParser, RawConfigParser
+# Last Change: Wed Jan 16 09:00 PM 2008 J
+"""This module contains the infrastructure to get all the necessary options for
+perflib checkers from the perflib configuration file."""
 
-from numscons.numdist import default_lib_dirs
+from os.path import join as pjoin, dirname as pdirname
+from ConfigParser import SafeConfigParser
 
 from numscons.core.utils import DefaultDict
+from numscons.checkers.configuration import build_config_factory_flags, \
+     BuildConfigFactory
+
+__all__ = ['CONFIG', 'IsFactory', 'GetVersionFactory']
+
+# List of perflibs supported: this must correspond to the sections in
+# perflib.cfg
+_PERFLIBS = ('GenericBlas', 'GenericLapack', 'MKL', 'ATLAS', 'Accelerate',
+             'vecLib', 'Sunperf', 'FFTW2', 'FFTW3')
 
 #------------------------
 # Generic functionalities
 #------------------------
-class PerflibConfig:
-    def __init__(self, name, section, defopts, headers, funcs, version_checker = None):
-        """Initialize the configuration.
+class _PerflibConfig:
+    """A class which contain all the information read from the configuration
+    file (perflib.cfg). 
+    
+    For a given performance library, this includes build options (cflags, libs,
+    path, etc....) and meta information (name, version, how to check)."""
+    def __init__(self, dispname, sitename, values):
+        """Initialize the configuration."""
+        self.name = dispname
+        self.section = sitename
 
-        Args:
-            - name : str
-                the name of the perflib
-            - section : str
-                the name of the section used in site.cfg for customization
-            - defopts : ConfigOpts
-                the compilation configuration for the checker
-            - headers : list
-                the list of headers to test in the checker
-            - funcs : list
-                the list of functions to test in the checker.
-            - version_checker : callable
-                optional function to check version of the perflib. Its
-                arguments should be env and opts, where env is a scons
-                environment and opts a ConfigOpts instance. It should return an
-                integer (1 if successfull) and a version string."""
-                
-        self.name = name
-        self.section = section
-        self.defopts = defopts
-        self.headers = headers
-        self.funcs = funcs
-        self.version_checker = version_checker
+        self._values = values
+        self.headers = values['htc']
+        self.funcs = values['ftc']
+        #self.version_checker = version_checker
+
+        self.opts_factory = BuildConfigFactory(values)
+
+    def __str__(self):
+        return self.__repr__()
+
+    def __repr__(self):
+        rep = ["Display name: %s" % self.name]
+        rep += ["Section name: %s" % self.section]
+        rep += ["Headers to check : %s" % self.headers]
+        rep += ["Funcs to check : %s" % self.funcs]
+        return '\n'.join(rep)
 
 #-------------------------------------------
 # Perflib specific configuration and helpers
 #-------------------------------------------
 def build_config():
-    perflib = ['GenericBlas', 'GenericLapack', 'MKL', 'ATLAS', 'Accelerate',
-               'vecLib', 'Sunperf', 'FFTW2', 'FFTW3']
-    opts = ['cpppath', 'cflags', 'libpath', 'libs', 'linkflags', 'rpath',
-            'frameworks']
-    defint = {'atlas_def_libs' : 
-              ','.join([pjoin(i, 'atlas') for i in default_lib_dirs])}
+    # list_opts contain a list of all available options available in
+    # perflib.cfg which can be a list.
+    list_opts = build_config_factory_flags()
+
+    #defint = {'atlas_def_libs' : 
+    #          ','.join([pjoin(i, 'atlas') for i in default_lib_dirs])}
+
     cfg = SafeConfigParser()
 
     st = cfg.read(pjoin(pdirname(__file__), 'perflib.cfg'))
@@ -55,83 +66,49 @@ def build_config():
     assert len(st) > 0
 
     def get_perflib_config(name):
-        yop =  DefaultDict(avkeys = opts)
-        for i in cfg.options(name):
-            yop[i] =  cfg.get(name, i, vars = defint).split(',')
+        yop = DefaultDict.fromcallable(list_opts, lambda: [])
+        opts = cfg.options(name)
 
-        return yop
+        # Get mandatory options first
+        def get_opt(opt):
+            opts.pop(opts.index(opt))
+            o = cfg.get(name, opt)
+            return o
+        dispname = get_opt('dispname')
+        sitename = get_opt('sitename')
+
+        # Now get all optional options 
+        for i in opts:
+            #yop[i] =  cfg.get(name, i, vars = defint)
+            yop[i] =  cfg.get(name, i).split(',')
+
+        return _PerflibConfig(dispname, sitename, yop)
 
     ret = {}
-    for i in perflib:
+    for i in _PERFLIBS:
         ret[i] = get_perflib_config(i)
 
     return ret
         
-_PCONFIG = build_config()
-
-CONFIG = {
-        'GenericBlas': PerflibConfig('BLAS', 'blas', 
-                                    _PCONFIG['GenericBlas'],
-                                    [], []),
-        'GenericLapack': PerflibConfig('LAPACK', 'lapack', 
-                                      _PCONFIG['GenericLapack'],
-                                      [], []),
-        'MKL': PerflibConfig('MKL', 'mkl', _PCONFIG['MKL'],
-                             ['mkl.h'], ['MKLGetVersion']),
-        'ATLAS': PerflibConfig('ATLAS', 'atlas', _PCONFIG['ATLAS'], 
-                               ['atlas_enum.h'], ['ATL_sgemm']),
-        'Accelerate' : PerflibConfig('Framework: Accelerate', 'accelerate', 
-                                      _PCONFIG['Accelerate'],
-                                      ['Accelerate/Accelerate.h'],
-                                      ['cblas_sgemm']),
-        'vecLib' : PerflibConfig('Framework: vecLib', 'vecLib', 
-                                 _PCONFIG['vecLib'],
-                                 ['vecLib/vecLib.h'],
-                                 ['cblas_sgemm']),
-        'Sunperf' : PerflibConfig('Sunperf', 'sunperf', 
-                                  _PCONFIG['Sunperf'],
-                                  ['sunperf.h'],
-                                  ['cblas_sgemm']),
-        'FFTW3' : PerflibConfig('FFTW3', 'fftw', _PCONFIG['FFTW3'],
-                                ['fftw3.h'], ['fftw_cleanup']),
-        'FFTW2' : PerflibConfig('FFTW2', 'fftw', _PCONFIG['FFTW2'],
-                                ['fftw.h'], ['fftw_forget_wisdom'])
-        }
+# A dictionary which keys are the name of the perflib (same than perflib.cfg
+# section name) and values a _PerflibConfig instance.
+CONFIG = build_config()
 
 class IsFactory:
     def __init__(self, name):
         """Name should be one key of CONFIG."""
-        try:
-            CONFIG[name]
-        except KeyError, e:
-            raise RuntimeError("name %s is unknown")
-
-        def f(env, libname):
-            if env['NUMPY_PKG_CONFIG'][libname] is None:
-                return 0 == 1
+        def func(env, libname): 
+            cache = env['NUMPY_PKG_CONFIG']['LIB'][libname]
+            if cache:
+                return cache.uses_perflib(name)
             else:
-                return env['NUMPY_PKG_CONFIG'][libname].name == \
-                       CONFIG[name].name
-        self.func = f
+                return False
 
-    def get_func(self):
-        return self.func
+        self.func = func
 
 class GetVersionFactory:
     def __init__(self, name):
         """Name should be one key of CONFIG."""
-        try:
-            CONFIG[name]
-        except KeyError, e:
-            raise RuntimeError("name %s is unknown")
-
-        def f(env, libname):
-            if env['NUMPY_PKG_CONFIG'][libname] is None or \
-               not env['NUMPY_PKG_CONFIG'][libname].name == CONFIG[name].name:
-                return 'No version info'
-            else:
-                return env['NUMPY_PKG_CONFIG'][libname].version
-        self.func = f
-
-    def get_func(self):
-        return self.func
+        def func(env):
+            return env['NUMPY_PKG_CONFIG']['PERFLIB'][name].version
+        self.func = func

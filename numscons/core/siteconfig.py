@@ -8,6 +8,27 @@ import ConfigParser
 
 from numscons.numdist import default_lib_dirs, default_include_dirs, \
                              default_src_dirs, get_standard_file
+from numscons.core.utils import DefaultDict
+
+# List of options that ConfigOpts can keep. If later additional variables
+# should be added (e.g. cpp flags, etc...), they should be added here.
+_SITE_CONFIG_PATH_FLAGS = ('library_dirs', 'include_dirs')
+_SITE_CONFIG_NONPATH_FLAGS = ('libraries'),
+
+_SITE_OPTS_FLAGS = _SITE_CONFIG_PATH_FLAGS + _SITE_CONFIG_NONPATH_FLAGS
+
+class ConfigOpts(DefaultDict):
+    """Small container class to keep all necessary options to build with a
+    given library/package, such as cflags, libs, library paths, etc..."""
+    _keys = _SITE_OPTS_FLAGS
+    def __init__(self):
+        DefaultDict.__init__(self, self._keys)
+        for k in self._keys:
+            self[k] = []
+
+    def __repr__(self):
+        msg = [r'%s : %s' % (k, i) for k, i in self.items() if len(i) > 0]
+        return '\n'.join(msg)
 
 # Think about a cache mechanism, to avoid reparsing the config file everytime.
 def get_config():
@@ -53,7 +74,7 @@ def parse_config_param(var):
     """Given var, the output of ConfirParser.get(section, name), returns a list
     of each item of its content."""
     varl = var.split(',')
-    return [i.strip() for i in varl]
+    return [i.strip() for i in varl if len(i) > 0]
 
 def get_paths(var):
     """Given var, the output of ConfirParser.get(section, name), returns a list
@@ -66,23 +87,28 @@ def get_config_from_section(siteconfig, section):
     """For the given siteconfig and section, return the found information.
     
     Returns a tuple (info, found), where:
-        info : tuple (cpppath, libs, libpath), containing a list of path or libraries
-        found: 1 if the section was found, 0 otherwise."""
+        info : ConfigOpts instance
+        found: True if the section was found, False otherwise."""
+    cfgopts = ConfigOpts()
+    found = False
+    defaults = siteconfig.defaults()
+    if len(defaults) > 0:
+        # the customization file has a default section: we add all its options
+        # into cfgopts (only the ones which make sense)
+        for k, v in defaults.items():
+            if k in _SITE_CONFIG_PATH_FLAGS:
+                cfgopts[k].extend(get_paths(v))
+            elif k in _SITE_CONFIG_NONPATH_FLAGS:
+                cfgopts[k].extend(parse_config_param(v))
+
     if siteconfig.has_section(section):
-        try:
-            libpath = get_paths(siteconfig.get(section, 'library_dirs'))
-        except ConfigParser.NoOptionError, e:
-            libpath = []
+        found = True
+        for opt in _SITE_CONFIG_PATH_FLAGS:
+            if siteconfig.has_option(section, opt):
+                cfgopts[opt].extend(get_paths(siteconfig.get(section, opt)))
 
-        try:
-            cpppath = get_paths(siteconfig.get(section, 'include_dirs'))
-        except ConfigParser.NoOptionError, e:
-            cpppath = []
+        for opt in _SITE_CONFIG_NONPATH_FLAGS:
+            if siteconfig.has_option(section, opt):
+                cfgopts[opt].extend(parse_config_param(siteconfig.get(section, opt)))
 
-        try:
-            libs = parse_config_param(siteconfig.get(section, 'libraries'))
-        except ConfigParser.NoOptionError, e:
-            libs = []
-        return (cpppath, libs, libpath), 1
-    else:
-        return ([], [], []), 0
+    return cfgopts, found

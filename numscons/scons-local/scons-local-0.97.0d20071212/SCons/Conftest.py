@@ -474,7 +474,7 @@ int main()
 
     st = context.CompileProg(src, suffix)
     _YesNoResult(context, st, "HAVE_DECL_" + symbol, src,
-                 "Set to 1 if %s is defined." % symbol)
+                 "Set to 1 if %s is declared." % symbol)
     return st
 
 def CheckLib(context, libs, func_name = None, header = None,

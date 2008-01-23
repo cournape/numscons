@@ -1,19 +1,31 @@
-Remaining things:
-    - Finish the split-up in numscons package (separate from numpy svn
-      repository)
-    - Start testing facilities (using nose ?)
-
 Then, those are the old remaining things to do (once we get to the point we
 were when scons was inside numpy repository):
-    - clean the code: checkers, numpyenv in perticular
-    - check windows
+    - clean writing info code: see cleaning checkers module
+    - Clean fortran code to use shlex instead of our intricated state machine (0.3* serie)
+    - check windows: in perticular MS studio + g77 (0.4* serie)
+    - clean the code of numpyenv; in perticular: builder creation (should be
+      done through tools), remove _glob (scons has the functionality now),
+      rename functions, and set the order right (0.5* serie).
+    - clean up numpy.core building (0.5* serie)
+    - add a function to set up distutils build dirs and call the builder
+    - CXX optimizations flags + Control cxxflags from env
     - umfpack checker
     - Add CPPPDEFINES in perflib checkers 
-    - CXX optimizations flags + Control cxxflags from env
     - handle inplace
     - doc
     - finish scipy
     - CLAPACK: check old atlas
+
+Goals:
+    - 0.3: checkers subpackage is cleaned
+    - 0.4: should work on linux/mac os X/windows (on windows: MS + g77 should
+      work too at this point)
+    - 0.5: clean numscons.core, in particular builders
+
+Cleaning checkers modules:
+    - Refactor site config custom: remove duplicate between core.libinfo and
+      checkers.perflib_info
+    - Have test for fortran
 
 Things to implement / problems to solve:
     - Make 'real' python extension builders
@@ -34,7 +46,6 @@ Tests:
     - What can be tested ?
 
 Fortran:
-    - Rewrite verbose output parser using shlex for quote handling
     - improve Fortran runtime detection for upstream integration
     - improve Fortran mangling and dummy main detection for upstream
       integration
