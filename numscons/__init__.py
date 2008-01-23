@@ -1,5 +1,5 @@
 #! /usr/bin/env python
-# Last Change: Wed Jan 23 07:00 PM 2008 J
+# Last Change: Wed Jan 23 08:00 PM 2008 J
 
 """numscons is a package which enable building python extensions within
 distutils. It is intented as a replacement of numpy.distutils to build numpy
@@ -30,6 +30,10 @@ from checkers import write_info
 
 # XXX: this is ugly, better find the mathlibs with a checker 
 # XXX: this had nothing to do here, too...
+def scons_get_paths(paths):
+    import os
+    return paths.split(os.pathsep)
+
 def scons_get_mathlib(env):
     from numpy.distutils.misc_util import get_mathlibs
     path_list = scons_get_paths(env['include_bootstrap']) + [None]
