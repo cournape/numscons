@@ -3,3 +3,5 @@ from fft_checkers import CheckFFT
 
 from perflib import IsMKL, IsATLAS, IsVeclib, IsAccelerate, IsSunperf, IsFFTW3, IsFFTW2
 from simple_check import NumpyCheckLibAndHeader
+
+from fortran import *

@@ -11,6 +11,8 @@ from numscons.core.extension_scons import built_with_mstools, \
     built_with_mingw, built_with_gnu_f77
 from fortran import parse_f77link, check_link_verbose, gnu_to_ms_link
 
+__all__ = ['CheckF77Clib', 'CheckF77Mangling']
+
 #-----------------
 # Public functions
 #-----------------
