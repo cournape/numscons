@@ -1,20 +1,10 @@
 #! /usr/bin/env python
-# Last Change: Tue Dec 04 03:00 PM 2007 J
+# Last Change: Wed Jan 16 07:00 PM 2008 J
 
-# Module for custom, common checkers for numpy (and scipy)
-import sys
-import os.path
-from copy import deepcopy
-from distutils.util import get_platform
-
-# from numpy.distutils.scons.core.libinfo import get_config_from_section, get_config
-# from numpy.distutils.scons.testcode_snippets import cblas_sgemm as cblas_src, \
-#         c_sgemm as sunperf_src, lapack_sgesv, blas_sgemm, c_sgemm2, \
-#         clapack_sgesv as clapack_src
-# from numpy.distutils.scons.fortran_scons import CheckF77Mangling, CheckF77Clib
-from numscons.configuration import add_info
-from perflib import CheckMKL, CheckFFTW3, CheckFFTW2
-from support import check_include_and_run, ConfigOpts, ConfigRes
+"""Module for fft checkers."""
+from numscons.checkers.perflib import checker
+from numscons.checkers.perflib_info import add_lib_info, MetalibInfo, \
+     get_cached_perflib_info
 
 __all__ = ['CheckFFT']
 
@@ -23,30 +13,27 @@ def CheckFFT(context, autoadd = 1, check_version = 0):
     libname = 'fft'
     env = context.env
 
-    def check(func, name, suplibs):
-        st, res = func(context, autoadd, check_version)
-        # XXX: check for fft code ?
-        if st:
-            for lib in suplibs:
-                res.cfgopts['libs'].append(lib)
-            add_info(env, libname, res)
+    def check_fft_perflib(perflibs):
+        def check(pname):
+            func = checker(pname)
+            if func(context, autoadd, check_version):
+                # XXX: check for fft code ?
+                cache = get_cached_perflib_info(context.env, pname)
+                cfgopts = cache.opts_factory[libname]()
+                add_lib_info(env, libname, MetalibInfo(pname, cfgopts))
+                st = 1
+            else:
+                st = 0
 
-        return st
+            return st
 
-    # Check MKL
-    st = check(CheckMKL, 'MKL', [])
-    if st:
-        return st
+        for p in perflibs:
+            if check(p):
+                return 1
+        return 0
 
-    # Check fftw3
-    st = check(CheckFFTW3, 'fftw3', ['fftw3'])
-    if st:
-        return st
+    if check_fft_perflib(('MKL', 'FFTW3', 'FFTW2')):
+        return 1
 
-    # Check fftw2
-    st = check(CheckFFTW2, 'fftw2', ['fftw'])
-    if st:
-        return st
-
-    add_info(env, libname, None)
+    add_lib_info(env, libname, None)
     return 0

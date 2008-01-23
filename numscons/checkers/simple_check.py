@@ -1,18 +1,16 @@
 #! /usr/bin/env python
 # Last Change: Tue Nov 06 07:00 PM 2007 J
 
-# Module for support to look for external code (replacement of
-# numpy.distutils.system_info). scons dependant code.
-import ConfigParser
+"""Module for support to look for external code (replacement of
+numpy.distutils.system_info). scons dependant code."""
 import os
-from copy import deepcopy
 
-from numscons.core.libinfo import get_config_from_section, get_config
-from numscons.checkers.support import ConfigOpts, save_and_set, \
-                                                   restore, check_symbol
+from numscons.core.siteconfig import get_config_from_section, get_config, \
+                                     get_paths, parse_config_param
 
-from libinfo import get_config, get_paths, parse_config_param
-from utils import get_empty
+from numscons.checkers.support import save_and_set, \
+                                      restore, check_symbol
+from numscons.checkers.configuration import BuildConfig
 
 _SYMBOL_DEF_STR = """
 #ifdef __cplusplus
@@ -55,19 +53,14 @@ def NumpyCheckLibAndHeader(context, libs, symbols = None, headers = None,
 
     # Get site.cfg customization if any
     siteconfig, cfgfiles = get_config()
-    (cus_cpppath, cus_libs, cus_libpath), found = \
-        get_config_from_section(siteconfig, section)
+    opts, found = get_config_from_section(siteconfig, section)
     if found:
-        opts = ConfigOpts()
-        opts['cpppath'] = cus_cpppath
-        opts['libpath'] = cus_libpath
-        opts['libs'] = cus_libs
         # XXX: fix this
-        if len(cus_libs) == 1 and len(cus_libs[0]) == 0:
-            opts['libs'] = libs
+        if len(opts['libraries']) == 1 and len(opts['libraries'][0]) == 0:
+            opts['libraries'] = libs
     else:
-        opts = ConfigOpts()
-        opts['libs'] = libs
+        opts = BuildConfig()
+        opts['libraries'] = libs
     
     # Display message
     if symbols:

@@ -5,7 +5,7 @@
 import os
 import unittest
 
-from utils import pkg_to_path, _rsplit, DefaultDict
+from numscons.core.utils import pkg_to_path, _rsplit, DefaultDict
 
 class PkgToPathTester(unittest.TestCase):
     def setUp(self):
@@ -50,9 +50,28 @@ class DefaultDictTester(unittest.TestCase):
         d['a'] = 1 
         try:
             d['c'] = 2
-            raise AssertionError('Setting a non existing key succeeded, should have failed.')
+            raise AssertionError('Setting a non existing key succeeded, '\
+                                 'should have failed.')
         except KeyError:
             pass
 
+    def test_fromcallable(self):
+        a = DefaultDict.fromcallable(('1', '2'), lambda: [])
+        assert not a['1'] is a['2']
+
+        b = DefaultDict(('1', '2'), [])
+        assert b['1'] is b['2']
+
+    def test_copy(self):
+        from copy import copy
+        a = DefaultDict(('a', 'b'))
+        a['a'] = ['a']
+        a['b'] = ['b']
+        b = copy(a)
+        b['b'] += 'c'
+
+        assert not b['b'] == a['b']
+        assert b['a'] == a['a']
+        assert b['a'] is not a['a']
 if __name__ == "__main__":
     unittest.main()

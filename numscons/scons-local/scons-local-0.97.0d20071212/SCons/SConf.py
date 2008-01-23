@@ -4,7 +4,7 @@ Autoconf-like configuration support.
 """
 
 #
-# Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007 The SCons Foundation
+# __COPYRIGHT__
 #
 # Permission is hereby granted, free of charge, to any person obtaining
 # a copy of this software and associated documentation files (the
@@ -26,7 +26,7 @@ Autoconf-like configuration support.
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #
 
-__revision__ = "src/engine/SCons/SConf.py 2523 2007/12/12 09:37:41 knight"
+__revision__ = "__FILE__ __REVISION__ __DATE__ __DEVELOPER__"
 
 import SCons.compat
 
@@ -410,7 +410,6 @@ class SConfBase:
                  'CheckCXXHeader'     : CheckCXXHeader,
                  'CheckLib'           : CheckLib,
                  'CheckLibWithHeader' : CheckLibWithHeader,
-                 'Define'             : Define,
                }
         self.AddTests(default_tests)
         self.AddTests(custom_tests)
@@ -426,6 +425,31 @@ class SConfBase:
         """
         self._shutdown()
         return self.env
+
+    def Define(self, name, value = None, comment = None):
+        """
+        Define a pre processor symbol name, with the optional given value in the
+        current config header.
+
+        If value is None (default), then #define name is written. If value is not
+        none, then #define name value is written.
+        
+        comment is a string which will be put as a C comment in the
+        header, to explain the meaning of the value (appropriate C comments /* and
+        */ will be put automatically."""
+        lines = []
+        if comment:
+            comment_str = "\n/* %s */" % comment
+            lines.append(comment_str)
+
+        if value is not None:
+            define_str = "#define %s %s" % (name, value)
+        else:
+            define_str = "#define %s" % name
+        lines.append(define_str)
+        lines.append('')
+
+        self.config_h_text = self.config_h_text + '\n'.join(lines)
 
     def BuildNodes(self, nodes):
         """
@@ -897,13 +921,6 @@ def CheckHeader(context, header, include_quotes = '<>', language = None):
                                      include_quotes = include_quotes)
     context.did_show_result = 1
     return not res
-
-def Define(context, name, value = None, comment = None):
-    """
-    A test for a C header file.
-    """
-    return SCons.Conftest.Define(context, name, value, comment)
-
 
 # Bram: Make this function obsolete?  CheckHeader() is more generic.
 

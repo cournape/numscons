@@ -7,7 +7,7 @@ library."""
 import os
 import re
 
-from copy import deepcopy
+from copy import deepcopy, copy
 
 _START_WITH_MINUS = re.compile('^\s*-')
 
@@ -51,15 +51,29 @@ def get_empty(dic, key):
     does."""
     try:
         return deepcopy(dic[key])
-    except KeyError, e:
+    except KeyError:
         return []
 
 class NonDefaultKeyError(KeyError):
+    """Exception raised when trying to set/get a value from a non default key
+    for DefaultDict instances."""
     pass
 
 class DefaultDict(dict):
     """Structure similar to a dictionary, with a restricted set of possible
     keys."""
+    @classmethod
+    def fromcallable(cls, avkeys, default = None):
+        """Class method to instanciate a DefaultDict using a callable for the
+        default value.
+
+        Example: DefaultDict.fromcallable(keys, lambda: [])"""
+        res = cls(avkeys, default)
+        if default is not None:
+            for k in res:
+                res[k] = default()
+        return res
+
     def __init__(self, avkeys, default = None):
         dict.__init__(self, [(i, default) for i in avkeys])
 
@@ -67,6 +81,14 @@ class DefaultDict(dict):
         if not self.has_key(key):
             raise NonDefaultKeyError(key)
         dict.__setitem__(self, key, val)
+
+    def __copy__(self):
+        cls = self.__class__
+        cpy = cls.__new__(cls)
+        cpy.update(self)
+        for k in self.keys():
+            cpy[k] = copy(self[k])
+        return cpy
         
 def rsplit(s, sep, maxsplit = -1):
     """Equivalent of rsplit, but works on 2.3."""
@@ -106,17 +128,20 @@ import types
 from UserString import UserString
 # Don't "from types import ..." these because we need to get at the
 # types module later to look for UnicodeType.
+InstanceType    = types.InstanceType
 StringType      = types.StringType
 TupleType       = types.TupleType
 if hasattr(types, 'UnicodeType'):
     UnicodeType = types.UnicodeType
     def isstring(obj):
+        """Return true if argument is a string."""
         t = type(obj)
         return t is StringType \
             or t is UnicodeType \
             or (t is InstanceType and isinstance(obj, UserString))
 else:
     def isstring(obj):
+        """Return true if argument is a string."""
         t = type(obj)
         return t is StringType \
             or (t is InstanceType and isinstance(obj, UserString))
