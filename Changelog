@@ -1,3 +1,10 @@
+Thu, 24 Jan 2008 00:17:52 +0900
+	* 0.3.0 release.
+	* Sunperf checker works again on indiana
+	* rpath is not used with Apple linkers
+	* Do not throw exception when no customization is available for
+	compilers, but uses a default set of values instead.
+
 Wed, 23 Jan 2008 20:03:24 +0900
 	* 0.2.3.1 release. This is a trivial fix to build numpy with numscons
 
