@@ -98,5 +98,5 @@ setup(cmdclass = {'install': install, 'install_data': install_data, 'sdist': sdi
                   'numscons.checkers.tests', 'numscons.checkers.fortran'],
       package_data = {'numscons.core' : ['compiler.cfg', 'fcompiler.cfg'], 
                       'numscons.checkers' : ['perflib.cfg']},
-      data_dir = ['numscons/scons-local'],
+      data_dir = ['numscons/scons-local', 'tests', 'doc'],
       )
