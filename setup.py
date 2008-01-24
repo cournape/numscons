@@ -73,7 +73,7 @@ class install(old_install):
 setup(cmdclass = {'install': install, 'install_data': install_data},
       distclass = Distribution,
       name = 'numscons',
-      version = '0.3.0',
+      version = '0.3.1dev',
       description = 'Enable to use scons within distutils to build extensions',
       classifiers = filter(None, CLASSIFIERS.split('\n')),
       author = 'David Cournapeau',
