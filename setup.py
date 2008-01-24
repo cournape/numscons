@@ -7,6 +7,7 @@ from distutils.core import setup
 from distutils.dist import Distribution as old_Distribution
 from distutils.command.install import install as old_install
 from distutils.command.install_data import install_data as old_install_data
+from distutils.command.sdist import sdist as old_sdist
 
 CLASSIFIERS = """\
 Development Status :: 4 - Beta
@@ -28,9 +29,7 @@ if os.path.exists('MANIFEST'): os.remove('MANIFEST')
 
 # We implement our own add_data_dir method, to avoid depending on numpy
 # distutils, which would create an obvious boostrapping problem once we want to
-# build numpy with scons ... Thanks to distutils wonderful design, this means
-# we have to reimplement 3 classes, yeah !
-
+# build numpy with scons ... 
 class Distribution(old_Distribution):
     """This new Distribution class is necessary to support the new data_dir
     argument in setup files."""
@@ -69,8 +68,24 @@ class install(old_install):
 
         old_install.run(self)
 
+class sdist(old_sdist):
+    def add_defaults (self):
+        old_sdist.add_defaults(self)
+
+        dist = self.distribution
+
+        if dist.data_files is None:
+            dist.data_files = []
+
+        for d in dist.data_dir:
+            src_data_files = []
+            for roots, dirs, files in os.walk(d):
+                for file in files:
+                    src_data_files.append(os.path.join(roots, file))
+            self.filelist.extend(src_data_files)
+
 # Main setup method
-setup(cmdclass = {'install': install, 'install_data': install_data},
+setup(cmdclass = {'install': install, 'install_data': install_data, 'sdist': sdist},
       distclass = Distribution,
       name = 'numscons',
       version = '0.3.1dev',
