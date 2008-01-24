@@ -52,7 +52,7 @@ def PythonExtension(env, target, source, *args, **kw):
             LIBS.extend([get_pythonlib_name(), py_runtime_library])
     elif sys.platform == "darwin":
         # XXX: When those should be used ? (which version of Mac OS X ?)
-        LINKFLAGS += ' -undefined dynamic_lookup '
+        LINKFLAGS.extend(['-undefined', 'dynamic_lookup'])
     else:
         pass
 
