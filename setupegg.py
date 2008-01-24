@@ -52,7 +52,7 @@ class Distribution(old_Distribution):
 # Main setup method
 setup(distclass = Distribution,
       name = 'numscons',
-      version = '0.3.1dev',
+      version = '0.3.1',
       description = 'Enable to use scons within distutils to build extensions',
       classifiers = filter(None, CLASSIFIERS.split('\n')),
       author = 'David Cournapeau',
