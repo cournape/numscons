@@ -35,12 +35,12 @@ __revision__ = "src/engine/SCons/Tool/applelink.py 2523 2007/12/12 09:37:41 knig
 
 import SCons.Util
 
-import gnulink
+import link
 
 def generate(env):
     """Add Builders and construction variables for applelink to an
     Environment."""
-    gnulink.generate(env)
+    link.generate(env)
 
     env['FRAMEWORKPATHPREFIX'] = '-F'
     env['_FRAMEWORKPATH'] = '${_concat(FRAMEWORKPATHPREFIX, FRAMEWORKPATH, "", __env__)}'
