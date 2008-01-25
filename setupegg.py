@@ -6,6 +6,7 @@ from setuptools import setup
 from distutils.dist import Distribution as old_Distribution
 from distutils.command.install import install as old_install
 from distutils.command.install_data import install_data as old_install_data
+from distutils.command.sdist import sdist as old_sdist
 
 # BEFORE importing distutils, remove MANIFEST. distutils doesn't properly
 # update it when the contents of directories change.
@@ -22,22 +23,56 @@ class Distribution(old_Distribution):
         self.data_dir = []
         old_Distribution.__init__(self, attrs)
 
-        # Butt ugly: we add the data directories when the distribution is
-        # initialized. But it does not work with eggs otherwise ?
-        for d in self.data_dir:
+class install_data(old_install_data):
+    """this install_data command does not install data files into the wild, but
+    put them into the package directory."""
+    def finalize_options(self):
+        if self.install_dir is None:
+            installobj = self.distribution.get_command_obj('install')
+            self.install_dir = installobj.install_purelib
+
+    def run(self):
+        old_install_data.run(self)
+
+class install(old_install):
+    """This install command extends the data_files list of data files using the
+    data_dir argument."""
+    def run(self):
+        dist = self.distribution
+
+        if dist.data_files is None:
+            dist.data_files = []
+
+        for d in dist.data_dir:
             install_data_files = []
             for roots, dirs, files in os.walk(d):
                 for file in files:
                     install_data_files.append((roots, [os.path.join(roots, file)]))
 
-        if self.data_files:
-            self.data_files.extend(install_data_files)
-        else:
-            self.data_files = install_data_files
+            dist.data_files.extend(install_data_files)
+
+        old_install.run(self)
+
+class sdist(old_sdist):
+    def add_defaults (self):
+        old_sdist.add_defaults(self)
+
+        dist = self.distribution
+
+        if dist.data_files is None:
+            dist.data_files = []
+
+        for d in dist.data_dir:
+            src_data_files = []
+            for roots, dirs, files in os.walk(d):
+                for file in files:
+                    src_data_files.append(os.path.join(roots, file))
+            self.filelist.extend(src_data_files)
 
 # Main setup method
 import release as R
-setup(distclass = Distribution,
+setup(cmdclass = {'install': install, 'install_data': install_data, 'sdist': sdist},
+      distclass = Distribution,
       name          = R.NAME,
       version       = R.VERSION,
       description   = R.DESCRIPTION,
