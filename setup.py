@@ -88,7 +88,7 @@ class sdist(old_sdist):
 setup(cmdclass = {'install': install, 'install_data': install_data, 'sdist': sdist},
       distclass = Distribution,
       name = 'numscons',
-      version = '0.3.1',
+      version = '0.3.2dev',
       description = 'Enable to use scons within distutils to build extensions',
       classifiers = filter(None, CLASSIFIERS.split('\n')),
       author = 'David Cournapeau',
