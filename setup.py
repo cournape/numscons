@@ -9,20 +9,6 @@ from distutils.command.install import install as old_install
 from distutils.command.install_data import install_data as old_install_data
 from distutils.command.sdist import sdist as old_sdist
 
-CLASSIFIERS = """\
-Development Status :: 4 - Beta
-Intended Audience :: Science/Research
-Intended Audience :: Developers
-License :: OSI Approved
-Programming Language :: Python
-Topic :: Software Development
-Topic :: Scientific/Engineering
-Operating System :: Microsoft :: Windows
-Operating System :: POSIX
-Operating System :: Unix
-Operating System :: MacOS
-"""
-
 # BEFORE importing distutils, remove MANIFEST. distutils doesn't properly
 # update it when the contents of directories change.
 if os.path.exists('MANIFEST'): os.remove('MANIFEST')
@@ -85,18 +71,15 @@ class sdist(old_sdist):
             self.filelist.extend(src_data_files)
 
 # Main setup method
+import release as R
 setup(cmdclass = {'install': install, 'install_data': install_data, 'sdist': sdist},
-      distclass = Distribution,
-      name = 'numscons',
-      version = '0.3.2dev',
-      description = 'Enable to use scons within distutils to build extensions',
-      classifiers = filter(None, CLASSIFIERS.split('\n')),
-      author = 'David Cournapeau',
-      author_email = 'david@ar.media.kyoto-u.ac.jp',
-      packages = ['numscons', 'numscons.core', 'numscons.checkers',
-                  'numscons.tools', 'numscons.numdist',
-                  'numscons.checkers.tests', 'numscons.checkers.fortran'],
-      package_data = {'numscons.core' : ['compiler.cfg', 'fcompiler.cfg'], 
-                      'numscons.checkers' : ['perflib.cfg']},
-      data_dir = ['numscons/scons-local', 'tests', 'doc'],
+      distclass     = Distribution,
+      name          = R.NAME,
+      version       = R.VERSION,
+      description   = R.DESCRIPTION,
+      author        = R.AUTHOR,
+      author_email  = R.AUTHOR_EMAIL,
+      packages      = R.PACKAGES,
+      package_data  = R.PACKAGE_DATA,
+      data_dir      = R.DATA_DIR
       )
