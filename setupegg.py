@@ -36,6 +36,7 @@ class Distribution(old_Distribution):
             self.data_files = install_data_files
 
 # Main setup method
+import release as R
 setup(distclass = Distribution,
       name          = R.NAME,
       version       = R.VERSION,
