@@ -29,7 +29,9 @@ def _check(perflibs, context, libname, check_version, msg_template, test_src,
         """pname is the name of the perflib."""
         func = checker(pname)
         name = CONFIG[pname].name
-        st = func(context, autoadd, check_version)
+        # Do not autoadd in the perflib checker. If the meta lib check works,
+        # it will add all the flags if autoadd is asked.
+        st = func(context, 0, check_version)
         if st:
             cache = get_cached_perflib_info(context.env, pname)
             cfgopts = cache.opts_factory[libname]()

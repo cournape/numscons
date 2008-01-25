@@ -16,7 +16,9 @@ def CheckFFT(context, autoadd = 1, check_version = 0):
     def check_fft_perflib(perflibs):
         def check(pname):
             func = checker(pname)
-            if func(context, autoadd, check_version):
+            # Do not autoadd in the perflib checker. If the meta lib check works,
+            # it will add all the flags if autoadd is asked.
+            if func(context, 0, check_version):
                 # XXX: check for fft code ?
                 cache = get_cached_perflib_info(context.env, pname)
                 cfgopts = cache.opts_factory[libname]()
