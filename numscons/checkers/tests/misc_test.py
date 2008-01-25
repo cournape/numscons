@@ -12,7 +12,7 @@ cc -o build/scons/numpy/scons_fake/checkers/.sconf/conftest_5 -xlic_lib=sunperf 
 	/usr/ccs/bin/ld /opt/SUNWspro/prod/lib/crti.o /opt/SUNWspro/prod/lib/crt1.o /opt/SUNWspro/prod/lib/values-xa.o -o build/scons/numpy/scons_fake/checkers/.sconf/conftest_5 -lsunperf -lfui -lfsu -lmtsk -lsunmath -lpicl -lm build/scons/numpy/scons_fake/checkers/.sconf/conftest_5.o -Y "P,/opt/SUNWspro/lib:/opt/SUNWspro/prod/lib:/usr/ccs/lib:/lib:/usr/lib" -Qy -R/opt/SUNWspro/lib -lc /opt/SUNWspro/prod/lib/crtn.o"""
 
 expect_v12 = {
-    'libs': ['sunperf', 'fui', 'fsu', 'mtsk', 'sunmath'],
+    'libraries': ['sunperf', 'fui', 'fsu', 'mtsk', 'sunmath'],
     'rpath': ['/opt/SUNWspro/lib'],
     'library_dirs': ['/opt/SUNWspro/lib', '/opt/SUNWspro/prod/lib',
                      '/usr/ccs/lib', '/lib', '/usr/lib']}
