@@ -8,6 +8,7 @@
 import sys
 import re
 import os
+import shlex
 
 GCC_DRIVER_LINE = re.compile('^Driving:')
 POSIX_STATIC_EXT = re.compile('\S+\.a')
@@ -137,31 +138,48 @@ def parse_f77link(lines):
             _parse_f77link_line(line, final_flags)
     return final_flags
 
+SPACE_OPTS = re.compile('^-[LRuYz]$')
+NOSPACE_OPTS = re.compile('^-[RL]')
+
 def _parse_f77link_line(line, final_flags):
-    # Here we go (convention for wildcard is shell, not regex !)
-    #   1 TODO: we first get some root .a libraries
-    #   2 TODO: take everything starting by -bI:*
-    #   3 Ignore the following flags: -lang* | -lcrt*.o | -lc |
-    #   -lgcc* | -lSystem | -libmil | -LANG:=* | -LIST:* | -LNO:*)
-    #   4 TODO: take into account -lkernel32
-    #   5 For options of the kind -[[LRuYz]], as they take one argument
-    #   after, we have to somewhat keep it. We do as autoconf, that is
-    #   removing space between the flag and its argument.
-    #   6 For -YP,*: take and replace by -Larg where arg is the old argument
-    #   7 For -[lLR]*: take
-    flags = line.split()
+    lexer = shlex.shlex(line, posix = True)
+    lexer.whitespace_split = True
 
-    # Step 3
-    flags = [i for i in flags if not match_ignore(i)]
+    t = lexer.get_token()
+    keep = dict(zip(('libraries', 'library_dirs', 'rpath'), ([], [], [])))
+    while t:
+        def parse(token):
+            # Here we go (convention for wildcard is shell, not regex !)
+            #   1 TODO: we first get some root .a libraries
+            #   2 TODO: take everything starting by -bI:*
+            #   3 Ignore the following flags: -lang* | -lcrt*.o | -lc |
+            #   -lgcc* | -lSystem | -libmil | -LANG:=* | -LIST:* | -LNO:*)
+            #   4 TODO: take into account -lkernel32
+            #   5 For options of the kind -[[LRuYz]], as they take one argument
+            #   after, the actual option is the next token 
+            #   6 For -YP,*: take and replace by -Larg where arg is the old argument
+            #   7 For -[lLR]*: take
+            # final_flags.extend(good_flags)
+            if match_ignore(token):
+                t = lexer.get_token()
+            elif token.startswith('-lkernel32'):
+                final_flags.append(t)
+            elif SPACE_OPTS.match(token):
+                n = token
+                t = lexer.get_token()
+                if t.startswith('P,'):
+                    t = t[2:]
+                for opt in t.split(os.pathsep):
+                    final_flags.append('-L%s' % opt)
+            elif NOSPACE_OPTS.match(token):
+                final_flags.append(token)
+                t = lexer.get_token()
+            elif POSIX_LIB_FLAGS.match(token):
+                final_flags.append(token)
+                t = lexer.get_token()
+            else:
+                t = lexer.get_token()
 
-    # Step 5
-    flags = merge_space(flags)
-
-    # Step 6
-    flags = homo_libpath_flags(flags)
-
-    # Step 7
-    good_flags = [i for i in flags if match_interesting(i)]
-
-    final_flags.extend(good_flags)
+            return t
+        t = parse(t)
     return final_flags
