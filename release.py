@@ -13,7 +13,7 @@ Operating System :: MacOS
 """
 
 NAME        = 'numscons'
-VERSION     = '0.3.2'
+VERSION     = '0.3.3dev'
 DESCRIPTION = 'Enable to use scons within distutils to build extensions'
 CLASSIFIERS = filter(None, CLASSIFIERS.split('\n'))
 AUTHOR      = 'David Cournapeau'
