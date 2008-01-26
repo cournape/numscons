@@ -1,0 +1,3 @@
+recursive-include numscons/scons-local *.py
+recursive-include doc *
+recursive-include tests *.py *.f *.c
