@@ -1,5 +1,5 @@
 #! /usr/bin/env python
-# Last Change: Fri Jan 18 02:00 PM 2008 J
+# Last Change: Sat Jan 26 05:00 PM 2008 J
 
 """This module implements the functionality to keep all necessary build
 informations about perflib and meta lib, so that those info can be passed from
@@ -11,7 +11,7 @@ from numscons.core.utils import DefaultDict
 # List of options that BuildConfig can keep. If later additional variables
 # should be added (e.g. cpp flags, etc...), they should be added here.
 _BUILD_OPTS_FLAGS = ('include_dirs', 'cflags', 'library_dirs', 'libraries',
-                     'linkflags', 'rpath', 'frameworks')
+                     'linkflags', 'linkflagsend', 'rpath', 'frameworks')
 
 # List of options that BuildConfigFactory can keep. If later additional
 # variables should be added, they should be added here.
