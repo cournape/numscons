@@ -19,24 +19,32 @@ from numscons.checkers.support import check_include_and_run
 
 __all__ = ['CheckF77BLAS', 'CheckF77LAPACK', 'CheckCBLAS', 'CheckCLAPACK']
 
+def _get_language_opts(context, language):
+    """Return additional options necessary depending on the language.
+    
+    If no options is necessary (for C, for example), return None. Otherwise,
+    returns a dictionary whose possible keys are the same than BuildConfig
+    instances."""
+    if language == 'C':
+        moreopts = None
+    elif language == 'F77':
+        # We need C/F77 runtime info, otherwise, cannot proceed further
+        if not context.env.has_key('F77_LDFLAGS') and not CheckF77Clib(context):
+            add_lib_info(context.env, libname, None)
+            return 0
+        moreopts = {'linkflagsend' : copy(context.env['F77_LDFLAGS'])}
+    else:
+        raise ValueError("language %s unknown" % language)
+
+    return moreopts
+
 def _check(perflibs, context, libname, check_version, msg_template, test_src,
            autoadd, language = 'C'):
     """Generic perflib checker to be used in meta checkers.
 
     perflibs should be a list of perflib to check (the names which can be used
     are the keys of CONFIG."""
-    moreopts = {}
-    if language == 'C':
-        pass
-    elif language == 'F77':
-        # We need C/F77 runtime info, otherwise, cannot proceed further
-        if not context.env.has_key('F77_LDFLAGS') and not CheckF77Clib(context):
-            add_lib_info(context.env, libname, None)
-            return 0
-        moreopts['linkflagsend'] = copy(context.env['F77_LDFLAGS'])
-    else:
-        raise ValueError("language %s unknown" % language)
-
+    moreopts = _get_language_opts(context, language)
     def _check_perflib(pname):
         """pname is the name of the perflib."""
         cache = get_perflib_info(context, pname)
