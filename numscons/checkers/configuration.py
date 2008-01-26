@@ -85,7 +85,7 @@ class BuildConfigFactory:
         return self._get_libraries(['cblas_libs'])
 
     def lapack_config(self):
-        return self._get_libraries(['lapack_libs', 'blas_libs'])
+        return self._get_libraries(['lapack_libs', 'cblas_libs', 'blas_libs'])
 
     def clapack_config(self):
         return self._get_libraries(['clapack_libs', 'cblas_libs'])
