@@ -50,8 +50,18 @@ def _check(perflibs, context, libname, check_version, msg_template, test_src,
             cache = get_cached_perflib_info(context.env, pname)
 
         cfgopts = cache.opts_factory[libname]()
+        if moreopts:
+            # More options are necessary to check the code snippet (fortran
+            # runtime, etc...), so we create a new BuildConfig which contain
+            # those info.
+            testopts = copy(cfgopts)
+            for k, v in moreopts.items():
+                testopts[k].extend(v)
+        else:
+            # Nothing to do, testopts and cfgopts are the same
+            testopts = cfgopts
         st = check_include_and_run(context, msg_template % CONFIG[pname].name,
-                                   cfgopts, [], test_src, autoadd)
+                                   testopts, [], test_src, autoadd)
         if st:
             add_lib_info(context.env, libname, MetalibInfo(pname, cfgopts))
         return st
