@@ -1,5 +1,5 @@
 #! /usr/bin/env python
-# Last Change: Wed Jan 23 09:00 PM 2008 J
+# Last Change: Sat Jan 26 06:00 PM 2008 J
 
 """This module implements the functionality to:
     - add/retrieve info about checked meta-lib for show_config functionality.

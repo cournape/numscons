@@ -13,9 +13,8 @@ from numscons.testcode_snippets import \
         clapack_sgesv as clapack_src
 from fortran import CheckF77Mangling, CheckF77Clib
 
-from numscons.checkers.perflib_info import add_lib_info, \
-     get_cached_perflib_info, MetalibInfo, CacheError as PerflibCacheError
-from numscons.checkers.perflib import CONFIG, checker
+from numscons.checkers.perflib_info import add_lib_info, MetalibInfo
+from numscons.checkers.perflib import CONFIG, get_perflib_info
 from numscons.checkers.support import check_include_and_run
 
 __all__ = ['CheckF77BLAS', 'CheckF77LAPACK', 'CheckCBLAS', 'CheckCLAPACK']
@@ -40,15 +39,9 @@ def _check(perflibs, context, libname, check_version, msg_template, test_src,
 
     def _check_perflib(pname):
         """pname is the name of the perflib."""
-        try:
-            cache = get_cached_perflib_info(context.env, pname)
-        except PerflibCacheError:
-            # Do not autoadd in the perflib checker. If the meta lib check works,
-            # it will add all the flags if autoadd is asked.
-            if not checker(pname)(context, 0, check_version):
-                return 0
-            cache = get_cached_perflib_info(context.env, pname)
-
+        cache = get_perflib_info(context, pname)
+        if not cache:
+            return 0
         cfgopts = cache.opts_factory[libname]()
         if moreopts:
             # More options are necessary to check the code snippet (fortran

@@ -1,5 +1,5 @@
 #! /usr/bin/env python
-# Last Change: Wed Jan 16 09:00 PM 2008 J
+# Last Change: Sat Jan 26 06:00 PM 2008 J
 
 """This module defines checkers for performances libs providing standard API,
 such as MKL (Intel), ATLAS, Sunperf (solaris and linux), Accelerate (Mac OS X),
@@ -9,7 +9,8 @@ library specific check if possible, or other heuristics.
 Generally, you don't use those directly: they are used in 'meta' checkers, such
 as BLAS, CBLAS, LAPACK checkers."""
 
-from numscons.checkers.perflib_info import add_perflib_info, PerflibInfo
+from numscons.checkers.perflib_info import add_perflib_info, PerflibInfo, \
+     CacheError as PerflibCacheError, get_cached_perflib_info
 from numscons.checkers.common import check_code
 from numscons.checkers.perflib_config import IsFactory, GetVersionFactory, \
      CONFIG
@@ -160,3 +161,19 @@ def checker(name):
 
 def perflib_version_checker(name):
     return _PERFLIBS_VERSION_CHECKERS[name]
+
+def get_perflib_info(context, pname):
+    """This will get info for the perflib 'pname'.
+
+    Takes the cache into account, and run the checker if no cache is
+    available."""
+    try:
+        cache = get_cached_perflib_info(context.env, pname)
+    except PerflibCacheError:
+        if not checker(pname)(context, 0, 1):
+            cache = None
+        else:
+            cache = get_cached_perflib_info(context.env, pname)
+
+    return cache
+
