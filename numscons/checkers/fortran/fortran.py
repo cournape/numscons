@@ -13,7 +13,6 @@ import shlex
 GCC_DRIVER_LINE = re.compile('^Driving:')
 POSIX_STATIC_EXT = re.compile('\S+\.a')
 POSIX_LIB_FLAGS = re.compile('-l\S+')
-MERGE_SPACE_R1 = re.compile('^-[LRuYz]$')
 
 # linkflags which match those are ignored
 LINKFLAGS_IGNORED = [r'-lang*', r'-lcrt[a-zA-Z0-9]*\.o', r'-lc', r'-lSystem', r'-libmil', r'-LIST:*', r'-LNO:*']
@@ -83,43 +82,8 @@ def check_link_verbose(lines):
     else:
         return _check_link_verbose_posix(lines)
 
-def merge_space(line):
-    """For options taking an argument, merge them to avoid spaces.
-    
-    line should be a list of tokens."""
-    nline = []
-    for i in range(len(line)):
-        if MERGE_SPACE_R1.match(line[i]):
-            merged = [line[i]]
-            if not (line[i+1][0] == '-'):
-                merged.append(line[i+1])
-                i += 1
-            nline.append(''.join(merged))
-        else:
-            nline.append(line[i])
-    return nline
-
-def homo_libpath_flags(flags):
-    """For arguments like -YP, transform them into -L."""
-    nflags = []
-    for i in flags:
-        if i[:4] == "-YP,":
-            i = i.replace('-YP,', '-L')
-            i = i.replace(':', ' -L')
-            nflags.extend(i.split(' '))
-        else:
-            nflags.append(i)
-    return nflags
-
 def match_ignore(str):
     if [i for i in RLINKFLAGS_IGNORED if i.match(str)]:
-        return True
-    else:
-        return False
-
-def match_interesting(str):
-    pop = [i for i in RLINKFLAGS_INTERESTING if i.match(str)]
-    if pop:
         return True
     else:
         return False
@@ -154,16 +118,19 @@ def _parse_f77link_line(line, final_flags):
             #   2 TODO: take everything starting by -bI:*
             #   3 Ignore the following flags: -lang* | -lcrt*.o | -lc |
             #   -lgcc* | -lSystem | -libmil | -LANG:=* | -LIST:* | -LNO:*)
-            #   4 TODO: take into account -lkernel32
+            #   4 take into account -lkernel32
             #   5 For options of the kind -[[LRuYz]], as they take one argument
             #   after, the actual option is the next token 
             #   6 For -YP,*: take and replace by -Larg where arg is the old argument
             #   7 For -[lLR]*: take
-            # final_flags.extend(good_flags)
+
+            # step 3
             if match_ignore(token):
                 t = lexer.get_token()
+            # step 4
             elif token.startswith('-lkernel32'):
                 final_flags.append(t)
+            # step 5
             elif SPACE_OPTS.match(token):
                 n = token
                 t = lexer.get_token()
@@ -171,9 +138,11 @@ def _parse_f77link_line(line, final_flags):
                     t = t[2:]
                 for opt in t.split(os.pathsep):
                     final_flags.append('-L%s' % opt)
+            # step 6
             elif NOSPACE_OPTS.match(token):
                 final_flags.append(token)
                 t = lexer.get_token()
+            # step 7
             elif POSIX_LIB_FLAGS.match(token):
                 final_flags.append(token)
                 t = lexer.get_token()
