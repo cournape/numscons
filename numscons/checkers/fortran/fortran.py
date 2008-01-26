@@ -133,34 +133,35 @@ def parse_f77link(lines):
     remove_space = ['-[LRuYz]*']
     final_flags = []
     for line in lines:
-        # Here we go (convention for wildcard is shell, not regex !)
-        #   1 TODO: we first get some root .a libraries
-        #   2 TODO: take everything starting by -bI:*
-        #   3 Ignore the following flags: -lang* | -lcrt*.o | -lc |
-        #   -lgcc* | -lSystem | -libmil | -LANG:=* | -LIST:* | -LNO:*)
-        #   4 TODO: take into account -lkernel32
-        #   5 For options of the kind -[[LRuYz]], as they take one argument
-        #   after, we have to somewhat keep it. We do as autoconf, that is
-        #   removing space between the flag and its argument.
-        #   6 For -YP,*: take and replace by -Larg where arg is the old argument
-        #   7 For -[lLR]*: take
         if not GCC_DRIVER_LINE.match(line):
-            flags = line.split()
-
-            # Step 3
-            flags = [i for i in flags if not match_ignore(i)]
-
-            # Step 5
-            flags = merge_space(flags)
-
-            # Step 6
-            flags = homo_libpath_flags(flags)
-
-            # Step 7
-            good_flags = [i for i in flags if match_interesting(i)]
-
-            final_flags.extend(good_flags)
+            _parse_f77link_line(line, final_flags)
     return final_flags
 
-if __name__ == '__main__':
-    pass
+def _parse_f77link_line(line, final_flags):
+    # Here we go (convention for wildcard is shell, not regex !)
+    #   1 TODO: we first get some root .a libraries
+    #   2 TODO: take everything starting by -bI:*
+    #   3 Ignore the following flags: -lang* | -lcrt*.o | -lc |
+    #   -lgcc* | -lSystem | -libmil | -LANG:=* | -LIST:* | -LNO:*)
+    #   4 TODO: take into account -lkernel32
+    #   5 For options of the kind -[[LRuYz]], as they take one argument
+    #   after, we have to somewhat keep it. We do as autoconf, that is
+    #   removing space between the flag and its argument.
+    #   6 For -YP,*: take and replace by -Larg where arg is the old argument
+    #   7 For -[lLR]*: take
+    flags = line.split()
+
+    # Step 3
+    flags = [i for i in flags if not match_ignore(i)]
+
+    # Step 5
+    flags = merge_space(flags)
+
+    # Step 6
+    flags = homo_libpath_flags(flags)
+
+    # Step 7
+    good_flags = [i for i in flags if match_interesting(i)]
+
+    final_flags.extend(good_flags)
+    return final_flags
