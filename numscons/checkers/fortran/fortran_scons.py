@@ -1,4 +1,4 @@
-# Last Change: Mon Nov 12 07:00 PM 2007 J
+# Last Change: Sat Jan 26 04:00 PM 2008 J
 import os
 import sys
 import string
@@ -107,9 +107,8 @@ def CheckF77Clib(context):
             parsed = env.ParseFlags(final_flags)
             final_flags = gnu_g2c_libs(parsed['LIBS'], parsed['LIBPATH'])
             print final_flags
-        #env.Append(F77_LDFLAGS = ' '.join(final_flags))
         env['F77_LDFLAGS'] = final_flags
-        context.Result(str(env['F77_LDFLAGS']))
+        context.Result(' '.join(env['F77_LDFLAGS']))
     else:
         context.Result('Failed !')
 
