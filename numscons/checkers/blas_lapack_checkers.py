@@ -1,5 +1,5 @@
 #! /usr/bin/env python
-# Last Change: Wed Jan 16 07:00 PM 2008 J
+# Last Change: Sat Jan 26 06:00 PM 2008 J
 
 """Module for blas/lapack/cblas/clapack checkers. Use perflib checkers
 implementations if available."""
@@ -13,7 +13,7 @@ from numscons.testcode_snippets import \
 from fortran import CheckF77Mangling, CheckF77Clib
 
 from numscons.checkers.perflib_info import add_lib_info, \
-     get_cached_perflib_info, MetalibInfo
+     get_cached_perflib_info, MetalibInfo, CacheError as PerflibCacheError
 from numscons.checkers.perflib import CONFIG, checker
 from numscons.checkers.support import check_include_and_run
 
@@ -27,19 +27,21 @@ def _check(perflibs, context, libname, check_version, msg_template, test_src,
     are the keys of CONFIG."""
     def _check_perflib(pname):
         """pname is the name of the perflib."""
-        func = checker(pname)
-        name = CONFIG[pname].name
-        # Do not autoadd in the perflib checker. If the meta lib check works,
-        # it will add all the flags if autoadd is asked.
-        st = func(context, 0, check_version)
-        if st:
+        try:
             cache = get_cached_perflib_info(context.env, pname)
-            cfgopts = cache.opts_factory[libname]()
-            st = check_include_and_run(context, msg_template % name, 
-                                       cfgopts, [], test_src, autoadd)
-            if st:
-                add_lib_info(context.env, libname, MetalibInfo(pname, cfgopts))
-            return st
+        except PerflibCacheError:
+            # Do not autoadd in the perflib checker. If the meta lib check works,
+            # it will add all the flags if autoadd is asked.
+            if not checker(pname)(context, 0, check_version):
+                return 0
+            cache = get_cached_perflib_info(context.env, pname)
+
+        cfgopts = cache.opts_factory[libname]()
+        st = check_include_and_run(context, msg_template % CONFIG[pname].name,
+                                   cfgopts, [], test_src, autoadd)
+        if st:
+            add_lib_info(context.env, libname, MetalibInfo(pname, cfgopts))
+        return st
     for p in perflibs:
         if _check_perflib(p):
             return 1
