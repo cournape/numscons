@@ -1,5 +1,5 @@
 #! /usr/bin/env python
-# Last Change: Sat Jan 26 05:00 PM 2008 J
+# Last Change: Sat Jan 26 07:00 PM 2008 J
 
 """This module implements the functionality to keep all necessary build
 informations about perflib and meta lib, so that those info can be passed from
@@ -49,8 +49,7 @@ class BuildConfigFactory:
         self._data = bld_opts
 
         self._bld = BuildConfig()
-        for k in self._bld:
-            self._bld[k] = self._data[k]
+        self._update_bld()
 
         self._cfgs = {
             'fft':      self.fft_config,
@@ -58,6 +57,11 @@ class BuildConfigFactory:
             'lapack':   self.lapack_config,
             'cblas':    self.cblas_config,
             'clapack':  self.clapack_config}
+
+    def _update_bld(self):
+        """Update _bld info. Necessary whenever _data is modified."""
+        for k in self._bld:
+            self._bld[k] = self._data[k]
 
     def _get_libraries(self, supp):
         res = copy(self._bld)
@@ -98,7 +102,8 @@ class BuildConfigFactory:
         
         Similar to merge, but replace values instead of merging.""" 
         for k, v in cfg.items():
-            self._bld[k] = v
+            self._data[k] = v
+        self._update_bld()
 
     def merge(self, cfg, append = False):
         """Given a dictionary cfg, merge all its value with the one of cfg, for
@@ -109,10 +114,11 @@ class BuildConfigFactory:
         customization)."""
         if append:
             for k, v in cfg.items():
-                self._bld[k] += v
+                self._data[k] += v
         else:
             for k, v in cfg.items():
-                self._bld[k] = v + self._bld[k]
+                self._data[k] = v + self._data[k]
+        self._update_bld()
 
     def __repr__(self):
         return '\n\t'.join(['%s: %s' % (k, v) 
