@@ -4,6 +4,7 @@
 """Module for blas/lapack/cblas/clapack checkers. Use perflib checkers
 implementations if available."""
 import sys
+from copy import copy
 
 from numscons.core.siteconfig import get_config_from_section, get_config
 from numscons.testcode_snippets import \
@@ -20,11 +21,23 @@ from numscons.checkers.support import check_include_and_run
 __all__ = ['CheckF77BLAS', 'CheckF77LAPACK', 'CheckCBLAS', 'CheckCLAPACK']
 
 def _check(perflibs, context, libname, check_version, msg_template, test_src,
-           autoadd):
+           autoadd, language = 'C'):
     """Generic perflib checker to be used in meta checkers.
 
     perflibs should be a list of perflib to check (the names which can be used
     are the keys of CONFIG."""
+    moreopts = {}
+    if language == 'C':
+        pass
+    elif language == 'F77':
+        # We need C/F77 runtime info, otherwise, cannot proceed further
+        if not context.env.has_key('F77_LDFLAGS') and not CheckF77Clib(context):
+            add_lib_info(context.env, libname, None)
+            return 0
+        moreopts['linkflagsend'] = copy(context.env['F77_LDFLAGS'])
+    else:
+        raise ValueError("language %s unknown" % language)
+
     def _check_perflib(pname):
         """pname is the name of the perflib."""
         try:
@@ -42,6 +55,7 @@ def _check(perflibs, context, libname, check_version, msg_template, test_src,
         if st:
             add_lib_info(context.env, libname, MetalibInfo(pname, cfgopts))
         return st
+
     for p in perflibs:
         if _check_perflib(p):
             return 1
@@ -89,16 +103,12 @@ def CheckF77BLAS(context, autoadd = 1, check_version = 0):
         add_lib_info(env, libname, None)
         return 0
 
-    if not env.has_key('F77_LDFLAGS') and not CheckF77Clib(context):
-        add_lib_info(env, libname, None)
-        return 0
-
     func_name = env['F77_NAME_MANGLER']('sgemm')
     test_src = c_sgemm2 % {'func' : func_name}
 
     def check(perflibs):
         return _check(perflibs, context, libname, check_version, 'BLAS (%s)',
-                      test_src, autoadd) 
+                      test_src, autoadd, language = 'F77') 
 
     if _get_customization(context, section, libname, autoadd):
         return 1
@@ -132,17 +142,13 @@ def CheckF77LAPACK(context, autoadd = 1, check_version = 0):
         add_lib_info(env, 'lapack', None)
         return 0
     
-    if not env.has_key('F77_LDFLAGS') and not CheckF77Clib(context):
-        add_lib_info(env, 'lapack', None)
-        return 0
-    
     # Get the mangled name of our test function
     sgesv_string = env['F77_NAME_MANGLER']('sgesv')
     test_src = lapack_sgesv % sgesv_string
 
     def check(perflibs):
         return _check(perflibs, context, libname, check_version, 'LAPACK (%s)',
-                      test_src, autoadd) 
+                      test_src, autoadd, language = 'F77') 
 
     # XXX: handle F77_LDFLAGS
     if _get_customization(context, section, libname, autoadd):
