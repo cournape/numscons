@@ -74,11 +74,21 @@ def _check(perflibs, context, libname, check_version, msg_template, test_src,
 def _get_customization(context, section, libname, autoadd, language = 'C'):
     """Check whether customization is available through config files."""
     siteconfig = get_config()[0]
-    cfg, found = get_config_from_section(siteconfig, section)
+    cfgopts, found = get_config_from_section(siteconfig, section)
     if found:
-        if check_include_and_run(context, '% (from site.cfg) ' % libname, cfg,
+        if moreopts:
+            # More options are necessary to check the code snippet (fortran
+            # runtime, etc...), so we create a new BuildConfig which contain
+            # those info.
+            testopts = copy(cfgopts)
+            for k, v in moreopts.items():
+                testopts[k].extend(v)
+        else:
+            # Nothing to do, testopts and cfgopts are the same
+            testopts = cfgopts
+        if check_include_and_run(context, '% (from site.cfg) ' % libname, testopts,
                                  [], cblas_src, autoadd):
-            add_lib_info(context.env, libname, MetalibInfo(None, cfg, found))
+            add_lib_info(context.env, libname, MetalibInfo(None, cfgopts, found))
             return 1
     return 0
 
