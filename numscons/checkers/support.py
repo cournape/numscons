@@ -1,17 +1,18 @@
 #! /usr/bin/env python
-# Last Change: Tue Dec 04 02:00 PM 2007 J
+# Last Change: Sat Jan 26 05:00 PM 2008 J
 
 """This module defines some helper functions, to be used by high level
 checkers."""
 from copy import deepcopy
 
 # Tools to save and restore environments construction variables (the ones often
-# altered for configuration tests)
+# altered for configuration tests).
 _arg2env = {'include_dirs' : 'CPPPATH',
             'cflags' : 'CFLAGS',
             'library_dirs' : 'LIBPATH',
             'libraries' : 'LIBS',
             'linkflags' : 'LINKFLAGS',
+            'linkflagsend' : 'LINKFLAGSEND',
             'rpath' : 'RPATH',
             'frameworks' : 'FRAMEWORKS'}
 
