@@ -63,7 +63,7 @@ def _check(perflibs, context, libname, check_version, msg_template, test_src,
         if _check_perflib(p):
             return 1
 
-def _get_customization(context, section, libname, autoadd):
+def _get_customization(context, section, libname, autoadd, language = 'C'):
     """Check whether customization is available through config files."""
     siteconfig = get_config()[0]
     cfg, found = get_config_from_section(siteconfig, section)
@@ -113,7 +113,7 @@ def CheckF77BLAS(context, autoadd = 1, check_version = 0):
         return _check(perflibs, context, libname, check_version, 'BLAS (%s)',
                       test_src, autoadd, language = 'F77') 
 
-    if _get_customization(context, section, libname, autoadd):
+    if _get_customization(context, section, libname, autoadd, language = 'F77'):
         return 1
     else:
         if sys.platform == 'darwin' and check(('Accelerate', 'vecLib')):
@@ -154,7 +154,7 @@ def CheckF77LAPACK(context, autoadd = 1, check_version = 0):
                       test_src, autoadd, language = 'F77') 
 
     # XXX: handle F77_LDFLAGS
-    if _get_customization(context, section, libname, autoadd):
+    if _get_customization(context, section, libname, autoadd, language = 'F77'):
         return 1
     else:
         if sys.platform == 'darwin' and check(('Accelerate', 'vecLib')):
