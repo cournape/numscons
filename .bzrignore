@@ -3,3 +3,4 @@ build
 MANIFEST
 dist
 tools/fortran/autom4te.cache
+tools/fortran/config.log
