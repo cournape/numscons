@@ -23,4 +23,4 @@ PACKAGES    = ['numscons', 'numscons.core', 'numscons.checkers',
                'numscons.checkers.tests', 'numscons.checkers.fortran']
 PACKAGE_DATA = {'numscons.core' : ['compiler.cfg', 'fcompiler.cfg'], 
               'numscons.checkers' : ['perflib.cfg']}
-DATA_DIR    = ['numscons/scons-local', 'tests', 'doc']
+DATA_DIR    = ['numscons/scons-local']
