@@ -61,11 +61,17 @@ mingw_g77_link_output = """
 
 def generate_output(fcomp, vflag, fflag):
     from numscons.core.utils import popen_wrapper
+    import sys
+
+    if sys.platform == 'win32':
+        objsuff = '.obj'
+    else:
+        objsuff = '.o'
     st, output = popen_wrapper('%s %s %s' % (fcomp, fflag, 'empty.f'))
     if st:
         raise RuntimeError("Compilation failed: status is %s. output is %s" %\
                            (st, output))
-    st, output = popen_wrapper('%s %s %s' % (fcomp, vflag, 'empty.o'))
+    st, output = popen_wrapper('%s %s %s' % (fcomp, vflag, 'empty%s' % objsuff))
     if st:
         raise RuntimeError("Link failed: status is %s. output is %s" %\
                            (st, output))
