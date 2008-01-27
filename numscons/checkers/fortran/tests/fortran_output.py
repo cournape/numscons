@@ -57,7 +57,32 @@ ifort_v10_link_expected = ['-L/home/david/opt/intel/fc/10.0.023//lib',
         '-lifcore', '-limf', '-lm', '-lipgo', '-lirc', '-lirc_s', '-ldl']
 
 mingw_g77_link_output = """
-['Driving: g77 -v -o build\\scons\\numpy\\scons_fake\\checkers\\.sconf\\conftest_0 build\\scons\\numpy\\scons_fake\\checkers\\.sconf\\conftest_0.obj -lfrtbegin -lg2c', 'Reading specs from c:/MINGW/bin/../lib/gcc/mingw32/3.4.5/specs', 'Configured with: ../gcc-3.4.5/configure --with-gcc --with-gnu-ld --with-gnu-as --host=mingw32 --target=mingw32 --prefix=/mingw --enable-threads --disable-nls --enable-languages=c,c++,f77,ada,objc,java --disable-win32-registry --disable-shared --enable-sjlj-exceptions --enable-libgcj --disable-java-awt --without-x --enable-java-gc=boehm --disable-libgcj-debug --enable-interpreter --enable-hash-synchronization --enable-libstdcxx-debug', 'Thread model: win32', 'gcc version 3.4.5 (mingw special)', ' c:/MINGW/bin/../libexec/gcc/mingw32/3.4.5/collect2.exe -Bdynamic -o build\\scons\\numpy\\scons_fake\\checkers\\.sconf\\conftest_0.exe /mingw/lib/crt2.o c:/MINGW/bin/../lib/gcc/mingw32/3.4.5/crtbegin.o -Lc:/MINGW/bin/../lib/gcc/mingw32/3.4.5 -Lc:/MINGW/bin/../lib/gcc -L/mingw/lib/gcc/mingw32/3.4.5 -Lc:/MINGW/bin/../lib/gcc/mingw32/3.4.5/../../../../mingw32/lib -L/mingw/lib/gcc/mingw32/3.4.5/../../../../mingw32/lib -L/mingw/lib -Lc:/MINGW/bin/../lib/gcc/mingw32/3.4.5/../../.. -L/mingw/lib/gcc/mingw32/3.4.5/../../.. build\\scons\\numpy\\scons_fake\\checkers\\.sconf\\conftest_0.obj -lfrtbegin -lg2c -lmingw32 -lgcc -lmoldname -lmingwex -lmsvcrt -luser32 -lkernel32 -ladvapi32 -lshell32 -lmingw32 -lgcc -lmoldname -lmingwex -lmsvcrt c:/MINGW/bin/../lib/gcc/mingw32/3.4.5/crtend.o', '']"""
+Driving: g77 -v empty.o -lfrtbegin -lg2c
+Reading specs from /usr/lib/gcc/i686-pc-cygwin/3.4.4/specs
+Configured with: /usr/build/package/orig/test.respin/gcc-3.4.4-3/configure --verbose --prefix=/usr --exec-prefix=/usr --sysconfdir=/etc --libdir=/usr/lib --libexecdir=/usr/lib --mandir=/usr/share/man --infodir=/usr/share/info --enable-languages=c,ada,c++,d,f77,pascal,java,objc --enable-nls --without-included-gettext --enable-version-specific-runtime-libs --without-x --enable-libgcj --disable-java-awt --with-system-zlib --enable-interpreter --disable-libgcj-debug --enable-threads=posix --enable-java-gc=boehm --disable-win32-registry --enable-sjlj-exceptions --enable-hash-synchronization --enable-libstdcxx-debug
+Thread model: posix
+gcc version 3.4.4 (cygming special, gdc 0.12, using dmd 0.125)
+ /usr/lib/gcc/i686-pc-cygwin/3.4.4/collect2.exe -Bdynamic --dll-search-prefix=cyg /usr/lib/gcc/i686-pc-cygwin/3.4.4/../../../crt0.o -L/usr/lib/gcc/i686-pc-cygwin/3.4.4 -L/usr/lib/gcc/i686-pc-cygwin/3.4.4 -L/usr/lib/gcc/i686-pc-cygwin/3.4.4/../../.. empty.o -lfrtbegin -lg2c -lgcc -lcygwin -luser32 -lkernel32 -ladvapi32 -lshell32 -lgcc"""
+
+mingw_gfortran_link_output = """
+Driving: gfortran -v empty.o -lgfortranbegin -lgfortran
+Using built-in specs.
+Target: i386-pc-mingw32
+Configured with: ../trunk/configure --prefix=/mingw --enable-languages=c,fortran --with-gmp=/home/FX/local --with-ld=/mingw/bin/ld --with-as=/mingw/bin/as --disable-werror --enable-bootstrap --enable-threads --disable-nls --build=i386-pc-mingw32 --enable-libgomp --disable-shared
+Thread model: win32
+gcc version 4.3.0 20080109 (experimental) [trunk revision 131426] (GCC) 
+COMPILER_PATH=c:/program files/gfortran/bin/../libexec/gcc/i386-pc-mingw32/4.3.0/;c:/program files/gfortran/bin/../libexec/gcc/
+LIBRARY_PATH=c:/program files/gfortran/bin/../lib/gcc/i386-pc-mingw32/4.3.0/;c:/program files/gfortran/bin/../lib/gcc/;c:/program files/gfortran/bin/../lib/gcc/i386-pc-mingw32/4.3.0/../../../;/mingw/lib/
+COLLECT_GCC_OPTIONS='-v' '-mtune=i386'
+ c:/program files/gfortran/bin/../libexec/gcc/i386-pc-mingw32/4.3.0/collect2.exe -Bdynamic c:/program files/gfortran/bin/../lib/gcc/i386-pc-mingw32/4.3.0/../../../crt2.o c:/program files/gfortran/bin/../lib/gcc/i386-pc-mingw32/4.3.0/crtbegin.o -Lc:/program files/gfortran/bin/../lib/gcc/i386-pc-mingw32/4.3.0 -Lc:/program files/gfortran/bin/../lib/gcc -Lc:/program files/gfortran/bin/../lib/gcc/i386-pc-mingw32/4.3.0/../../.. -L/mingw/lib empty.o -lgfortranbegin -lgfortran -lmingw32 -lgcc -lmoldname -lmingwex -lmsvcrt -luser32 -lkernel32 -ladvapi32 -lshell32 -lmingw32 -lgcc -lmoldname -lmingwex -lmsvcrt c:/program files/gfortran/bin/../lib/gcc/i386-pc-mingw32/4.3.0/crtend.o"""
+
+cygwin_g77_link_output = """
+Driving: g77 -v empty.o -lfrtbegin -lg2c
+Reading specs from /usr/lib/gcc/i686-pc-cygwin/3.4.4/specs
+Configured with: /usr/build/package/orig/test.respin/gcc-3.4.4-3/configure --verbose --prefix=/usr --exec-prefix=/usr --sysconfdir=/etc --libdir=/usr/lib --libexecdir=/usr/lib --mandir=/usr/share/man --infodir=/usr/share/info --enable-languages=c,ada,c++,d,f77,pascal,java,objc --enable-nls --without-included-gettext --enable-version-specific-runtime-libs --without-x --enable-libgcj --disable-java-awt --with-system-zlib --enable-interpreter --disable-libgcj-debug --enable-threads=posix --enable-java-gc=boehm --disable-win32-registry --enable-sjlj-exceptions --enable-hash-synchronization --enable-libstdcxx-debug
+Thread model: posix
+gcc version 3.4.4 (cygming special, gdc 0.12, using dmd 0.125)
+ /usr/lib/gcc/i686-pc-cygwin/3.4.4/collect2.exe -Bdynamic --dll-search-prefix=cyg /usr/lib/gcc/i686-pc-cygwin/3.4.4/../../../crt0.o -L/usr/lib/gcc/i686-pc-cygwin/3.4.4 -L/usr/lib/gcc/i686-pc-cygwin/3.4.4 -L/usr/lib/gcc/i686-pc-cygwin/3.4.4/../../.. empty.o -lfrtbegin -lg2c -lgcc -lcygwin -luser32 -lkernel32 -ladvapi32 -lshell32 -lgcc"""
 
 def generate_output(fcomp, vflag, fflag, objsuff = '.o'):
     import sys
