@@ -1,4 +1,4 @@
-#! Last Change: Mon Nov 12 07:00 PM 2007 J
+#! Last Change: Sun Jan 27 04:00 PM 2008 J
 
 # This module defines some functions/classes useful for testing fortran-related
 # features (name mangling, F77/C runtime, etc...).
@@ -15,7 +15,8 @@ POSIX_STATIC_EXT = re.compile('\S+\.a')
 POSIX_LIB_FLAGS = re.compile('-l\S+')
 
 # linkflags which match those are ignored
-LINKFLAGS_IGNORED = [r'-lang*', r'-lcrt[a-zA-Z0-9]*\.o', r'-lc', r'-lSystem', r'-libmil', r'-LIST:*', r'-LNO:*']
+LINKFLAGS_IGNORED = [r'-lang*', r'-lcrt[a-zA-Z0-9]*\.o', r'-lc', r'-lSystem',
+                     r'-libmil', r'-LIST:*', r'-LNO:*']
 if os.name == 'nt':
     LINKFLAGS_IGNORED.extend([r'-lfrt*', r'-luser32',
 	    r'-lkernel32', r'-ladvapi32', r'-lmsvcrt',
@@ -23,11 +24,7 @@ if os.name == 'nt':
 else:
     LINKFLAGS_IGNORED.append(r'-lgcc*')
 
-RLINKFLAGS_IGNORED = [re.compile(i) for i in LINKFLAGS_IGNORED]
-
-# linkflags which match those are the one we are interested in
-LINKFLAGS_INTERESTING = [r'-[lLR][a-zA-Z0-9]*']
-RLINKFLAGS_INTERESTING = [re.compile(i) for i in LINKFLAGS_INTERESTING]
+RLINKFLAGS_IGNORED = [re.compile(f) for f in LINKFLAGS_IGNORED]
 
 def gnu_to_ms_link(linkflags):
     # XXX: This is bogus. Instead of manually playing with those flags, we
@@ -82,8 +79,9 @@ def check_link_verbose(lines):
     else:
         return _check_link_verbose_posix(lines)
 
-def match_ignore(str):
-    if [i for i in RLINKFLAGS_IGNORED if i.match(str)]:
+def match_ignore(line):
+    """True if the line should be ignored."""
+    if [i for i in RLINKFLAGS_IGNORED if i.match(line)]:
         return True
     else:
         return False
@@ -92,10 +90,6 @@ def parse_f77link(lines):
     """Given the output of verbose link of F77 compiler, this returns a list of
     flags necessary for linking using the standard linker."""
     # TODO: On windows ?
-    # TODO: take into account quotting...
-    # Those options takes an argument, so concatenate any following item
-    # until the end of the line or a new option.
-    remove_space = ['-[LRuYz]*']
     final_flags = []
     for line in lines:
         if not GCC_DRIVER_LINE.match(line):
@@ -110,7 +104,6 @@ def _parse_f77link_line(line, final_flags):
     lexer.whitespace_split = True
 
     t = lexer.get_token()
-    keep = dict(zip(('libraries', 'library_dirs', 'rpath'), ([], [], [])))
     while t:
         def parse(token):
             # Here we go (convention for wildcard is shell, not regex !)
@@ -121,7 +114,8 @@ def _parse_f77link_line(line, final_flags):
             #   4 take into account -lkernel32
             #   5 For options of the kind -[[LRuYz]], as they take one argument
             #   after, the actual option is the next token 
-            #   6 For -YP,*: take and replace by -Larg where arg is the old argument
+            #   6 For -YP,*: take and replace by -Larg where arg is the old
+            #   argument
             #   7 For -[lLR]*: take
 
             # step 3
@@ -132,7 +126,6 @@ def _parse_f77link_line(line, final_flags):
                 final_flags.append(t)
             # step 5
             elif SPACE_OPTS.match(token):
-                n = token
                 t = lexer.get_token()
                 if t.startswith('P,'):
                     t = t[2:]
@@ -147,6 +140,7 @@ def _parse_f77link_line(line, final_flags):
                 final_flags.append(token)
                 t = lexer.get_token()
             else:
+                # ignore anything not explicitely taken into account
                 t = lexer.get_token()
 
             return t
