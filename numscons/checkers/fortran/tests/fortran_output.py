@@ -84,4 +84,4 @@ Thread model: posix
 gcc version 3.4.4 (cygming special, gdc 0.12, using dmd 0.125)
  /usr/lib/gcc/i686-pc-cygwin/3.4.4/collect2.exe -Bdynamic --dll-search-prefix=cyg /usr/lib/gcc/i686-pc-cygwin/3.4.4/../../../crt0.o -L/usr/lib/gcc/i686-pc-cygwin/3.4.4 -L/usr/lib/gcc/i686-pc-cygwin/3.4.4 -L/usr/lib/gcc/i686-pc-cygwin/3.4.4/../../.. empty.o -lfrtbegin -lg2c -lgcc -lcygwin -luser32 -lkernel32 -ladvapi32 -lshell32 -lgcc"""
 
-cygwin_g77_link_expect = ['-L/usr/lib/gcc/i686-pc-cygwin/3.4.4', '-L/usr/lib/gcc/i686-pc-cygwin/3.4.4/../../..', '-lfrtbegin', '-lg2c', '-lcygwin',  '-luser32', '-lkernel32', '-ladvapi32', '-lshell32']
+cygwin_g77_link_expected = ['-L/usr/lib/gcc/i686-pc-cygwin/3.4.4', '-L/usr/lib/gcc/i686-pc-cygwin/3.4.4/../../..', '-lfrtbegin', '-lg2c', '-lcygwin',  '-luser32', '-lkernel32', '-ladvapi32', '-lshell32']
