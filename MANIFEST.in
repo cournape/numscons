@@ -1,3 +1,4 @@
 recursive-include numscons/scons-local *.py
 recursive-include doc *
 recursive-include tests *.py *.f *.c
+recursive-include tools *.py configure configure.ac empty.f
