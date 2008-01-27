@@ -59,16 +59,30 @@ ifort_v10_link_expected = ['-L/home/david/opt/intel/fc/10.0.023//lib',
 mingw_g77_link_output = """
 ['Driving: g77 -v -o build\\scons\\numpy\\scons_fake\\checkers\\.sconf\\conftest_0 build\\scons\\numpy\\scons_fake\\checkers\\.sconf\\conftest_0.obj -lfrtbegin -lg2c', 'Reading specs from c:/MINGW/bin/../lib/gcc/mingw32/3.4.5/specs', 'Configured with: ../gcc-3.4.5/configure --with-gcc --with-gnu-ld --with-gnu-as --host=mingw32 --target=mingw32 --prefix=/mingw --enable-threads --disable-nls --enable-languages=c,c++,f77,ada,objc,java --disable-win32-registry --disable-shared --enable-sjlj-exceptions --enable-libgcj --disable-java-awt --without-x --enable-java-gc=boehm --disable-libgcj-debug --enable-interpreter --enable-hash-synchronization --enable-libstdcxx-debug', 'Thread model: win32', 'gcc version 3.4.5 (mingw special)', ' c:/MINGW/bin/../libexec/gcc/mingw32/3.4.5/collect2.exe -Bdynamic -o build\\scons\\numpy\\scons_fake\\checkers\\.sconf\\conftest_0.exe /mingw/lib/crt2.o c:/MINGW/bin/../lib/gcc/mingw32/3.4.5/crtbegin.o -Lc:/MINGW/bin/../lib/gcc/mingw32/3.4.5 -Lc:/MINGW/bin/../lib/gcc -L/mingw/lib/gcc/mingw32/3.4.5 -Lc:/MINGW/bin/../lib/gcc/mingw32/3.4.5/../../../../mingw32/lib -L/mingw/lib/gcc/mingw32/3.4.5/../../../../mingw32/lib -L/mingw/lib -Lc:/MINGW/bin/../lib/gcc/mingw32/3.4.5/../../.. -L/mingw/lib/gcc/mingw32/3.4.5/../../.. build\\scons\\numpy\\scons_fake\\checkers\\.sconf\\conftest_0.obj -lfrtbegin -lg2c -lmingw32 -lgcc -lmoldname -lmingwex -lmsvcrt -luser32 -lkernel32 -ladvapi32 -lshell32 -lmingw32 -lgcc -lmoldname -lmingwex -lmsvcrt c:/MINGW/bin/../lib/gcc/mingw32/3.4.5/crtend.o', '']"""
 
-def generate_output(fcomp, verbose):
+def generate_output(fcomp, vflag, fflag):
     import os
-    os.system('%s -c %s &> /dev/null ' % (fcomp, 'empty.f'))
-    os.system('%s %s %s' % (fcomp, verbose, 'empty.o'))
+    os.system('%s %s %s > /dev/null ' % (fcomp, fflag, 'empty.f'))
+    os.system('%s %s %s' % (fcomp, vflag, 'empty.o'))
 
 if __name__ == '__main__':
-    import sys
-    fcomp = sys.argv[1]
-    try:
-        vflag = sys.argv[2]
-    except IndexError:
+    from optparse import OptionParser
+    
+    parser = OptionParser()
+    parser.add_option("-c", "--compile-flag", dest="fflag",
+                      help="compiler flag (-c, etc...)")
+    parser.add_option("-v", "--verbose-flag", dest="vflag",
+                      help = "verbose flag (-v, etc...). This should be the "
+                      "*linker* verbose flag, not the compiler one.")
+
+    (options, args) = parser.parse_args()
+    if options.fflag:
+        fflag = options.fflag
+    else:
+        fflag = '-c'
+    if options.vflag:
+        vflag = options.vflag
+    else:
         vflag = '-v'
-    generate_output(fcomp, vflag)
+
+    fcomp = args[0]
+    generate_output(fcomp, vflag, fflag)
