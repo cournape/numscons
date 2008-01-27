@@ -1,0 +1,4 @@
+AC_INIT(empty.f)
+
+AC_F77_LIBRARY_LDFLAGS([],[])
+AC_F77_DUMMY_MAIN
