@@ -1,7 +1,5 @@
 Then, those are the old remaining things to do (once we get to the point we
 were when scons was inside numpy repository):
-    - clean writing info code: see cleaning checkers module
-    - Clean fortran code to use shlex instead of our intricated state machine (0.3* serie)
     - check windows: in perticular MS studio + g77 (0.4* serie)
     - clean the code of numpyenv; in perticular: builder creation (should be
       done through tools), remove _glob (scons has the functionality now),
@@ -17,7 +15,6 @@ were when scons was inside numpy repository):
     - CLAPACK: check old atlas
 
 Goals:
-    - 0.3: checkers subpackage is cleaned
     - 0.4: should work on linux/mac os X/windows (on windows: MS + g77 should
       work too at this point)
     - 0.5: clean numscons.core, in particular builders
