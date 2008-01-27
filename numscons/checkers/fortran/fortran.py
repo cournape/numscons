@@ -39,7 +39,7 @@ def gnu_to_ms_link(linkflags):
             newflags.append(r'lib%s.a' % flag[2:])
     return newflags
 
-def get_g2c_libs(libs, libpaths):
+def _get_g2c_libs(libs, libpaths):
     """Given a list of libraries and libpaths, return the fullpath of the
     libraries.
 
@@ -79,7 +79,7 @@ def check_link_verbose(lines):
     else:
         return _check_link_verbose_posix(lines)
 
-def match_ignore(line):
+def _match_ignore(line):
     """True if the line should be ignored."""
     if [i for i in RLINKFLAGS_IGNORED if i.match(line)]:
         return True
@@ -119,7 +119,7 @@ def _parse_f77link_line(line, final_flags):
             #   7 For -[lLR]*: take
 
             # step 3
-            if match_ignore(token):
+            if _match_ignore(token):
                 t = lexer.get_token()
             # step 4
             elif token.startswith('-lkernel32'):
