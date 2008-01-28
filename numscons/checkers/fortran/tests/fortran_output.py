@@ -56,13 +56,9 @@ ifort_v10_link_expected = ['-L/home/david/opt/intel/fc/10.0.023//lib',
         '-L/usr/lib/gcc/i486-linux-gnu/4.1.3/../../../', '-lifport',
         '-lifcore', '-limf', '-lm', '-lipgo', '-lirc', '-lirc_s', '-ldl']
 
-mingw_g77_link_output = """
-Driving: g77 -v empty.o -lfrtbegin -lg2c
-Reading specs from /usr/lib/gcc/i686-pc-cygwin/3.4.4/specs
-Configured with: /usr/build/package/orig/test.respin/gcc-3.4.4-3/configure --verbose --prefix=/usr --exec-prefix=/usr --sysconfdir=/etc --libdir=/usr/lib --libexecdir=/usr/lib --mandir=/usr/share/man --infodir=/usr/share/info --enable-languages=c,ada,c++,d,f77,pascal,java,objc --enable-nls --without-included-gettext --enable-version-specific-runtime-libs --without-x --enable-libgcj --disable-java-awt --with-system-zlib --enable-interpreter --disable-libgcj-debug --enable-threads=posix --enable-java-gc=boehm --disable-win32-registry --enable-sjlj-exceptions --enable-hash-synchronization --enable-libstdcxx-debug
-Thread model: posix
-gcc version 3.4.4 (cygming special, gdc 0.12, using dmd 0.125)
- /usr/lib/gcc/i686-pc-cygwin/3.4.4/collect2.exe -Bdynamic --dll-search-prefix=cyg /usr/lib/gcc/i686-pc-cygwin/3.4.4/../../../crt0.o -L/usr/lib/gcc/i686-pc-cygwin/3.4.4 -L/usr/lib/gcc/i686-pc-cygwin/3.4.4 -L/usr/lib/gcc/i686-pc-cygwin/3.4.4/../../.. empty.o -lfrtbegin -lg2c -lgcc -lcygwin -luser32 -lkernel32 -ladvapi32 -lshell32 -lgcc"""
+mingw_g77_link_output = """"""
+
+mingw_g77_link_expected = ['-Lc:/MinGW/bin/../lib/gcc/mingw32/3.4.5 -Lc:/MinGW/bin/../lib/gcc -Lc:/MinGW/bin/../lib/gcc/mingw32/3.4.5/../../../../mingw32/lib -Lc:/MinGW/bin/../lib/gcc/mingw32/3.4.5/../../.. -lfrtbegin -lg2c -lmingw32 -lmoldname -lmingwex -lmsvcrt -luser32 -lkernel32 -ladvapi32 -lshell32']
 
 mingw_gfortran_link_output = """
 Driving: gfortran -v empty.o -lgfortranbegin -lgfortran
