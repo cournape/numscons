@@ -104,6 +104,7 @@ def _parse_f77link_line(line, final_flags):
     lexer.whitespace_split = True
 
     t = lexer.get_token()
+    tmp_flags
     while t:
         def parse(token):
             # Here we go (convention for wildcard is shell, not regex !)
@@ -120,29 +121,29 @@ def _parse_f77link_line(line, final_flags):
 
             # step 3
             if _match_ignore(token):
-                t = lexer.get_token()
+                pass
             # step 4
-            elif token.startswith('-lkernel32'):
-                final_flags.append(t)
+            elif token.startswith('-lkernel32') and sys.platform == 'cygwin':
+                tmp_flags.append(token)
             # step 5
             elif SPACE_OPTS.match(token):
                 t = lexer.get_token()
                 if t.startswith('P,'):
                     t = t[2:]
                 for opt in t.split(os.pathsep):
-                    final_flags.append('-L%s' % opt)
+                    tmp_flags.append('-L%s' % opt)
             # step 6
             elif NOSPACE_OPTS.match(token):
-                final_flags.append(token)
-                t = lexer.get_token()
+                tmp_flags.append(token)
             # step 7
             elif POSIX_LIB_FLAGS.match(token):
-                final_flags.append(token)
-                t = lexer.get_token()
+                tmp_flags.append(token)
             else:
                 # ignore anything not explicitely taken into account
-                t = lexer.get_token()
+                pass
 
+            t = lexer.get_token()
             return t
         t = parse(t)
+
     return final_flags
