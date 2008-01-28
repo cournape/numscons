@@ -104,7 +104,7 @@ def _parse_f77link_line(line, final_flags):
     lexer.whitespace_split = True
 
     t = lexer.get_token()
-    tmp_flags
+    tmp_flags = []
     while t:
         def parse(token):
             # Here we go (convention for wildcard is shell, not regex !)
@@ -146,4 +146,5 @@ def _parse_f77link_line(line, final_flags):
             return t
         t = parse(t)
 
+    final_flags.extend(tmp_flags)
     return final_flags
