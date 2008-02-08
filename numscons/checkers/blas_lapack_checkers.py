@@ -72,7 +72,12 @@ def _check(perflibs, context, libname, check_version, msg_template, test_src,
             return 1
 
 def _get_customization(context, section, libname, autoadd, language = 'C'):
-    """Check whether customization is available through config files."""
+    """Check whether customization is available through config files.
+    
+    Returns a tuple (found, cfgopts), where:
+	    - found is true if customization for libname was found
+	    - cfgopts is build options found, including default ones. So this
+	      can be non empty even if found is false. """
     siteconfig = get_config()[0]
     cfgopts, found = get_config_from_section(siteconfig, section)
     if found:
@@ -89,8 +94,9 @@ def _get_customization(context, section, libname, autoadd, language = 'C'):
         if check_include_and_run(context, '% (from site.cfg) ' % libname, testopts,
                                  [], cblas_src, autoadd):
             add_lib_info(context.env, libname, MetalibInfo(None, cfgopts, found))
-            return 1
-    return 0
+            return 1, cfgopts
+	
+    return 0, cfgopts
 
 def CheckCBLAS(context, autoadd = 1, check_version = 0):
     """This checker tries to find optimized library for cblas."""
