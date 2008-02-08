@@ -12,7 +12,7 @@ from copy import copy
 
 from numscons.core.siteconfig import get_config_from_section, get_config
 from numscons.checkers.perflib_info import PerflibInfo
-from numscons.checkers.support import save_and_set, restore, check_symbol
+from numscons.checkers.support import save_and_set, restore, check_symbol, env_dep_str
 
 def _get_site_cfg_customization(section, defopts_factory):
     """defopts_factory should be an instance of BuildConfigFactory."""
@@ -30,7 +30,7 @@ def _check_header(context, opts, headers_to_check):
     saved = save_and_set(context.env, opts)
     try:
         src_code = [r'#include <%s>' % h for h in headers_to_check]
-        src_code.extend([r'#if 0', str(opts), r'#endif', '\n'])
+        src_code.extend([r'#if 0', env_dep_str(opts), r'#endif', '\n'])
         src = '\n'.join(src_code)
         st = context.TryCompile(src, '.c')
     finally:
@@ -49,7 +49,7 @@ def _check_symbol(context, opts, headers_to_check, funcs_to_check, autoadd):
     saved = save_and_set(context.env, opts)
     try:
         for sym in funcs_to_check:
-            extra = [r'#if 0', str(opts), r'#endif', '\n']
+            extra = [r'#if 0', env_dep_str(opts), r'#endif', '\n']
             st = check_symbol(context, headers_to_check, sym, '\n'.join(extra))
             if not st:
                 break

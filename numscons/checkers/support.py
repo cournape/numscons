@@ -36,6 +36,9 @@ def restore(env, saved_keys):
     kw = dict(kw)
     env.Replace(**kw)
 
+def env_dep_str(opts):
+    return str(opts)
+
 # Implementation function to check symbol in a library
 def check_symbol(context, headers, sym, extra = r''):
     # XXX: add dep vars in code
@@ -57,30 +60,26 @@ return 0;
     code.append(extra)
     return context.TryLink('\n'.join(code), '.c')
 
-def _check_headers(context, cpppath, cflags, headers, autoadd):
+def _check_headers(context, opts, headers, autoadd):
     """Try to compile code including the given headers."""
     env = context.env
 
     #----------------------------
     # Check headers are available
     #----------------------------
-    # XXX: this should be rewritten using save/restore...
-    oldCPPPATH = (env.has_key('CPPPATH') and deepcopy(env['CPPPATH'])) or []
-    oldCFLAGS = (env.has_key('CFLAGS') and deepcopy(env['CFLAGS'])) or []
-    env.AppendUnique(CPPPATH = cpppath)
-    env.AppendUnique(CFLAGS = cflags)
-    # XXX: handle context
-    hcode = ['#include <%s>' % h for h in headers]
+    saved = save_and_set(context.env, opts)
+    try:
+        # XXX: handle context
+        hcode = ['#include <%s>' % h for h in headers]
 
-    # HACK: we add cpppath in the command of the source, to add dependency of
-    # the check on the cpppath.
-    hcode.extend(['#if 0', '%s' % cpppath, '#endif\n'])
-    src = '\n'.join(hcode)
-
-    ret = context.TryCompile(src, '.c')
-    if ret == 0 or autoadd == 0:
-        env.Replace(CPPPATH = oldCPPPATH)
-        env.Replace(CFLAGS = oldCFLAGS)
+        # HACK: we add cpppath in the command of the source, to add dependency of
+        # the check on the cpppath.
+        hcode.extend(['#if 0', env_dep_str(opts), '#endif\n'])
+        src = '\n'.join(hcode)
+        ret = context.TryCompile(src, '.c')
+    finally:
+	if ret == 0 or autoadd == 0:
+            restore(context.env, saved)
 
     return ret
 
@@ -107,8 +106,7 @@ def check_include_and_run(context, name, opts, headers, run_src, autoadd = 1):
     context.Message('Checking for %s ... ' % name)
     env = context.env
 
-    ret = _check_headers(context, opts['include_dirs'], opts['cflags'], headers,
-                         autoadd)
+    ret = _check_headers(context, opts, headers, autoadd)
     if not ret:
         context.Result('Failed: %s include not found' % name)
         return 0
@@ -121,7 +119,7 @@ def check_include_and_run(context, name, opts, headers, run_src, autoadd = 1):
         # HACK: we add libpath and libs at the end of the source as a comment,
         # to add dependency of the check on those.
         src = '\n'.join([r'#include <%s>' % h for h in headers] +\
-                        [run_src, r'#if  0', r'%s' % str(opts), r'#endif',
+                        [run_src, r'#if  0', env_dep_str(opts), r'#endif',
                          '\n'])
         ret, out = context.TryRun(src, '.c')
     finally:
