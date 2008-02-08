@@ -71,7 +71,8 @@ def _check(perflibs, context, libname, check_version, msg_template, test_src,
         if _check_perflib(p):
             return 1
 
-def _get_customization(context, section, libname, autoadd, language = 'C'):
+def _get_customization(context, section, libname, test_src, autoadd, 
+		       language = 'C'):
     """Check whether customization is available through config files.
     
     Returns a tuple (found, cfgopts), where:
@@ -92,7 +93,7 @@ def _get_customization(context, section, libname, autoadd, language = 'C'):
             # Nothing to do, testopts and cfgopts are the same
             testopts = cfgopts
         if check_include_and_run(context, '% (from site.cfg) ' % libname, testopts,
-                                 [], cblas_src, autoadd):
+                                 [], test_src, autoadd):
             add_lib_info(context.env, libname, MetalibInfo(None, cfgopts, found))
             return 1, cfgopts
 	
