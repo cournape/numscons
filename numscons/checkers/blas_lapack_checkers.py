@@ -109,7 +109,9 @@ def CheckCBLAS(context, autoadd = 1, check_version = 0):
         return _check(perflibs, context, libname, check_version, 'CBLAS (%s)',
                       cblas_src, autoadd) 
 
-    if _get_customization(context, section, libname, cblas_src, autoadd):
+    found, cfgopts =  _get_customization(context, section, libname, cblas_src,
+		     			 autoadd)
+    if found:
         return 1
     else:
         if sys.platform == 'darwin' and check(('Accelerate', 'vecLib')):
@@ -138,8 +140,9 @@ def CheckF77BLAS(context, autoadd = 1, check_version = 0):
         return _check(perflibs, context, libname, check_version, 'BLAS (%s)',
                       test_src, autoadd, language = 'F77') 
 
-    if _get_customization(context, section, libname, test_src, autoadd,
-		    	  language = 'F77'):
+    found, cfgopts = _get_customization(context, section, libname, test_src,
+		    			autoadd, language = 'F77')
+    if found:
         return 1
     else:
         if sys.platform == 'darwin' and check(('Accelerate', 'vecLib')):
@@ -179,9 +182,9 @@ def CheckF77LAPACK(context, autoadd = 1, check_version = 0):
         return _check(perflibs, context, libname, check_version, 'LAPACK (%s)',
                       test_src, autoadd, language = 'F77') 
 
-    # XXX: handle F77_LDFLAGS
-    if _get_customization(context, section, libname, test_src, autoadd,
-		    	  language = 'F77'):
+    found, cfgopts = _get_customization(context, section, libname, test_src,
+		    			autoadd, language = 'F77')
+    if found:
         return 1
     else:
         if sys.platform == 'darwin' and check(('Accelerate', 'vecLib')):
@@ -213,7 +216,9 @@ def CheckCLAPACK(context, autoadd = 1, check_version = 0):
         return _check(perflibs, context, libname, check_version, 'CLAPACK (%s)',
                       clapack_src, autoadd) 
 
-    if _get_customization(context, section, libname, clapack_src, autoadd):
+    found, cfgopts = _get_customization(context, section, libname,
+		    			clapack_src, autoadd)
+    if found:
         return 1
     else:
         if sys.platform == 'darwin':
