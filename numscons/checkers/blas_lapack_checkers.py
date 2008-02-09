@@ -178,8 +178,8 @@ def CheckF77LAPACK(context, autoadd = 1, check_version = 0):
     sgesv_string = env['F77_NAME_MANGLER']('sgesv')
     test_src = lapack_sgesv % sgesv_string
 
-    def check(perflibs):
-        return _check(perflibs, context, libname, check_version, 'LAPACK (%s)',
+    def check(perflibs, cfgopts):
+        return _check(perflibs, cfgopts, context, libname, check_version, 'LAPACK (%s)',
                       test_src, autoadd, language = 'F77') 
 
     found, cfgopts = _get_customization(context, section, libname, test_src,
@@ -189,11 +189,11 @@ def CheckF77LAPACK(context, autoadd = 1, check_version = 0):
     else:
         if sys.platform == 'darwin' and check(('Accelerate', 'vecLib')):
             return 1
-        elif check(('MKL', 'ATLAS', 'Sunperf')):
+        elif check(('MKL', 'ATLAS', 'Sunperf'), cfgopts):
             return 1
 
     # Check generic blas last
-    if check(('GenericLapack',)):
+    if check(('GenericLapack',), cfgopts):
         return 1
 
     add_lib_info(env, libname, None)
@@ -212,8 +212,8 @@ def CheckCLAPACK(context, autoadd = 1, check_version = 0):
     section = "clapack"
     env = context.env
 
-    def check(perflibs):
-        return _check(perflibs, context, libname, check_version, 'CLAPACK (%s)',
+    def check(perflibs, cfopts):
+        return _check(perflibs, cfgopts, context, libname, check_version, 'CLAPACK (%s)',
                       clapack_src, autoadd) 
 
     found, cfgopts = _get_customization(context, section, libname,
@@ -223,7 +223,7 @@ def CheckCLAPACK(context, autoadd = 1, check_version = 0):
     else:
         if sys.platform == 'darwin':
             pass
-        elif check(('ATLAS',)):
+        elif check(('ATLAS',), cfgopts):
             return 1
 
     add_lib_info(env, libname, None)
