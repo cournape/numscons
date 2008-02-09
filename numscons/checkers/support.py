@@ -36,9 +36,6 @@ def restore(env, saved_keys):
     kw = dict(kw)
     env.Replace(**kw)
 
-def env_dep_str(opts):
-    return str(opts)
-
 # Implementation function to check symbol in a library
 def check_symbol(context, headers, sym, extra = r''):
     # XXX: add dep vars in code
@@ -119,7 +116,7 @@ def check_include_and_run(context, name, opts, headers, run_src, autoadd = 1):
         # HACK: we add libpath and libs at the end of the source as a comment,
         # to add dependency of the check on those.
         src = '\n'.join([r'#include <%s>' % h for h in headers] +\
-                        [run_src, r'#if  0', env_dep_str(opts), r'#endif',
+                        [run_src, r'#if  0', r'%s' % str(opts), r'#endif',
                          '\n'])
         ret, out = context.TryRun(src, '.c')
     finally:
