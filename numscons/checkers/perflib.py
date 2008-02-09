@@ -1,5 +1,5 @@
 #! /usr/bin/env python
-# Last Change: Sat Jan 26 06:00 PM 2008 J
+# Last Change: Sun Feb 10 01:00 AM 2008 J
 
 """This module defines checkers for performances libs providing standard API,
 such as MKL (Intel), ATLAS, Sunperf (solaris and linux), Accelerate (Mac OS X),
@@ -104,23 +104,12 @@ IsSunperf = IsFactory('Sunperf').func
 #---------------------
 # Generic BLAS checker
 #---------------------
-def CheckGenericBlas(context, autoadd = 1, check_version = 0):
-    """Generic (fortran) blas checker."""
-    cfg = CONFIG['GenericBlas']
-
-    add_perflib_info(context.env, 'GenericBlas', PerflibInfo(cfg.opts_factory))
-    return 1
+CheckGenericBlas = CheckPerflibFactory('GenericBlas').checker
 
 #-----------------------
 # Generic Lapack checker
 #-----------------------
-def CheckGenericLapack(context, autoadd = 1, check_version = 0):
-    """Generic (fortran) lapack checker."""
-    cfg = CONFIG['GenericLapack']
-
-    add_perflib_info(context.env, 'GenericLapack',
-                     PerflibInfo(cfg.opts_factory))
-    return 1
+CheckGenericLapack = CheckPerflibFactory('GenericLapack').checker
 
 #--------------------
 # FFT related perflib
