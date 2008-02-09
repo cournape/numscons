@@ -1,5 +1,5 @@
 #! /usr/bin/env python
-# Last Change: Sat Jan 26 06:00 PM 2008 J
+# Last Change: Sun Feb 10 01:00 AM 2008 J
 
 """Module for blas/lapack/cblas/clapack checkers. Use perflib checkers
 implementations if available."""
@@ -71,14 +71,8 @@ def _check(perflibs, context, libname, check_version, msg_template, test_src,
         if _check_perflib(p):
             return 1
 
-def _get_customization(context, section, libname, test_src, autoadd, 
-		       language = 'C'):
-    """Check whether customization is available through config files.
-    
-    Returns a tuple (found, cfgopts), where:
-	    - found is true if customization for libname was found
-	    - cfgopts is build options found, including default ones. So this
-	      can be non empty even if found is false. """
+def _get_customization(context, section, libname, autoadd, language = 'C'):
+    """Check whether customization is available through config files."""
     siteconfig = get_config()[0]
     cfgopts, found = get_config_from_section(siteconfig, section)
     if found:
@@ -95,9 +89,8 @@ def _get_customization(context, section, libname, test_src, autoadd,
         if check_include_and_run(context, '% (from site.cfg) ' % libname, testopts,
                                  [], test_src, autoadd):
             add_lib_info(context.env, libname, MetalibInfo(None, cfgopts, found))
-            return 1, cfgopts
-	
-    return 0, cfgopts
+            return 1
+    return 0
 
 def CheckCBLAS(context, autoadd = 1, check_version = 0):
     """This checker tries to find optimized library for cblas."""
