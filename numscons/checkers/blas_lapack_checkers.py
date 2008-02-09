@@ -71,7 +71,7 @@ def _check(perflibs, context, libname, check_version, msg_template, test_src,
         if _check_perflib(p):
             return 1
 
-def _get_customization(context, section, libname, autoadd, language = 'C'):
+def _get_customization(context, section, libname, test_src, autoadd, language = 'C'):
     """Check whether customization is available through config files."""
     siteconfig = get_config()[0]
     cfgopts, found = get_config_from_section(siteconfig, section)

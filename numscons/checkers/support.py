@@ -1,5 +1,5 @@
 #! /usr/bin/env python
-# Last Change: Sat Jan 26 05:00 PM 2008 J
+# Last Change: Sun Feb 10 01:00 AM 2008 J
 
 """This module defines some helper functions, to be used by high level
 checkers."""
@@ -71,11 +71,11 @@ def _check_headers(context, opts, headers, autoadd):
 
         # HACK: we add cpppath in the command of the source, to add dependency of
         # the check on the cpppath.
-        hcode.extend(['#if 0', env_dep_str(opts), '#endif\n'])
+        hcode.extend(['#if 0', str(opts), '#endif\n'])
         src = '\n'.join(hcode)
         ret = context.TryCompile(src, '.c')
     finally:
-	if ret == 0 or autoadd == 0:
+        if ret == 0 or autoadd == 0:
             restore(context.env, saved)
 
     return ret
