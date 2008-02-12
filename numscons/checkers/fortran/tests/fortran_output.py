@@ -84,3 +84,9 @@ cygwin_g77_link_expected = ['-L/usr/lib/gcc/i686-pc-cygwin/3.4.4',
         '-L/usr/lib/gcc/i686-pc-cygwin/3.4.4',
         '-L/usr/lib/gcc/i686-pc-cygwin/3.4.4/../../..', '-lfrtbegin', '-lg2c',
         '-lcygwin',  '-luser32', '-lkernel32', '-ladvapi32', '-lshell32']
+
+cygwin_g77_link_parsed = {'LIBPATH': ['/usr/lib/gcc/i686-pc-cygwin/3.4.4',
+	'/usr/lib/gcc/i686-pc-cygwin/3.4.4',
+	'/usr/lib/gcc/i686-pc-cygwin/3.4.4/../../..'],
+	'LIBS': ['frtbegin', 'g2c', 'cygwin',  'user32', 'kernel32', 'advapi32',
+	'shell32']}

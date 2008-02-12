@@ -31,12 +31,12 @@ def gnu_to_ms_link(linkflags):
     # should use scons facilities, but this is not so easy because we want to
     # use posix environment and MS environment at the same time. If we need it
     # at several places, we will have to think on a better way.
-    newflags = []
+    newflags = {'LIBPATH': [], 'LIBS': []}
     for flag in linkflags:
         if flag.startswith('-L'):
-            newflags.append(r'/LIBPATH:%s' % flag[2:])
+            newflags['LIBPATH'].append(r'%s' % flag[2:])
         elif flag.startswith('-l'):
-            newflags.append(r'lib%s.a' % flag[2:])
+            newflags['LIBS'].append(r'%s' % flag[2:])
     return newflags
 
 def _get_g2c_libs(libs, libpaths):
