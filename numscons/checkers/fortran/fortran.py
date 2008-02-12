@@ -8,6 +8,7 @@
 import sys
 import re
 import os
+from os.path import join
 import shlex
 
 GCC_DRIVER_LINE = re.compile('^Driving:')
@@ -39,26 +40,16 @@ def gnu_to_scons_flags(linkflags):
             newflags['LIBS'].append(r'%s' % flag[2:])
     return newflags
 
-def _get_g2c_libs(libs, libpaths):
+def find_libs_paths(libs, libpaths, prefix = "lib", suffix = ".a"):
     """Given a list of libraries and libpaths, return the fullpath of the
-    libraries.
-
-    Only works on windows platform, for windows convention (should be used only
-    for gcc<-> VS interop."""  
-    g2c_support = []
-    def _get_lib(lib, libpaths):
-        for path in libpaths:
-            fullname = os.path.join(path, 'lib%s.a' % lib)
-            if os.path.exists(fullname):
-                return fullname
-        return ''
+    libraries."""
+    ret = []
 
     for lib in libs:
-        fname = _get_lib(lib, libpaths)     
-        if len(fname) > 0:
-            g2c_support.append(fname)
+	libname = "%s%s%s" % (prefix, lib, suffix)
+	ret.extend([join(libpath, libname) for libpath in libpaths])
             
-    return g2c_support 
+    return ret 
 
 def _check_link_verbose_posix(lines):
     """Returns true if useful link options can be found in output.
