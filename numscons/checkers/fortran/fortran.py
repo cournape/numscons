@@ -26,7 +26,7 @@ else:
 
 RLINKFLAGS_IGNORED = [re.compile(f) for f in LINKFLAGS_IGNORED]
 
-def gnu_to_ms_link(linkflags):
+def gnu_to_scons_flags(linkflags):
     # XXX: This is bogus. Instead of manually playing with those flags, we
     # should use scons facilities, but this is not so easy because we want to
     # use posix environment and MS environment at the same time. If we need it

@@ -2,7 +2,7 @@
 import unittest
 
 from numscons.checkers.fortran.fortran import parse_f77link
-from numscons.checkers.fortran.fortran import gnu_to_ms_link
+from numscons.checkers.fortran.fortran import gnu_to_scons_flags
 
 from fortran_output import g77_link_output, gfortran_link_output, \
     sunfort_v12_link_output, ifort_v10_link_output, \
@@ -50,8 +50,8 @@ class test_CheckF77Verbose(unittest.TestCase):
         assert parse_f77link(cygwin_g77_link_output.split('\n')) == \
                cygwin_g77_link_expected
 
-class test_gnu_to_ms_link(unittest.TestCase):
+class test_gnu_to_scons_flags(unittest.TestCase):
 	def test1(self):
-		flags = gnu_to_ms_link(cygwin_g77_link_expected)
+		flags = gnu_to_scons_flags(cygwin_g77_link_expected)
 		assert cygwin_g77_link_parsed == flags
 
