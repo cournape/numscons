@@ -12,6 +12,13 @@ g77_link_expected = ['-L/usr/lib/gcc/i486-linux-gnu/3.4.6',
         '-L/usr/lib/gcc/i486-linux-gnu/3.4.6/../../..', '-L/lib/../lib',
         '-L/usr/lib/../lib', '-lfrtbegin', '-lg2c', '-lm']
 
+g77_link_parsed = {'LIBPATH' :['/usr/lib/gcc/i486-linux-gnu/3.4.6',
+        '/usr/lib/gcc/i486-linux-gnu/3.4.6',
+        '/usr/lib/gcc/i486-linux-gnu/3.4.6/../../../../lib',
+        '/usr/lib/gcc/i486-linux-gnu/3.4.6/../../..', '/lib/../lib',
+        '/usr/lib/../lib'], 
+	'LIBS': ['frtbegin', 'g2c', 'm']}
+
 gfortran_link_output = """
 Driving: gfortran -v -o hello hello.o -lgfortranbegin -lgfortran -lm -shared-libgcc
 Using built-in specs.
