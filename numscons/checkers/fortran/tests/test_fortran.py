@@ -2,7 +2,7 @@
 import unittest
 
 from numscons.checkers.fortran.fortran import parse_f77link
-from numscons.checkers.fortran.fortran import gnu_to_scons_flags
+from numscons.checkers.fortran.fortran import gnu_to_scons_flags, _get_g2c_libs
 
 from fortran_output import g77_link_output, gfortran_link_output, \
     sunfort_v12_link_output, ifort_v10_link_output, \
@@ -10,7 +10,7 @@ from fortran_output import g77_link_output, gfortran_link_output, \
     g77_link_expected, gfortran_link_expected, \
     sunfort_v12_link_expected, ifort_v10_link_expected, \
     cygwin_g77_link_expected, mingw_g77_link_expected, \
-    cygwin_g77_link_parsed
+    cygwin_g77_link_parsed, g77_link_parsed
 
 class test_CheckF77Verbose(unittest.TestCase):
     def setUp(self):
@@ -55,3 +55,7 @@ class test_gnu_to_scons_flags(unittest.TestCase):
 		flags = gnu_to_scons_flags(cygwin_g77_link_expected)
 		assert cygwin_g77_link_parsed == flags
 
+class test_get_g2c(unittest.TestCase):
+	def test1(self):
+		paths = g77_link_parsed['LIBPATH']
+		print _get_g2c_libs(['g2c'], paths)
