@@ -1,3 +1,7 @@
+Thu, 14 Feb 2008 01:03:27 +0900
+	* 0.4.0 release
+	* this relases main feature is support for MS compiler on windows.
+
 Mon, 28 Jan 2008 13:00:08 +0900
 	* 0.3.4 release
 	* this relases main feature is rewritten f77 link parser.
