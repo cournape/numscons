@@ -1,0 +1,9 @@
+# vim:syntax=python
+from numscons import GetNumpyEnvironment
+
+env = GetNumpyEnvironment(ARGUMENTS)
+
+bld = Builder(action = "$DLLWRAPCOM")
+env['BUILDERS']["Static2Dll"] = bld
+
+env.Static2Dll('blas.dll', source = "libblas.a")

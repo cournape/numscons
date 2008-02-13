@@ -151,7 +151,7 @@ def generate(env):
     # dll and dllwrap tools
     # XXX: this should be put in separate tools at some point
     env['DLLWRAP'] 	= 'dllwrap'
-    env['DLLWRAPFLAGS'] = SCons.Utils.CLVar('--export-all-symbols')
+    env['DLLWRAPFLAGS'] = SCons.Utils.CLVar('')
     env['_DLLWRAPLINKFLAGS'] = SCons.Utils.CLVar('')
     env['_DLLWRAPLIBS'] = SCons.Utils.CLVar('')
     env['DLLWRAPCOM'] 	= '$DLLWRAP -o $TARGET $DLLWRAPFLAGS $SOURCES $_DLLWRAPLIBS $_DLLWRAPLINKFLAGS'
