@@ -28,7 +28,7 @@ from numscons.core.custom_builders import NumpyFromCTemplate, NumpyFromFTemplate
 from numscons.tools.substinfile import TOOL_SUBST
 
 from misc import get_scons_build_dir, get_scons_configres_dir,\
-                 get_scons_configres_filename
+                 get_scons_configres_filename, built_with_mingw
 
 __all__ = ['GetNumpyEnvironment']
 
@@ -418,6 +418,10 @@ def customize_tools(env):
             
     for t in FindAllTools(DEF_OTHER_TOOLS, env):
         Tool(t)(env)
+
+    if built_with_mingw(env):
+        t = Tool("dllwrap", toolpath = get_additional_toolpaths(env))
+        t(env)
 
     # Add our own, custom tools (f2py, from_template, etc...)
     t = Tool('f2py', toolpath = get_additional_toolpaths(env))

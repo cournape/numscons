@@ -1,5 +1,6 @@
 # vim:syntax=python
 from numscons import GetNumpyEnvironment
+from numscons.core.misc import built_with_mingw
 
 env = GetNumpyEnvironment(ARGUMENTS)
 
@@ -7,3 +8,6 @@ bld = Builder(action = "$DLLWRAPCOM")
 env['BUILDERS']["Static2Dll"] = bld
 
 env.Static2Dll('blas.dll', source = "libblas.a")
+
+print "Built with mingw ? %d" % built_with_mingw(env)
+print "DLLWRAPCOM is %s" % env["DLLWRAPCOM"]
