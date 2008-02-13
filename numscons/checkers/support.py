@@ -16,10 +16,11 @@ _arg2env = {'include_dirs' : 'CPPPATH',
             'rpath' : 'RPATH',
             'frameworks' : 'FRAMEWORKS'}
 
-def save_and_set(env, opts):
-    """keys given as config opts args."""
+def save_and_set(env, opts, keys = None):
+    """Put informations from option configuration into a scons environment, and returns the savedkeys given as config opts args."""
     saved_keys = {}
-    keys = opts.keys()
+    if keys is None:
+        keys = opts.keys()
     for k in keys:
         saved_keys[k] = (env.has_key(_arg2env[k]) and\
                          deepcopy(env[_arg2env[k]])) or\
@@ -29,10 +30,9 @@ def save_and_set(env, opts):
     env.AppendUnique(**kw)
     return saved_keys
 
-def restore(env, saved_keys):
-    keys = saved_keys.keys()
+def restore(env, saved):
     kw = zip([_arg2env[k] for k in keys],
-             [saved_keys[k] for k in keys])
+             [saved[k] for k in keys])
     kw = dict(kw)
     env.Replace(**kw)
 
