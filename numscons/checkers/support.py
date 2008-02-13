@@ -31,6 +31,7 @@ def save_and_set(env, opts, keys = None):
     return saved_keys
 
 def restore(env, saved):
+    keys = saved.keys()
     kw = zip([_arg2env[k] for k in keys],
              [saved[k] for k in keys])
     kw = dict(kw)
