@@ -422,6 +422,8 @@ def customize_tools(env):
     if built_with_mingw(env):
         t = Tool("dllwrap", toolpath = get_additional_toolpaths(env))
         t(env)
+        t = Tool("dlltool", toolpath = get_additional_toolpaths(env))
+        t(env)
 
     # Add our own, custom tools (f2py, from_template, etc...)
     t = Tool('f2py', toolpath = get_additional_toolpaths(env))
