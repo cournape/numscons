@@ -5,7 +5,8 @@ customization (python extension builders, build_dir, etc...)."""
 
 import os
 import os.path
-from os.path import join as pjoin, dirname as pdirname, basename as pbasename
+from os.path import join as pjoin, dirname as pdirname, basename as pbasename, \
+    exists as pexists
 from distutils.sysconfig import get_config_vars
 
 from numscons.core.default import tool_list
@@ -84,8 +85,8 @@ def customize_cc(name, env):
     try:
         cfg = get_cc_config(name)
     except NoCompilerConfig, e:
-	print "compiler %s has no customization available" % name
-	cfg = CompilerConfig(Config())
+        print "compiler %s has no customization available" % name
+        cfg = CompilerConfig(Config())
     env.AppendUnique(**cfg.get_flags_dict())
 
 def customize_f77(name, env):
@@ -93,8 +94,8 @@ def customize_f77(name, env):
     try:
         cfg = get_f77_config(name)
     except NoCompilerConfig, e:
-	cfg = F77CompilerConfig(Config())
-	print "compiler %s has no customization available" % name
+        print "compiler %s has no customization available" % name
+        cfg = F77CompilerConfig(Config())
     env.AppendUnique(**cfg.get_flags_dict())
 
 def finalize_env(env):
@@ -104,6 +105,7 @@ def finalize_env(env):
     if built_with_mstools(env):
         major = get_vs_version(env)[0]
         # For VS 8 and above (VS 2005), use manifest for DLL
+        # XXX: this has nothing to do here, too
         if major >= 8:
             env['LINKCOM'] = [env['LINKCOM'], 
                       'mt.exe -nologo -manifest ${TARGET}.manifest '\
@@ -332,10 +334,10 @@ def customize_scons_dirs(env):
                              log_file = pjoin(env['build_dir'], 'config.log'))
     env.NumpyConfigure = NumpyConfigure
 
-    # XXX: Huge, ugly hack ! SConsign needs an absolute path or a path relative
-    # to where the SConstruct file is. We have to find the path of the build
-    # dir relative to the src_dir: we add n .., where n is the number of
-    # occurances of the path separator in the src dir.
+    # XXX: ugly hack ! SConsign needs an absolute path or a path relative to
+    # where the SConstruct file is. We have to find the path of the build dir
+    # relative to the src_dir: we add n .., where n is the number of occurances
+    # of the path separator in the src dir.
     def get_build_relative_src(srcdir, builddir):
         n = srcdir.count(os.sep)
         if len(srcdir) > 0 and not srcdir == '.':
@@ -345,6 +347,8 @@ def customize_scons_dirs(env):
     sconsign = pjoin(get_build_relative_src(env['src_dir'], 
                                             env['build_dir']),
                      '.sconsign.dblite')
+    if not pexists(pdirname(sconsign)):
+        os.makedirs(pdirname(sconsign))
     env.SConsignFile(sconsign)
 
 def add_custom_builders(env):
