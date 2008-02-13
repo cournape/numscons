@@ -65,7 +65,8 @@ def _check_headers(context, opts, headers, autoadd):
     #----------------------------
     # Check headers are available
     #----------------------------
-    saved = save_and_set(context.env, opts)
+    keys = ('include_dirs', 'cflags')
+    saved = save_and_set(context.env, opts, keys)
     try:
         # XXX: handle context
         hcode = ['#include <%s>' % h for h in headers]
@@ -112,6 +113,7 @@ def check_include_and_run(context, name, opts, headers, run_src, autoadd = 1):
     #------------------------------
     # Check a simple example works
     #------------------------------
+    keys = ('library_dirs', 'cflags')
     saved = save_and_set(env, opts)
     try:
         # HACK: we add libpath and libs at the end of the source as a comment,
