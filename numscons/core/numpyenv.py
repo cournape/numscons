@@ -454,7 +454,14 @@ def customize_link_flags(env):
     env['LDMODULEFLAGSEND'] = []
 
     # For mingw tools, we do it in our custom mingw scons tool
+    def set_end(key, value):
+	import SCons
+	if SCons.Util.is_String(env[key]):
+		env[key] = "%s %s" % (env[key], value)
     if not env['cc_opt'] == 'mingw':
-        env['LINKCOM'] = '%s $LINKFLAGSEND' % env['LINKCOM']
-        env['SHLINKCOM'] = '%s $SHLINKFLAGSEND' % env['SHLINKCOM']
-        env['LDMODULECOM'] = '%s $LDMODULEFLAGSEND' % env['LDMODULECOM']
+	set_end("LINKCOM", '$LINKFLAGSEND')
+	set_end("SHLINKCOM", '$SHLINKFLAGSEND')
+	set_end("LDMODULECOM", '$LDMODULEFLAGSEND')
+        #env['LINKCOM'] = ]
+        #env['SHLINKCOM'] = '%s $SHLINKFLAGSEND' % env['SHLINKCOM']
+        #env['LDMODULECOM'] = '%s $LDMODULEFLAGSEND' % env['LDMODULECOM']
