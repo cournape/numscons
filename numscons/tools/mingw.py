@@ -148,13 +148,5 @@ def generate(env):
     env['LIBPREFIX'] = 'lib'
     env['LIBSUFFIX'] = '.a'
 
-    # dll and dllwrap tools
-    # XXX: this should be put in separate tools at some point
-    env['DLLWRAP'] 	= 'dllwrap'
-    env['DLLWRAPFLAGS'] = SCons.Utils.CLVar('')
-    env['_DLLWRAPLINKFLAGS'] = SCons.Utils.CLVar('')
-    env['_DLLWRAPLIBS'] = SCons.Utils.CLVar('')
-    env['DLLWRAPCOM'] 	= '$DLLWRAP -o $TARGET $DLLWRAPFLAGS $SOURCES $_DLLWRAPLIBS $_DLLWRAPLINKFLAGS'
-
 def exists(env):
     return find(env)
