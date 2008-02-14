@@ -36,24 +36,27 @@ __revision__ = "src/engine/SCons/Tool/ifort.py 2446 2007/09/18 11:41:57 knight"
 import string
 
 import SCons.Defaults
+import SCons.Node
 
 def dlltoolEmitter(target, source, env):
     rtarget = []
     dllname = env.FindIxes(target, "SHLIBPREFIX", "SHLIBSUFFIX")
 
-    if not dll:
-        raise SCons.Errors.UserError, 
+    if not dllname:
+        raise SCons.Errors.UserError, \
 	      "A shared library should have exactly one target with the "\
 	      "suffix: %s" % env.subst("$SHLIBSUFFIX")
     
-    defname = env.ReplaceIxes(target, "SHLIBPREFIX", "SHLIBSUFFIX",
+    defname = env.ReplaceIxes(dllname, "SHLIBPREFIX", "SHLIBSUFFIX",
 		    "WINDOWSDEFPREFIX", "WINDOWSDEFSUFFIX")
-    libname = env.ReplaceIxes(target, "SHLIBPREFIX", "SHLIBSUFFIX",
+    libname = env.ReplaceIxes(dllname, "SHLIBPREFIX", "SHLIBSUFFIX",
 		    "LIBPREFIX", "LIBSUFFIX")
-    expname = env.ReplaceIxes(target, "SHLIBPREFIX", "SHLIBSUFFIX",
+    expname = env.ReplaceIxes(dllname, "SHLIBPREFIX", "SHLIBSUFFIX",
 		    "WINDOWSEXPPREFIX", "WINDOWSEXPSUFFIX")
 
-    return ((defname, libname, expname), source)
+    for i in (defname, libname, expname):
+	rtarget.append(SCons.Node.FS.default_fs.Entry(i))
+    return (rtarget, source)
 
 
 def generate(env):
