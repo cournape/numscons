@@ -40,13 +40,13 @@ import SCons.Defaults
 def dlltoolEmitter(target, source, env):
     rtarget = []
     dllname = env.FindIxes(target, "SHLIBPREFIX", "SHLIBSUFFIX")
-    #no_import_lib = env.get('no_import_lib', 0)
 
-
-    #insert_def = env.subst("$WINDOWS_INSERT_DEF")
-    defname = env.ReplaceIxes(target, "SHLIBPREFIX", "SHLIBSUFFIX", "WINDOWSDEFPREFIX", "WINDOWSDEFSUFFIX")
-    libname = env.ReplaceIxes(target, "SHLIBPREFIX", "SHLIBSUFFIX", "LIBPREFIX", "LIBSUFFIX")
-    expname = env.ReplaceIxes(target, "SHLIBPREFIX", "SHLIBSUFFIX", "WINDOWSEXPPREFIX", "WINDOWSEXPSUFFIX")
+    defname = env.ReplaceIxes(target, "SHLIBPREFIX", "SHLIBSUFFIX",
+		    "WINDOWSDEFPREFIX", "WINDOWSDEFSUFFIX")
+    libname = env.ReplaceIxes(target, "SHLIBPREFIX", "SHLIBSUFFIX",
+		    "LIBPREFIX", "LIBSUFFIX")
+    expname = env.ReplaceIxes(target, "SHLIBPREFIX", "SHLIBSUFFIX",
+		    "WINDOWSEXPPREFIX", "WINDOWSEXPSUFFIX")
 
     return ((defname, libname, expname), source)
 
@@ -58,9 +58,9 @@ def generate(env):
     env['DLLTOOLFLAGS'] = SCons.Util.CLVar('')
     env['_DLLTOOLLINKFLAGS'] = SCons.Util.CLVar('')
     env['_DLLTOOLLIBS'] = SCons.Util.CLVar('')
-    env['DLLTOOLCOM'] 	= '$DLLTOOL -o $TARGET $DLLTOOLFLAGS $SOURCES $_DLLTOOLLIBS $_DLLTOOLLINKFLAGS'
+    env['DLLTOOLCOM'] 	= '$DLLTOOL -o $TARGET $DLLTOOLFLAGS $SOURCES '
+    			  '$_DLLTOOLLIBS $_DLLTOOLLINKFLAGS'
     env["DLLTOOLEMITTER"] = dlltoolEmitter
 
-
 def exists(env):
-    return env.Detect('dllwrap')
+    return env.Detect('dlltool')
