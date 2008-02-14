@@ -5,8 +5,11 @@ from numscons.core.misc import built_with_mingw
 env = GetNumpyEnvironment(ARGUMENTS)
 
 
-bld = Builder(action = "$DLLWRAPCOM", suffix = ".dll")
+bld = Builder(action = "$DWPCOM", suffix = ".dll")
 env['BUILDERS']["Static2Dll"] = bld
 
-env.Static2Dll('blas', source = "libblas.a", DLLWRAPFLAGS = "--export-all-symbols", DLLWRAPLIBS = "g2c")
-env.Static2Dll('lapack', source = "liblapack.a", DLLWRAPFLAGS = "--export-all-symbols", DLLWRAPDLL = 'blas', DLLWRAPLIBS = "g2c")
+env.Static2Dll('blas', source = "libblas.a", 
+               DWPFLAGS = "--export-all-symbols", DWPLIBS = "g2c")
+env.Static2Dll('lapack', source = "liblapack.a", 
+	       DWPFLAGS = "--export-all-symbols", DWPDLL = 'blas', 
+	       DWPLIBS = "g2c")
