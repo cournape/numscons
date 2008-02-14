@@ -41,6 +41,11 @@ def dlltoolEmitter(target, source, env):
     rtarget = []
     dllname = env.FindIxes(target, "SHLIBPREFIX", "SHLIBSUFFIX")
 
+    if not dll:
+        raise SCons.Errors.UserError, 
+	      "A shared library should have exactly one target with the "\
+	      "suffix: %s" % env.subst("$SHLIBSUFFIX")
+    
     defname = env.ReplaceIxes(target, "SHLIBPREFIX", "SHLIBSUFFIX",
 		    "WINDOWSDEFPREFIX", "WINDOWSDEFSUFFIX")
     libname = env.ReplaceIxes(target, "SHLIBPREFIX", "SHLIBSUFFIX",
