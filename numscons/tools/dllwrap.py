@@ -41,9 +41,12 @@ def generate(env):
     """Add Builders and construction variables for dllwrap."""
     env['DLLWRAP'] 	= 'dllwrap'
     env['DLLWRAPFLAGS'] = SCons.Util.CLVar('')
+    env['DLLWRAPLINKPREFIX'] = '-l'
+    env['DLLWRAPLINKSUFFIX'] = ''
     env['_DLLWRAPLINKFLAGS'] = SCons.Util.CLVar('')
-    env['_DLLWRAPLIBS'] = SCons.Util.CLVar('')
-    env['DLLWRAPCOM'] 	= '$DLLWRAP -o $TARGET $DLLWRAPFLAGS $SOURCES $_DLLWRAPLIBS $_DLLWRAPLINKFLAGS'
+    env['_DLLWRAPLIBS'] = ''
+    env['_DLLWRAPLIBFLAGS'] ='${_stripixes(DLLWRAPLINKPREFIX, DLLWRAPLIBS, DLLWRAPLINKSUFFIX, LIBPREFIX, LIBSUFFIX, __env__)}'
+    env['DLLWRAPCOM'] 	= '$DLLWRAP -o $TARGET $DLLWRAPFLAGS $SOURCES $_DLLWRAPLIBFLAGS $_DLLWRAPLINKFLAGS'
 
 
 def exists(env):
