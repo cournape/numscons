@@ -58,7 +58,7 @@ def generate(env):
     env['DLLTOOLFLAGS'] = SCons.Util.CLVar('')
     env['_DLLTOOLLINKFLAGS'] = SCons.Util.CLVar('')
     env['_DLLTOOLLIBS'] = SCons.Util.CLVar('')
-    env['DLLTOOLCOM'] 	= '$DLLTOOL -o $TARGET $DLLTOOLFLAGS $SOURCES '
+    env['DLLTOOLCOM'] 	= '$DLLTOOL -o $TARGET $DLLTOOLFLAGS $SOURCES ' \
     			  '$_DLLTOOLLIBS $_DLLTOOLLINKFLAGS'
     env["DLLTOOLEMITTER"] = dlltoolEmitter
 
