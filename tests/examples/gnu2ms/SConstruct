@@ -9,3 +9,4 @@ bld = Builder(action = "$DLLWRAPCOM", suffix = ".dll")
 env['BUILDERS']["Static2Dll"] = bld
 
 env.Static2Dll('blas', source = "libblas.a", DLLWRAPFLAGS = "--export-all-symbols", DLLWRAPLIBS = "g2c")
+env.Static2Dll('lapack', source = "liblapack.a", DLLWRAPFLAGS = "--export-all-symbols", DLLWRAPDLL = 'blas', DLLWRAPLIBS = "g2c")
