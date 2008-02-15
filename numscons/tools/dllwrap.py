@@ -57,7 +57,7 @@ def generate(env):
     env['_DWPDLLFLAGS'] = '${_stripixes(DWPSHLINKPREFIX, DWPDLL, '\
 		    	  'DWPSHLINKSUFFIX, SHLIBPREFIX, SHLIBSUFFIX, __env__)}'
 
-    env['DWPCOM'] 	= '$DLLWRAP -o $TARGET $DWPFLAGS $SOURCES $_DWPDLLFLAGS '\
+    env['DWPCOM'] 	= '$DWP -o $TARGET $DWPFLAGS $SOURCES $_DWPDLLFLAGS '\
 		    	  '$_DWPLIBFLAGS'
 
 def exists(env):
