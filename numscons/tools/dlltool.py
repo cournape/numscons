@@ -40,41 +40,55 @@ import SCons.Node
 
 def dlltoolEmitter(target, source, env):
     rtarget = []
-    dllname = env.FindIxes(source, "SHLIBPREFIX", "SHLIBSUFFIX")
+    rsource = []
+    stname = env.FindIxes(source, "DLLTOOL_GNU_LIBPREFIX", "DLLTOOL_GNU_LIBSUFFIX")
 
-    if not dllname:
+    if not stname:
         raise SCons.Errors.UserError, \
-	      "A shared library should have exactly one source with the "\
-	      "suffix: %s" % env.subst("$SHLIBSUFFIX")
+	      "At least one source of dlltool should be a gnu static library, that is with suffix %s and prefix %s" % (env.subst("$DLLTOOL_GNU_LIBSUFFIX"), env.subst("$DLLTOOL_GNU_LIBPREFFIX"))
     
-    defname = env.ReplaceIxes(dllname, "SHLIBPREFIX", "SHLIBSUFFIX",
+    defname = env.ReplaceIxes(stname, "DLLTOOL_GNU_LIBPREFIX", "DLLTOOL_GNU_LIBSUFFIX",
 		    "WINDOWSDEFPREFIX", "WINDOWSDEFSUFFIX")
-    libname = env.ReplaceIxes(dllname, "SHLIBPREFIX", "SHLIBSUFFIX",
+    libname = env.ReplaceIxes(stname, "DLLTOOL_GNU_LIBPREFIX", "DLLTOOL_GNU_LIBSUFFIX",
 		    "DLLTOOLLIBPREFIX", "DLLTOOLLIBSUFFIX")
-    expname = env.ReplaceIxes(dllname, "SHLIBPREFIX", "SHLIBSUFFIX",
+    expname = env.ReplaceIxes(stname, "DLLTOOL_GNU_LIBPREFIX", "DLLTOOL_GNU_LIBSUFFIX",
 		    "DLLTOOLEXPPREFIX", "DLLTOOLEXPSUFFIX")
+    dllname = env.ReplaceIxes(stname, "DLLTOOL_GNU_LIBPREFIX", "DLLTOOL_GNU_LIBSUFFIX", "DLLTOOL_MS_SHLIBPREFFIX", "DLLTOOL_MS_SHLIBSUFFIX")
 
     for i in (defname, libname, expname):
-	print i
 	rtarget.append(SCons.Node.FS.default_fs.Entry(i))
-    return (rtarget, source)
+    
+    tmp = []
+    tmp.append(dllname)
+    tmp.extend(source)
+    for s in tmp:
+	rsource.append(SCons.Node.FS.default_fs.Entry(s))
+    return (rtarget, rsource)
 
 def generate_dlltool_action(source, target, env, for_signature):
     cmd = ['$DLLTOOL']
+    cmd.extend(['--dllname', str(source[0])])
     cmd.extend(['--output-def', str(target[0])])
-    for s in source:
-	    cmd.append(str(s))
+    cmd.append('$DLLTOOLFLAGS')
+    cmd.append(str(source[1]))
     return [cmd]
 
 dlltool_action = SCons.Action.Action(generate_dlltool_action, generator = 1)
 
 def generate(env):
     """Add Builders and construction variables for dlltool."""
-    # dlltool cwcan generate .def and .lib from static archive or object files
+    # dlltool cwcan generate .def, .exp and .lib from static archive or object
+    # files (Note that is is better to generate .lib with MS linker for
+    # compatibilities with MS code).
     env['DLLTOOL'] 	= 'dlltool'
     env['DLLTOOLFLAGS'] = SCons.Util.CLVar('')
+    env['DLLTOOLLIBS'] 	= SCons.Util.CLVar('')
     env['_DLLTOOLLINKFLAGS'] = SCons.Util.CLVar('')
     env['_DLLTOOLLIBS'] = SCons.Util.CLVar('')
+    env['DLLTOOL_GNU_LIBPREFIX'] = 'lib'
+    env['DLLTOOL_GNU_LIBSUFFIX'] = '.a'
+    env['DLLTOOL_MS_SHLIBPREFIX'] = ''
+    env['DLLTOOL_MS_SHLIBSUFFIX'] = '.dll'
     env['DLLTOOLLIBPREFIX'] = ''
     env['DLLTOOLLIBSUFFIX'] = '.lib'
     env['DLLTOOLEXPPREFIX'] = ''
