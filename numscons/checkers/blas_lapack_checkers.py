@@ -30,7 +30,7 @@ def _get_language_opts(context, language):
     elif language == 'F77':
         # We need C/F77 runtime info, otherwise, cannot proceed further
         if not context.env.has_key('F77_LDFLAGS') and not CheckF77Clib(context):
-            add_lib_info(context.env, libname, None)
+            #add_lib_info(context.env, libname, None)
             return 0
         moreopts = {'linkflagsend' : copy(context.env['F77_LDFLAGS'])}
     else:
