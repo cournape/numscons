@@ -45,8 +45,8 @@ def dlltoolEmitter(target, source, env):
 
     if not stname:
         raise SCons.Errors.UserError, \
-          "At least one source of dlltool should be a gnu static library, that'\
-          is with suffix %s and prefix %s" %
+          "At least one source of dlltool should be a gnu static library, that"\
+          "is with suffix %s and prefix %s" %\
           (env.subst("$DLLTOOL_GNU_LIBSUFFIX"),
            env.subst("$DLLTOOL_GNU_LIBPREFFIX"))
     
