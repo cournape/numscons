@@ -315,6 +315,9 @@ def _get_numpy_env(args):
     # useful)
     Help(opts.GenerateHelpText(env))
 
+    import sys
+    if sys.platform == "win32":
+	    env["ENV"]["PATH"] = os.environ["PATH"]
     return env
 
 def set_site_config(env):
@@ -460,7 +463,11 @@ def customize_link_flags(env):
     env['LDMODULEFLAGSEND'] = []
 
     # For mingw tools, we do it in our custom mingw scons tool
-    if not env['cc_opt'] == 'mingw':
+    # XXX: this should be done at the tool level, that's the only way to avoid
+    # screwing things up....
+    if built_with_mstools(env) or built_with_mingw(env):
+        pass
+    else:
         env['LINKCOM'] = '%s $LINKFLAGSEND' % env['LINKCOM']
         env['SHLINKCOM'] = '%s $SHLINKFLAGSEND' % env['SHLINKCOM']
         env['LDMODULECOM'] = '%s $LDMODULEFLAGSEND' % env['LDMODULECOM']
