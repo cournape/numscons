@@ -45,24 +45,29 @@ def dlltoolEmitter(target, source, env):
 
     if not stname:
         raise SCons.Errors.UserError, \
-	      "At least one source of dlltool should be a gnu static library, that is with suffix %s and prefix %s" % (env.subst("$DLLTOOL_GNU_LIBSUFFIX"), env.subst("$DLLTOOL_GNU_LIBPREFFIX"))
+          "At least one source of dlltool should be a gnu static library, that'\
+          is with suffix %s and prefix %s" %
+          (env.subst("$DLLTOOL_GNU_LIBSUFFIX"),
+           env.subst("$DLLTOOL_GNU_LIBPREFFIX"))
     
-    defname = env.ReplaceIxes(stname, "DLLTOOL_GNU_LIBPREFIX", "DLLTOOL_GNU_LIBSUFFIX",
-		    "WINDOWSDEFPREFIX", "WINDOWSDEFSUFFIX")
-    libname = env.ReplaceIxes(stname, "DLLTOOL_GNU_LIBPREFIX", "DLLTOOL_GNU_LIBSUFFIX",
-		    "DLLTOOLLIBPREFIX", "DLLTOOLLIBSUFFIX")
-    expname = env.ReplaceIxes(stname, "DLLTOOL_GNU_LIBPREFIX", "DLLTOOL_GNU_LIBSUFFIX",
-		    "DLLTOOLEXPPREFIX", "DLLTOOLEXPSUFFIX")
-    dllname = env.ReplaceIxes(stname, "DLLTOOL_GNU_LIBPREFIX", "DLLTOOL_GNU_LIBSUFFIX", "DLLTOOL_MS_SHLIBPREFFIX", "DLLTOOL_MS_SHLIBSUFFIX")
+    defname = env.ReplaceIxes(stname, "DLLTOOL_GNU_LIBPREFIX",
+            "DLLTOOL_GNU_LIBSUFFIX", "WINDOWSDEFPREFIX", "WINDOWSDEFSUFFIX")
+    libname = env.ReplaceIxes(stname, "DLLTOOL_GNU_LIBPREFIX",
+            "DLLTOOL_GNU_LIBSUFFIX", "DLLTOOLLIBPREFIX", "DLLTOOLLIBSUFFIX")
+    expname = env.ReplaceIxes(stname, "DLLTOOL_GNU_LIBPREFIX",
+            "DLLTOOL_GNU_LIBSUFFIX", "DLLTOOLEXPPREFIX", "DLLTOOLEXPSUFFIX")
+    dllname = env.ReplaceIxes(stname, "DLLTOOL_GNU_LIBPREFIX",
+            "DLLTOOL_GNU_LIBSUFFIX", "DLLTOOL_MS_SHLIBPREFFIX",
+            "DLLTOOL_MS_SHLIBSUFFIX")
 
     for i in (defname, libname, expname):
-	rtarget.append(SCons.Node.FS.default_fs.Entry(i))
+        rtarget.append(SCons.Node.FS.default_fs.Entry(i))
     
     tmp = []
     tmp.append(dllname)
     tmp.extend(source)
     for s in tmp:
-	rsource.append(SCons.Node.FS.default_fs.Entry(s))
+        rsource.append(SCons.Node.FS.default_fs.Entry(s))
     return (rtarget, rsource)
 
 def generate_dlltool_action(source, target, env, for_signature):

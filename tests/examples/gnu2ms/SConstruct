@@ -15,5 +15,7 @@ env.Static2Dll('lapack', source = "liblapack.a",
 	       DWPFLAGS = "--export-all-symbols", DWPDLL = 'blas', 
 	       DWPLIBS = "g2c")
 
-env.Dll2Import('blas', source = ['libblas.a'], DLLTOOLFLAGS = '--export-all-symbols')
-env.Dll2Import('lapack', source = ['liblapack.a'], DLLTOOLFLAGS = '--export-all-symbols')
+env.Dll2Import('blas', source = 'libblas.a', 
+            DLLTOOLFLAGS = '--export-all-symbols')
+env.Dll2Import('lapack', source = 'liblapack.a', 
+            DLLTOOLFLAGS = '--export-all-symbols')
