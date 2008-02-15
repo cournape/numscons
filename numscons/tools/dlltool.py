@@ -40,24 +40,33 @@ import SCons.Node
 
 def dlltoolEmitter(target, source, env):
     rtarget = []
-    dllname = env.FindIxes(target, "SHLIBPREFIX", "SHLIBSUFFIX")
+    dllname = env.FindIxes(source, "SHLIBPREFIX", "SHLIBSUFFIX")
 
     if not dllname:
         raise SCons.Errors.UserError, \
-	      "A shared library should have exactly one target with the "\
+	      "A shared library should have exactly one source with the "\
 	      "suffix: %s" % env.subst("$SHLIBSUFFIX")
     
     defname = env.ReplaceIxes(dllname, "SHLIBPREFIX", "SHLIBSUFFIX",
 		    "WINDOWSDEFPREFIX", "WINDOWSDEFSUFFIX")
     libname = env.ReplaceIxes(dllname, "SHLIBPREFIX", "SHLIBSUFFIX",
-		    "LIBPREFIX", "LIBSUFFIX")
+		    "DLLTOOLLIBPREFIX", "DLLTOOLLIBSUFFIX")
     expname = env.ReplaceIxes(dllname, "SHLIBPREFIX", "SHLIBSUFFIX",
-		    "WINDOWSEXPPREFIX", "WINDOWSEXPSUFFIX")
+		    "DLLTOOLEXPPREFIX", "DLLTOOLEXPSUFFIX")
 
     for i in (defname, libname, expname):
+	print i
 	rtarget.append(SCons.Node.FS.default_fs.Entry(i))
     return (rtarget, source)
 
+def generate_dlltool_action(source, target, env, for_signature):
+    cmd = ['$DLLTOOL']
+    cmd.extend(['--output-def', str(target[0])])
+    for s in source:
+	    cmd.append(str(s))
+    return [cmd]
+
+dlltool_action = SCons.Action.Action(generate_dlltool_action, generator = 1)
 
 def generate(env):
     """Add Builders and construction variables for dlltool."""
@@ -66,8 +75,11 @@ def generate(env):
     env['DLLTOOLFLAGS'] = SCons.Util.CLVar('')
     env['_DLLTOOLLINKFLAGS'] = SCons.Util.CLVar('')
     env['_DLLTOOLLIBS'] = SCons.Util.CLVar('')
-    env['DLLTOOLCOM'] 	= '$DLLTOOL -o $TARGET $DLLTOOLFLAGS $SOURCES ' \
-    			  '$_DLLTOOLLIBS $_DLLTOOLLINKFLAGS'
+    env['DLLTOOLLIBPREFIX'] = ''
+    env['DLLTOOLLIBSUFFIX'] = '.lib'
+    env['DLLTOOLEXPPREFIX'] = ''
+    env['DLLTOOLEXPSUFFIX'] = '.exp'
+    env['DLLTOOLCOM'] 	= dlltool_action
     env["DLLTOOLEMITTER"] = dlltoolEmitter
 
 def exists(env):
