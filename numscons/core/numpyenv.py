@@ -3,6 +3,7 @@
 """This initialize a scons environment using info from distutils, and all our
 customization (python extension builders, build_dir, etc...)."""
 
+import sys
 import os
 import os.path
 from os.path import join as pjoin, dirname as pdirname, basename as pbasename, \
@@ -91,6 +92,10 @@ def customize_cc(name, env):
 
 def customize_f77(name, env):
     """Customize env options related to the given tool (F77 compiler)."""
+    # XXX: this should be handled somewhere else...
+    if sys.platform == "win32" and is_f77_gnu(env['F77']):
+	name = "%s_mingw" % name
+
     try:
         cfg = get_f77_config(name)
     except NoCompilerConfig, e:
