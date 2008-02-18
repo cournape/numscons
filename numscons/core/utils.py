@@ -23,6 +23,7 @@ def popen_wrapper(cmd, merge = False):
         - it tries to be robust to find non existing command. For example, is
           cmd starts with a minus, a nonzero status is returned, and no junk is
           displayed on the interpreter stdout."""
+    # XXX: look at subprocess + scons emulation for it instead of this crap
     if _START_WITH_MINUS.match(cmd):
         return 1, ''
     if merge:
