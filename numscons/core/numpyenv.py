@@ -3,6 +3,7 @@
 """This initialize a scons environment using info from distutils, and all our
 customization (python extension builders, build_dir, etc...)."""
 
+import sys
 import os
 import os.path
 from os.path import join as pjoin, dirname as pdirname, basename as pbasename, \
@@ -28,7 +29,7 @@ from numscons.core.custom_builders import NumpyFromCTemplate, NumpyFromFTemplate
 from numscons.tools.substinfile import TOOL_SUBST
 
 from misc import get_scons_build_dir, get_scons_configres_dir,\
-                 get_scons_configres_filename
+                 get_scons_configres_filename, built_with_mingw
 
 __all__ = ['GetNumpyEnvironment']
 
@@ -91,6 +92,10 @@ def customize_cc(name, env):
 
 def customize_f77(name, env):
     """Customize env options related to the given tool (F77 compiler)."""
+    # XXX: this should be handled somewhere else...
+    if sys.platform == "win32" and is_f77_gnu(env['F77']):
+	name = "%s_mingw" % name
+
     try:
         cfg = get_f77_config(name)
     except NoCompilerConfig, e:
@@ -315,6 +320,9 @@ def _get_numpy_env(args):
     # useful)
     Help(opts.GenerateHelpText(env))
 
+    import sys
+    if sys.platform == "win32":
+	    env["ENV"]["PATH"] = os.environ["PATH"]
     return env
 
 def set_site_config(env):
@@ -419,6 +427,12 @@ def customize_tools(env):
     for t in FindAllTools(DEF_OTHER_TOOLS, env):
         Tool(t)(env)
 
+    if built_with_mingw(env):
+        t = Tool("dllwrap", toolpath = get_additional_toolpaths(env))
+        t(env)
+        t = Tool("dlltool", toolpath = get_additional_toolpaths(env))
+        t(env)
+
     # Add our own, custom tools (f2py, from_template, etc...)
     t = Tool('f2py', toolpath = get_additional_toolpaths(env))
 
@@ -454,14 +468,11 @@ def customize_link_flags(env):
     env['LDMODULEFLAGSEND'] = []
 
     # For mingw tools, we do it in our custom mingw scons tool
-    def set_end(key, value):
-	import SCons
-	if SCons.Util.is_String(env[key]):
-		env[key] = "%s %s" % (env[key], value)
-    if not env['cc_opt'] == 'mingw':
-	set_end("LINKCOM", '$LINKFLAGSEND')
-	set_end("SHLINKCOM", '$SHLINKFLAGSEND')
-	set_end("LDMODULECOM", '$LDMODULEFLAGSEND')
-        #env['LINKCOM'] = ]
-        #env['SHLINKCOM'] = '%s $SHLINKFLAGSEND' % env['SHLINKCOM']
-        #env['LDMODULECOM'] = '%s $LDMODULEFLAGSEND' % env['LDMODULECOM']
+    # XXX: this should be done at the tool level, that's the only way to avoid
+    # screwing things up....
+    if built_with_mstools(env) or built_with_mingw(env):
+        pass
+    else:
+        env['LINKCOM'] = '%s $LINKFLAGSEND' % env['LINKCOM']
+        env['SHLINKCOM'] = '%s $SHLINKFLAGSEND' % env['SHLINKCOM']
+        env['LDMODULECOM'] = '%s $LDMODULEFLAGSEND' % env['LDMODULECOM']

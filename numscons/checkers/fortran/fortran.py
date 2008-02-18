@@ -8,7 +8,11 @@
 import sys
 import re
 import os
+from os.path import join, basename
 import shlex
+import shutil
+
+from numscons.core.utils import unique
 
 GCC_DRIVER_LINE = re.compile('^Driving:')
 POSIX_STATIC_EXT = re.compile('\S+\.a')
@@ -19,46 +23,69 @@ LINKFLAGS_IGNORED = [r'-lang*', r'-lcrt[a-zA-Z0-9]*\.o', r'-lc$', r'-lSystem',
                      r'-libmil', r'-LIST:*', r'-LNO:*']
 if os.name == 'nt':
     LINKFLAGS_IGNORED.extend([r'-lfrt*', r'-luser32',
-	    r'-lkernel32', r'-ladvapi32', r'-lmsvcrt',
-	    r'-lshell32', r'-lmingw', r'-lmoldname'])
+            r'-lkernel32', r'-ladvapi32', r'-lmsvcrt',
+            r'-lshell32', r'-lmingw', r'-lmoldname'])
 else:
     LINKFLAGS_IGNORED.append(r'-lgcc*')
 
 RLINKFLAGS_IGNORED = [re.compile(f) for f in LINKFLAGS_IGNORED]
 
-def gnu_to_ms_link(linkflags):
+def gnu_to_scons_flags(linkflags):
     # XXX: This is bogus. Instead of manually playing with those flags, we
     # should use scons facilities, but this is not so easy because we want to
     # use posix environment and MS environment at the same time. If we need it
     # at several places, we will have to think on a better way.
-    newflags = []
+    newflags = {'LIBPATH': [], 'LIBS': []}
     for flag in linkflags:
         if flag.startswith('-L'):
-            newflags.append(r'/LIBPATH:%s' % flag[2:])
+            newflags['LIBPATH'].append(r'%s' % flag[2:])
         elif flag.startswith('-l'):
-            newflags.append(r'lib%s.a' % flag[2:])
+            newflags['LIBS'].append(r'%s' % flag[2:])
     return newflags
 
-def _get_g2c_libs(libs, libpaths):
+def find_libs_paths(libs, libpaths, prefix = "lib", suffix = ".a"):
     """Given a list of libraries and libpaths, return the fullpath of the
-    libraries.
+    libraries."""
+    ret = []
 
-    Only works on windows platform, for windows convention (should be used only
-    for gcc<-> VS interop."""  
-    g2c_support = []
-    def _get_lib(lib, libpaths):
-        for path in libpaths:
-            fullname = os.path.join(path, 'lib%s.a' % lib)
-            if os.path.exists(fullname):
-                return fullname
-        return ''
+    def fdlib(libn, libpaths):
+        for libpath in libpaths:
+                if os.path.exists(join(libpath, libname)):
+                    return join(libpath, libname)
+        return None
 
     for lib in libs:
-        fname = _get_lib(lib, libpaths)     
-        if len(fname) > 0:
-            g2c_support.append(fname)
-            
-    return g2c_support 
+        libname = "%s%s%s" % (prefix, lib, suffix)
+        if fdlib(libname, libpaths):
+            ret.append(fdlib(libname, libpaths))
+        else:
+            raise RuntimeError("%s not found ?" % libname)
+    return ret 
+
+def get_g2c_libs(env, final_flags):
+    # XXX:Fix me this ugly piece of code
+    pf = gnu_to_scons_flags(final_flags)
+    pf["LIBS"] = unique(pf["LIBS"])
+    rtlibs = find_libs_paths(pf["LIBS"], pf["LIBPATH"])
+    msrtlibs =[]
+    tmpdir = join("build", "g77_runtime")
+    # XXX: clean the path before
+    if os.path.exists(tmpdir):
+	shutil.rmtree(tmpdir)
+    os.makedirs(tmpdir)
+    for i in rtlibs:
+	mslib = gnulib2mslib(i)
+	mslibpath = join(tmpdir, mslib)
+	#print "Copying %s in %s" % (i, mslibpath)
+	shutil.copy(i, mslibpath)
+	msrtlibs.append(mslib)
+
+    return tmpdir, msrtlibs
+
+def gnulib2mslib(lib, gprefix = "lib", gsuffix = ".a", msprefix = "", mssuffix = ".lib"):
+    p = len(gprefix)
+    s = len(gsuffix)
+    return "%s%s%s" % (msprefix, basename(lib)[p:-s], mssuffix)
 
 def _check_link_verbose_posix(lines):
     """Returns true if useful link options can be found in output.
