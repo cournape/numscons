@@ -4,8 +4,9 @@
 """Module for blas/lapack/cblas/clapack checkers. Use perflib checkers
 implementations if available."""
 import sys
-from copy import copy
+from copy import copy, deepcopy
 
+from numscons.core.extension_scons import built_with_mstools
 from numscons.core.siteconfig import get_config_from_section, get_config
 from numscons.testcode_snippets import \
         cblas_sgemm as cblas_src, \
@@ -32,7 +33,10 @@ def _get_language_opts(context, language):
         if not context.env.has_key('F77_LDFLAGS') and not CheckF77Clib(context):
             #add_lib_info(context.env, libname, None)
             return 0
-        moreopts = {'linkflagsend' : copy(context.env['F77_LDFLAGS'])}
+        if built_with_mstools(context.env):
+            moreopts = deepcopy(context.env["F77_LDFLAGS"])
+	else:
+            moreopts = {'linkflagsend' : copy(context.env['F77_LDFLAGS'])}
     else:
         raise ValueError("language %s unknown" % language)
 
