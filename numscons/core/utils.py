@@ -161,3 +161,7 @@ def delconsdup(l):
 
     return nl
 
+def unique(seq):
+    """remove duplicate in sequence. Members should be hashable."""
+    d = dict([(x, x) for x in seq])
+    return d.values()
