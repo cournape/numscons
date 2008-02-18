@@ -66,8 +66,18 @@ def get_g2c_libs(env, final_flags):
     pf = gnu_to_scons_flags(final_flags)
     pf["LIBS"] = unique(pf["LIBS"])
     rtlibs = find_libs_paths(pf["LIBS"], pf["LIBPATH"])
+    msrtlibs =[]
     for i in rtlibs:
-        print "Copying %s into %s" % (i, basename(i)[3:-2])
+        print "Copying %s into %s" % (i, gnulib2mslib(i))
+	shutil.copy(i, gnulib2mslib(i))
+	msrtlibs.append(gnulib2mslib(i))
+    return msrtlibs
+
+def gnulib2mslib(lib, gprefix = "lib", gsuffix = ".a", msprefix = "", mssuffix = ".lib"):
+    p = len(gprefix)
+    s = len(gsuffix)
+    return "%s%s%s" % (msprefix, basename(lib)[p:-s], mssuffix)
+
 def _check_link_verbose_posix(lines):
     """Returns true if useful link options can be found in output.
 
