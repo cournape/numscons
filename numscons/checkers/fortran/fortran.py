@@ -68,7 +68,7 @@ def get_g2c_libs(env, final_flags):
     pf["LIBS"] = unique(pf["LIBS"])
     rtlibs = find_libs_paths(pf["LIBS"], pf["LIBPATH"])
     msrtlibs =[]
-    tmpdir = join(env["build_dir"], "g77_runtime")
+    tmpdir = join("build", "g77_runtime")
     # XXX: clean the path before
     if os.path.exists(tmpdir):
 	shutil.rmtree(tmpdir)
@@ -76,8 +76,10 @@ def get_g2c_libs(env, final_flags):
     for i in rtlibs:
 	mslib = gnulib2mslib(i)
 	mslibpath = join(tmpdir, mslib)
+	#print "Copying %s in %s" % (i, mslibpath)
 	shutil.copy(i, mslibpath)
 	msrtlibs.append(mslib)
+
     return tmpdir, msrtlibs
 
 def gnulib2mslib(lib, gprefix = "lib", gsuffix = ".a", msprefix = "", mssuffix = ".lib"):
