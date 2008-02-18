@@ -45,10 +45,18 @@ def find_libs_paths(libs, libpaths, prefix = "lib", suffix = ".a"):
     libraries."""
     ret = []
 
+    def fdlib(libn, libpaths):
+	for libpath in libpaths:
+	    if os.path.exists(join(libpath, libname)):
+	        return join(libpath, libname)
+	return None
+
     for lib in libs:
 	libname = "%s%s%s" % (prefix, lib, suffix)
-	ret.extend([join(libpath, libname) for libpath in libpaths])
-            
+	if fdlib(libname, libpaths):
+	    ret.append(fdlib(libname, libpaths))
+	else:
+	    raise RuntimeError("%s not found ?" % libname)
     return ret 
 
 def _check_link_verbose_posix(lines):
