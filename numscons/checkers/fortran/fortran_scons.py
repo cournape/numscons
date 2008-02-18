@@ -103,10 +103,11 @@ def CheckF77Clib(context):
         final_flags = parse_f77link(cnt)
         if built_with_mstools(env) and built_with_gnu_f77(env):
             from fortran import gnu_to_scons_flags, find_libs_paths
-	    pf = gnu_to_scons_flags(final_flags)
-	    find_libs_paths(pf["LIBS"], pf["LIBPATH"])
+            pf = gnu_to_scons_flags(final_flags)
+            pf["LIBS"] = unique(pf["LIBS"])
+            find_libs_paths(pf["LIBS"], pf["LIBPATH"])
             context.Result('Failed !')
-	    return 0
+            return 0
         env['F77_LDFLAGS'] = final_flags
         context.Result(' '.join(env['F77_LDFLAGS']))
     else:
