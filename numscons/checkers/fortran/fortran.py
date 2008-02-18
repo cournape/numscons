@@ -20,8 +20,8 @@ LINKFLAGS_IGNORED = [r'-lang*', r'-lcrt[a-zA-Z0-9]*\.o', r'-lc$', r'-lSystem',
                      r'-libmil', r'-LIST:*', r'-LNO:*']
 if os.name == 'nt':
     LINKFLAGS_IGNORED.extend([r'-lfrt*', r'-luser32',
-	    r'-lkernel32', r'-ladvapi32', r'-lmsvcrt',
-	    r'-lshell32', r'-lmingw', r'-lmoldname'])
+            r'-lkernel32', r'-ladvapi32', r'-lmsvcrt',
+            r'-lshell32', r'-lmingw', r'-lmoldname'])
 else:
     LINKFLAGS_IGNORED.append(r'-lgcc*')
 
@@ -46,17 +46,17 @@ def find_libs_paths(libs, libpaths, prefix = "lib", suffix = ".a"):
     ret = []
 
     def fdlib(libn, libpaths):
-	for libpath in libpaths:
-	    if os.path.exists(join(libpath, libname)):
-	        return join(libpath, libname)
-	return None
+        for libpath in libpaths:
+                if os.path.exists(join(libpath, libname)):
+                    return join(libpath, libname)
+        return None
 
     for lib in libs:
-	libname = "%s%s%s" % (prefix, lib, suffix)
-	if fdlib(libname, libpaths):
-	    ret.append(fdlib(libname, libpaths))
-	else:
-	    raise RuntimeError("%s not found ?" % libname)
+        libname = "%s%s%s" % (prefix, lib, suffix)
+        if fdlib(libname, libpaths):
+            ret.append(fdlib(libname, libpaths))
+        else:
+            raise RuntimeError("%s not found ?" % libname)
     return ret 
 
 def _check_link_verbose_posix(lines):
