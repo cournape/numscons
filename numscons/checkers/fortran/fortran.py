@@ -63,15 +63,22 @@ def find_libs_paths(libs, libpaths, prefix = "lib", suffix = ".a"):
     return ret 
 
 def get_g2c_libs(env, final_flags):
+    # XXX:Fix me this ugly piece of code
     pf = gnu_to_scons_flags(final_flags)
     pf["LIBS"] = unique(pf["LIBS"])
     rtlibs = find_libs_paths(pf["LIBS"], pf["LIBPATH"])
     msrtlibs =[]
+    tmpdir = join(env["build_dir"], "g77_runtime")
+    # XXX: clean the path before
+    if os.path.exists(tmpdir):
+	shutil.rmtree(tmpdir)
+    os.makedirs(tmpdir)
     for i in rtlibs:
-        print "Copying %s into %s" % (i, gnulib2mslib(i))
-	shutil.copy(i, gnulib2mslib(i))
-	msrtlibs.append(gnulib2mslib(i))
-    return msrtlibs
+	mslib = gnulib2mslib(i)
+	mslibpath = join(tmpdir, mslib)
+	shutil.copy(i, mslibpath)
+	msrtlibs.append(mslib)
+    return tmpdir, msrtlibs
 
 def gnulib2mslib(lib, gprefix = "lib", gsuffix = ".a", msprefix = "", mssuffix = ".lib"):
     p = len(gprefix)
