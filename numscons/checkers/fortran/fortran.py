@@ -8,8 +8,11 @@
 import sys
 import re
 import os
-from os.path import join
+from os.path import join, basename
 import shlex
+import shutil
+
+from numscons.core.utils import unique
 
 GCC_DRIVER_LINE = re.compile('^Driving:')
 POSIX_STATIC_EXT = re.compile('\S+\.a')
@@ -59,6 +62,12 @@ def find_libs_paths(libs, libpaths, prefix = "lib", suffix = ".a"):
             raise RuntimeError("%s not found ?" % libname)
     return ret 
 
+def get_g2c_libs(env, final_flags):
+    pf = gnu_to_scons_flags(final_flags)
+    pf["LIBS"] = unique(pf["LIBS"])
+    rtlibs = find_libs_paths(pf["LIBS"], pf["LIBPATH"])
+    for i in rtlibs:
+        print "Copying %s into %s" % (i, basename(i)[3:-2])
 def _check_link_verbose_posix(lines):
     """Returns true if useful link options can be found in output.
 

@@ -102,11 +102,8 @@ def CheckF77Clib(context):
     if res == 1:
         final_flags = parse_f77link(cnt)
         if built_with_mstools(env) and built_with_gnu_f77(env):
-            from fortran import gnu_to_scons_flags, find_libs_paths
-	    from numscons.core.utils import unique
-            pf = gnu_to_scons_flags(final_flags)
-            pf["LIBS"] = unique(pf["LIBS"])
-            print find_libs_paths(pf["LIBS"], pf["LIBPATH"])
+	    from fortran import get_g2c_libs
+	    get_g2c_libs(env, final_flags)
             context.Result('Failed !')
             return 0
         env['F77_LDFLAGS'] = final_flags
