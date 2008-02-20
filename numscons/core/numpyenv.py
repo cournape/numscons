@@ -210,6 +210,7 @@ def initialize_f77(env, path_list):
     """Initialize F77 compiler from distutils info."""
     from SCons.Tool import Tool, FindTool
 
+    has_f77 = False
     if len(env['f77_opt']) > 0:
         if len(env['f77_opt_path']) > 0:
             t = Tool(env['f77_opt'], 
@@ -217,12 +218,14 @@ def initialize_f77(env, path_list):
             t(env) 
             path_list.append(env['f77_opt_path'])
             customize_f77(t.name, env)
+	    has_f77 = True
     else:
         def_fcompiler =  FindTool(DEF_FORTRAN_COMPILERS, env)
         if def_fcompiler:
             t = Tool(def_fcompiler, toolpath = get_additional_toolpaths(env))
             t(env)
             customize_f77(t.name, env)
+	    has_f77 = True
         else:
             print "========== NO FORTRAN COMPILER FOUND ==========="
 
@@ -234,14 +237,15 @@ def initialize_f77(env, path_list):
     #   - the only guaranteed variables for fortran are the list generators, so
     #   use them through env.subst to get any compiler, and set F77* to them if
     #   they are not already defined.
-    if not env.has_key('F77'):
-        env['F77'] = env.subst('$_FORTRANG')
-        # Basic safeguard against buggy fortran tools ...
-        assert len(env['F77']) > 0
-    if not env.has_key('F77FLAGS'):
-        env['F77FLAGS'] = env.subst('$_FORTRANFLAGSG')
-    if not env.has_key('SHF77FLAGS'):
-        env['SHF77FLAGS'] = '$F77FLAGS %s' % env.subst('$_SHFORTRANFLAGSG')
+    if has_f77:
+        if not env.has_key('F77'):
+            env['F77'] = env.subst('$_FORTRANG')
+            # Basic safeguard against buggy fortran tools ...
+            assert len(env['F77']) > 0
+        if not env.has_key('F77FLAGS'):
+            env['F77FLAGS'] = env.subst('$_FORTRANFLAGSG')
+        if not env.has_key('SHF77FLAGS'):
+            env['SHF77FLAGS'] = '$F77FLAGS %s' % env.subst('$_SHFORTRANFLAGSG')
 
 def initialize_cxx(env, path_list):
     """Initialize C++ compiler from distutils info."""
