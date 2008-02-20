@@ -104,11 +104,14 @@ def get_additional_toolpaths(env):
     toolp.extend(get_local_toolpaths())
     return toolp
 
-def is_f77_gnu(fullpath):
-    """Returns true if the command given by fullpath is a Gnu fortran 
+def is_f77_gnu(env):
+    """Returns true if F77 in env is a Gnu fortran 
     compiler."""
     # XXX: do this properly
-    return pbasename(fullpath) == 'g77' or pbasename(fullpath) == 'gfortran'
+    if env.has_key('F77'):
+        return pbasename(fullpath) == 'g77' or pbasename(fullpath) == 'gfortran'
+    else:
+        return False
 
 def get_vs_version(env):
     """Returns the visual studio version."""

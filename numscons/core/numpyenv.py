@@ -93,7 +93,7 @@ def customize_cc(name, env):
 def customize_f77(name, env):
     """Customize env options related to the given tool (F77 compiler)."""
     # XXX: this should be handled somewhere else...
-    if sys.platform == "win32" and is_f77_gnu(env['F77']):
+    if sys.platform == "win32" and is_f77_gnu(env):
 	name = "%s_mingw" % name
 
     try:
@@ -122,7 +122,7 @@ def finalize_env(env):
                         'mt.exe -nologo -manifest ${TARGET}.manifest '\
                         '-outputresource:$TARGET;2']
 
-    if is_f77_gnu(env['F77']):
+    if is_f77_gnu(env):
         env.AppendUnique(F77FLAGS = ['-fno-second-underscore'])
 
 def GetNumpyEnvironment(args):
