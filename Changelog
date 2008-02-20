@@ -1,4 +1,8 @@
 Tue, 19 Feb 2008 03:32:25 +0900
+	* 0.4.1.1 release
+	* Egg fix
+
+Tue, 19 Feb 2008 03:32:25 +0900
 	* 0.4.1 release
 	* this relases main feature is support for MS compiler + g77 on
 	windows. This means compiling scipy on windows with MS compiler is not
