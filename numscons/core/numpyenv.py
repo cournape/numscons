@@ -154,15 +154,17 @@ def GetNumpyEnvironment(args):
     #--------------------------------
     # XXX: For now, only handle F77 case, but will have to think about multiple
     # fortran standard at some points ?
-    if 'FFLAGS' in os.environ:
-        env.Append(F77FLAGS = "%s" % os.environ['FFLAGS'])
-        env.AppendUnique(F77FLAGS = env['NUMPY_EXTRA_FFLAGS'] +
-                                    env['NUMPY_THREAD_FFLAGS'])
-    else: env.AppendUnique(F77FLAGS  = env['NUMPY_WARN_FFLAGS'] +
-                                     env['NUMPY_OPTIM_FFLAGS'] +
-                                     env['NUMPY_DEBUG_SYMBOL_FFLAGS'] +
-                                     env['NUMPY_EXTRA_FFLAGS'] +
-                                     env['NUMPY_THREAD_FFLAGS'])
+    if env.has_key('F77'):
+        if 'FFLAGS' in os.environ:
+            env.Append(F77FLAGS = "%s" % os.environ['FFLAGS'])
+            env.AppendUnique(F77FLAGS = env['NUMPY_EXTRA_FFLAGS'] +
+                                        env['NUMPY_THREAD_FFLAGS'])
+        else: 
+    	    env.AppendUnique(F77FLAGS  = env['NUMPY_WARN_FFLAGS'] +
+                                         env['NUMPY_OPTIM_FFLAGS'] +
+                                         env['NUMPY_DEBUG_SYMBOL_FFLAGS'] +
+                                         env['NUMPY_EXTRA_FFLAGS'] +
+                                         env['NUMPY_THREAD_FFLAGS'])
     #print env.Dump('F77')
     #print env.Dump('F77FLAGS')
     #print env.Dump('SHF77FLAGS')
