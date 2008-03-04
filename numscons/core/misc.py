@@ -109,6 +109,7 @@ def is_f77_gnu(env):
     compiler."""
     # XXX: do this properly
     if env.has_key('F77'):
+        fullpath = env['F77']
         return pbasename(fullpath) == 'g77' or pbasename(fullpath) == 'gfortran'
     else:
         return False
