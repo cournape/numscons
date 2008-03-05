@@ -7,7 +7,7 @@ import sys
 import os
 import os.path
 from os.path import join as pjoin, dirname as pdirname, basename as pbasename, \
-    exists as pexists
+    exists as pexists, abspath as pabspath
 from distutils.sysconfig import get_config_vars
 
 from numscons.core.default import tool_list
@@ -341,6 +341,8 @@ def customize_scons_dirs(env):
                              log_file = pjoin(env['build_dir'], 'config.log'))
     env.NumpyConfigure = NumpyConfigure
 
+    # Put sconsign file in build dir
+
     # XXX: ugly hack ! SConsign needs an absolute path or a path relative to
     # where the SConstruct file is. We have to find the path of the build dir
     # relative to the src_dir: we add n .., where n is the number of occurances
@@ -354,8 +356,9 @@ def customize_scons_dirs(env):
     sconsign = pjoin(get_build_relative_src(env['src_dir'], 
                                             env['build_dir']),
                      '.sconsign.dblite')
-    if not pexists(pdirname(sconsign)):
-        os.makedirs(pdirname(sconsign))
+    asconsign = pabspath(env['build_dir'])
+    if not pexists(asconsign):
+        os.makedirs(asconsign)
     env.SConsignFile(sconsign)
 
 def add_custom_builders(env):
