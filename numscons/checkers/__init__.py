@@ -18,3 +18,4 @@ __all__ += fft_checkers.__all__
 __all__ += perflib.__all__
 __all__ += perflib_info.__all__
 __all__ += fortran.__all__
+__all__ += ['NumpyCheckLibAndHeader']
