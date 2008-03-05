@@ -1,5 +1,5 @@
 #! /usr/bin/env python
-# Last Change: Sun Feb 10 01:00 AM 2008 J
+# Last Change: Wed Mar 05 02:00 PM 2008 J
 
 """Module for blas/lapack/cblas/clapack checkers. Use perflib checkers
 implementations if available."""
@@ -96,127 +96,123 @@ def _get_customization(context, section, libname, test_src, autoadd, language = 
             return 1
     return 0
 
-def CheckCBLAS(context, autoadd = 1, check_version = 0):
-    """This checker tries to find optimized library for cblas."""
-    libname = 'cblas'
-    section = 'cblas'
-    env = context.env
+class CheckerFactory:
+    def __init__(self, perflibs, section, libname, msg_template, test, language = 'C'):
+        """Create a Meta-Checker from a list of perlibs and basic informations.
 
-    def check(perflibs):
-        return _check(perflibs, context, libname, check_version, 'CBLAS (%s)',
-                      cblas_src, autoadd) 
+        perflibs: dict
+            values should be sequence of perflibs to check. keys should
+            correspond to the string returned by sys.platform, or default, or
+            fallback.
+        section: str
+            name of the section in customization file (site.cfg, etc...)
+        libname: str
+            name of the library
+        msg_template: str
+            template of the displayed message at configuration stage
+        test: callable
+            should returns a tuple (test, st) where test is a string, and st
+            the status code (1 for success, 0 for failure).
+        language: str
+            language of the test ('C', 'F77', etc...)
+        """
+        self._libname = libname
+        self._section = section
+        self._msg = msg_template
 
-    if _get_customization(context, section, libname, cblas_src, autoadd):
-        return 1
-    else:
-        if sys.platform == 'darwin' and check(('Accelerate', 'vecLib')):
+        self._test = test    
+        self._perflibs = perflibs
+        self._lang = language
+
+    def _check(self, context, perflib, check_version, test_src, autoadd):
+        return _check(perflib, context, self._libname, check_version, self._msg,
+                      test_src, autoadd, self._lang) 
+
+    def __call__(self, context, autoadd = 1, check_version = 0):
+        # Get the source code of the test
+        src, st = self._test(context)
+        if st:
+            add_lib_info(context.env, self._libname, None)
+            return 0
+
+        # Get customization from site.cfg, etc... if available
+        if _get_customization(context, self._section, self._libname, src, autoadd,
+                      self._lang):
             return 1
-        elif check(('MKL', 'ATLAS', 'Sunperf')):
-            return 1
+        else:
+            # Test if any performance library provides the whished API
+            try:
+                pf = self._perflibs[sys.platform]
+            except KeyError:
+                pf = self._perflibs['default']
 
-    add_lib_info(env, libname, None)
-    return 0
+            if self._check(context, pf, check_version, src, autoadd):
+                return 1
 
-def CheckF77BLAS(context, autoadd = 1, check_version = 0):
-    """This checker tries to find optimized library for blas (fortran F77)."""
-    libname = 'blas'
-    section = "blas"
-    env = context.env
+        # try a fallback if available
+        try:
+            pf = self._perflibs['fallback']
+            if self._check(context, pf, check_version, src, autoadd):
+                return 1
+        except KeyError:
+            pass
 
-    # Get Fortran things we need
-    if not env.has_key('F77_NAME_MANGLER') and not CheckF77Mangling(context):
-        add_lib_info(env, libname, None)
+        # Nothing worked, fail
+        add_lib_info(context.env, self._libname, None)
         return 0
 
-    func_name = env['F77_NAME_MANGLER']('sgemm')
-    test_src = c_sgemm2 % {'func' : func_name}
+# CBLAS configuration
+CBLAS_PERFLIBS = {
+        'darwin': ('Accelerate', 'vecLib'), 
+        'default': ('MKL', 'ATLAS', 'Sunperf')}
 
-    def check(perflibs):
-        return _check(perflibs, context, libname, check_version, 'BLAS (%s)',
-                      test_src, autoadd, language = 'F77') 
+# BLAS configuration
+BLAS_PERFLIBS = {
+        'darwin': ('Accelerate', 'vecLib'), 
+        'default': ('MKL', 'ATLAS', 'Sunperf'),
+        'fallback' : ('GenericBlas',)}
 
-    if _get_customization(context, section, libname, test_src, autoadd,
-		    	  language = 'F77'):
-        return 1
-    else:
-        if sys.platform == 'darwin' and check(('Accelerate', 'vecLib')):
-            return 1
-        elif check(('MKL', 'ATLAS', 'Sunperf')):
-            return 1
+# CLAPACK configuration
+CLAPACK_PERFLIBS = { 'default': ('ATLAS',)}
 
-    # Check generic blas last
-    if check(('GenericBlas',)):
-        return 1
+# LAPACK configuration
+LAPACK_PERFLIBS = {
+        'darwin': ('Accelerate', 'vecLib'), 
+        'default': ('MKL', 'ATLAS', 'Sunperf'),
+        'fallback' : ('GenericLapack',)}
 
-    add_lib_info(env, libname, None)
-    return 0
+# Functions to compute test code snippets
+def _cblas_test_src(context):
+    return cblas_src, 0
 
-def CheckF77LAPACK(context, autoadd = 1, check_version = 0):
-    """This checker tries to find optimized library for F77 lapack.
+def _blas_test_src(context):
+    if not context.env.has_key('F77_NAME_MANGLER') and \
+       not CheckF77Mangling(context):
+        return None, 1
 
-    This test is pretty strong: it first detects an optimized library, and then
-    tests that a simple (C) program can be run using this (F77) lib.
-    
-    It looks for the following libs:
-        - Mac OS X: Accelerate, and then vecLib.
-        - Others: MKL, then ATLAS."""
-    libname = 'lapack'
-    section = "lapack"
-    env = context.env
+    func_name = context.env['F77_NAME_MANGLER']('sgemm')
+    src = c_sgemm2 % {'func': func_name}
+    return src, 0
 
-    if not env.has_key('F77_NAME_MANGLER') and not CheckF77Mangling(context):
-        add_lib_info(env, 'lapack', None)
-        return 0
+def _clapack_test_src(context):
+    return clapack_src, 0
+
+def _lapack_test_src(context):
+    if not context.env.has_key('F77_NAME_MANGLER') and \
+       not CheckF77Mangling(context):
+        return None, 1
     
     # Get the mangled name of our test function
-    sgesv_string = env['F77_NAME_MANGLER']('sgesv')
+    sgesv_string = context.env['F77_NAME_MANGLER']('sgesv')
     test_src = lapack_sgesv % sgesv_string
+    return test_src, 0
 
-    def check(perflibs):
-        return _check(perflibs, context, libname, check_version, 'LAPACK (%s)',
-                      test_src, autoadd, language = 'F77') 
-
-    # XXX: handle F77_LDFLAGS
-    if _get_customization(context, section, libname, test_src, autoadd,
-		    	  language = 'F77'):
-        return 1
-    else:
-        if sys.platform == 'darwin' and check(('Accelerate', 'vecLib')):
-            return 1
-        elif check(('MKL', 'ATLAS', 'Sunperf')):
-            return 1
-
-    # Check generic blas last
-    if check(('GenericLapack',)):
-        return 1
-
-    add_lib_info(env, libname, None)
-    return 0
-
-def CheckCLAPACK(context, autoadd = 1, check_version = 0):
-    """This checker tries to find optimized library for lapack.
-
-    This test is pretty strong: it first detects an optimized library, and then
-    tests that a simple cblas program can be run using this lib.
-    
-    It looks for the following libs:
-        - Mac OS X: Accelerate, and then vecLib.
-        - Others: MKL, then ATLAS."""
-    libname = 'clapack'
-    section = "clapack"
-    env = context.env
-
-    def check(perflibs):
-        return _check(perflibs, context, libname, check_version, 'CLAPACK (%s)',
-                      clapack_src, autoadd) 
-
-    if _get_customization(context, section, libname, clapack_src, autoadd):
-        return 1
-    else:
-        if sys.platform == 'darwin':
-            pass
-        elif check(('ATLAS',)):
-            return 1
-
-    add_lib_info(env, libname, None)
-    return 0
+# Checkers
+CheckCBLAS = CheckerFactory(CBLAS_PERFLIBS, 'cblas', 'cblas', 'CBLAS (%s)',
+                            _cblas_test_src)
+CheckF77BLAS = CheckerFactory(BLAS_PERFLIBS, 'blas', 'blas', 'BLAS (%s)',
+                              _blas_test_src, language = 'F77')
+CheckCLAPACK = CheckerFactory(CLAPACK_PERFLIBS, 'clapack', 'clapack', 'CLAPACK (%s)',
+                              _lapack_test_src, language = 'F77')
+CheckF77LAPACK = CheckerFactory(LAPACK_PERFLIBS, 'lapack', 'lapack', 'LAPACK (%s)',
+                              _lapack_test_src, language = 'F77')
