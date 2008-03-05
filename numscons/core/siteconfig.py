@@ -1,5 +1,5 @@
 #! /usr/bin/env python
-# Last Change: Sat Jan 26 06:00 PM 2008 J
+# Last Change: Wed Mar 05 06:00 PM 2008 J
 
 """This module has helper functions to get basic information from site.cfg-like
 files."""
@@ -13,7 +13,7 @@ from numscons.core.utils import DefaultDict
 # List of options that ConfigOpts can keep. If later additional variables
 # should be added (e.g. cpp flags, etc...), they should be added here.
 _SITE_CONFIG_PATH_FLAGS = ('library_dirs', 'include_dirs')
-_SITE_CONFIG_NONPATH_FLAGS = ('libraries', 'lapack_libs')
+_SITE_CONFIG_NONPATH_FLAGS = ('libraries',)
 
 _SITE_OPTS_FLAGS = _SITE_CONFIG_PATH_FLAGS + _SITE_CONFIG_NONPATH_FLAGS
 
