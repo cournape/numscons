@@ -36,6 +36,14 @@ __all__ = ['GetNumpyEnvironment']
 DEF_LINKERS, DEF_C_COMPILERS, DEF_CXX_COMPILERS, DEF_ASSEMBLERS, \
 DEF_FORTRAN_COMPILERS, DEF_ARS, DEF_OTHER_TOOLS = tool_list(pyplat2sconsplat())
 
+def _glob(env, path):
+    """glob function to handle src_dir issues."""
+    #import glob
+    #files = glob.glob(pjoin(env['src_dir'], path))
+    files = env.Glob(pjoin(env['src_dir'], path), strings = True)
+    rdir = pdirname(path)
+    return [pjoin(rdir, pbasename(f)) for f in files]
+
 def GetNumpyOptions(args):
     """Call this with args=ARGUMENTS to take into account command line args."""
     from SCons.Options import Options
@@ -360,6 +368,10 @@ def customize_scons_dirs(env):
     if not pexists(asconsign):
         os.makedirs(asconsign)
     env.SConsignFile(sconsign)
+
+    # Change Glob to take into account our particular need wrt build
+    # directories, etc...
+    env.NumpyGlob = partial(_glob, env)
 
 def add_custom_builders(env):
     """Call this to add all our custom builders to the environment."""

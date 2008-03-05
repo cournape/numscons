@@ -1,5 +1,5 @@
 #! /usr/bin/env python
-# Last Change: Sun Feb 10 01:00 AM 2008 J
+# Last Change: Wed Mar 05 06:00 PM 2008 J
 
 """This module defines some helper functions, to be used by high level
 checkers."""
