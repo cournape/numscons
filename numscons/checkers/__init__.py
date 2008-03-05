@@ -1,9 +1,9 @@
 from blas_lapack_checkers import CheckCLAPACK, CheckCBLAS, CheckF77BLAS, CheckF77LAPACK
 from fft_checkers import CheckFFT
 
-from perflib import IsMKL, IsATLAS, IsVeclib, IsAccelerate, IsSunperf, IsFFTW3, IsFFTW2
 from simple_check import NumpyCheckLibAndHeader
 
+from perflib import *
 from fortran import *
 
 from perflib_info import write_info
