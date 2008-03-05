@@ -17,3 +17,4 @@ __all__ = blas_lapack_checkers.__all__
 __all__ += fft_checkers.__all__
 __all__ += perflib.__all__
 __all__ += perflib_info.__all__
+__all__ += fortran.__all__
