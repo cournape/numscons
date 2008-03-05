@@ -47,6 +47,7 @@ def _check_symbol(context, opts, headers_to_check, funcs_to_check, autoadd):
 
     Returns 1 if successfull, 0 otherwise."""
     saved = save_and_set(context.env, opts)
+    st = 1
     try:
         for sym in funcs_to_check:
             extra = [r'#if 0', str(opts), r'#endif', '\n']

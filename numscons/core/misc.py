@@ -39,7 +39,10 @@ def built_with_mstools(env):
 
 def built_with_mingw(env):
     """Return true if built with mingw compiler."""
-    return env['cc_opt'] == 'mingw'
+    return env['cc_opt'] == 'mingw' or \
+	   (sys.platform == 'win32' 
+	    and (env['f77_opt'] == 'g77' or
+		 env['f77_opt'] == 'gfortran'))  
 
 def built_with_gnu_f77(env):
     """Return true if f77 compiler is gnu (g77, gfortran, etc...)."""
@@ -101,11 +104,15 @@ def get_additional_toolpaths(env):
     toolp.extend(get_local_toolpaths())
     return toolp
 
-def is_f77_gnu(fullpath):
-    """Returns true if the command given by fullpath is a Gnu fortran 
+def is_f77_gnu(env):
+    """Returns true if F77 in env is a Gnu fortran 
     compiler."""
     # XXX: do this properly
-    return pbasename(fullpath) == 'g77' or pbasename(fullpath) == 'gfortran'
+    if env.has_key('F77'):
+        fullpath = env['F77']
+        return pbasename(fullpath) == 'g77' or pbasename(fullpath) == 'gfortran'
+    else:
+        return False
 
 def get_vs_version(env):
     """Returns the visual studio version."""

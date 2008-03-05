@@ -3,9 +3,11 @@
 """This initialize a scons environment using info from distutils, and all our
 customization (python extension builders, build_dir, etc...)."""
 
+import sys
 import os
 import os.path
-from os.path import join as pjoin, dirname as pdirname, basename as pbasename
+from os.path import join as pjoin, dirname as pdirname, basename as pbasename, \
+    exists as pexists
 from distutils.sysconfig import get_config_vars
 
 from numscons.core.default import tool_list
@@ -27,7 +29,7 @@ from numscons.core.custom_builders import NumpyFromCTemplate, NumpyFromFTemplate
 from numscons.tools.substinfile import TOOL_SUBST
 
 from misc import get_scons_build_dir, get_scons_configres_dir,\
-                 get_scons_configres_filename
+                 get_scons_configres_filename, built_with_mingw
 
 __all__ = ['GetNumpyEnvironment']
 
@@ -84,17 +86,21 @@ def customize_cc(name, env):
     try:
         cfg = get_cc_config(name)
     except NoCompilerConfig, e:
-	print "compiler %s has no customization available" % name
-	cfg = CompilerConfig(Config())
+        print "compiler %s has no customization available" % name
+        cfg = CompilerConfig(Config())
     env.AppendUnique(**cfg.get_flags_dict())
 
 def customize_f77(name, env):
     """Customize env options related to the given tool (F77 compiler)."""
+    # XXX: this should be handled somewhere else...
+    if sys.platform == "win32" and is_f77_gnu(env):
+	name = "%s_mingw" % name
+
     try:
         cfg = get_f77_config(name)
     except NoCompilerConfig, e:
-	cfg = F77CompilerConfig(Config())
-	print "compiler %s has no customization available" % name
+        print "compiler %s has no customization available" % name
+        cfg = F77CompilerConfig(Config())
     env.AppendUnique(**cfg.get_flags_dict())
 
 def finalize_env(env):
@@ -104,6 +110,7 @@ def finalize_env(env):
     if built_with_mstools(env):
         major = get_vs_version(env)[0]
         # For VS 8 and above (VS 2005), use manifest for DLL
+        # XXX: this has nothing to do here, too
         if major >= 8:
             env['LINKCOM'] = [env['LINKCOM'], 
                       'mt.exe -nologo -manifest ${TARGET}.manifest '\
@@ -115,7 +122,7 @@ def finalize_env(env):
                         'mt.exe -nologo -manifest ${TARGET}.manifest '\
                         '-outputresource:$TARGET;2']
 
-    if is_f77_gnu(env['F77']):
+    if is_f77_gnu(env):
         env.AppendUnique(F77FLAGS = ['-fno-second-underscore'])
 
 def GetNumpyEnvironment(args):
@@ -147,15 +154,17 @@ def GetNumpyEnvironment(args):
     #--------------------------------
     # XXX: For now, only handle F77 case, but will have to think about multiple
     # fortran standard at some points ?
-    if 'FFLAGS' in os.environ:
-        env.Append(F77FLAGS = "%s" % os.environ['FFLAGS'])
-        env.AppendUnique(F77FLAGS = env['NUMPY_EXTRA_FFLAGS'] +
-                                    env['NUMPY_THREAD_FFLAGS'])
-    else: env.AppendUnique(F77FLAGS  = env['NUMPY_WARN_FFLAGS'] +
-                                     env['NUMPY_OPTIM_FFLAGS'] +
-                                     env['NUMPY_DEBUG_SYMBOL_FFLAGS'] +
-                                     env['NUMPY_EXTRA_FFLAGS'] +
-                                     env['NUMPY_THREAD_FFLAGS'])
+    if env.has_key('F77'):
+        if 'FFLAGS' in os.environ:
+            env.Append(F77FLAGS = "%s" % os.environ['FFLAGS'])
+            env.AppendUnique(F77FLAGS = env['NUMPY_EXTRA_FFLAGS'] +
+                                        env['NUMPY_THREAD_FFLAGS'])
+        else: 
+    	    env.AppendUnique(F77FLAGS  = env['NUMPY_WARN_FFLAGS'] +
+                                         env['NUMPY_OPTIM_FFLAGS'] +
+                                         env['NUMPY_DEBUG_SYMBOL_FFLAGS'] +
+                                         env['NUMPY_EXTRA_FFLAGS'] +
+                                         env['NUMPY_THREAD_FFLAGS'])
     #print env.Dump('F77')
     #print env.Dump('F77FLAGS')
     #print env.Dump('SHF77FLAGS')
@@ -203,6 +212,7 @@ def initialize_f77(env, path_list):
     """Initialize F77 compiler from distutils info."""
     from SCons.Tool import Tool, FindTool
 
+    has_f77 = False
     if len(env['f77_opt']) > 0:
         if len(env['f77_opt_path']) > 0:
             t = Tool(env['f77_opt'], 
@@ -210,12 +220,14 @@ def initialize_f77(env, path_list):
             t(env) 
             path_list.append(env['f77_opt_path'])
             customize_f77(t.name, env)
+	    has_f77 = True
     else:
         def_fcompiler =  FindTool(DEF_FORTRAN_COMPILERS, env)
         if def_fcompiler:
             t = Tool(def_fcompiler, toolpath = get_additional_toolpaths(env))
             t(env)
             customize_f77(t.name, env)
+	    has_f77 = True
         else:
             print "========== NO FORTRAN COMPILER FOUND ==========="
 
@@ -227,14 +239,15 @@ def initialize_f77(env, path_list):
     #   - the only guaranteed variables for fortran are the list generators, so
     #   use them through env.subst to get any compiler, and set F77* to them if
     #   they are not already defined.
-    if not env.has_key('F77'):
-        env['F77'] = env.subst('$_FORTRANG')
-        # Basic safeguard against buggy fortran tools ...
-        assert len(env['F77']) > 0
-    if not env.has_key('F77FLAGS'):
-        env['F77FLAGS'] = env.subst('$_FORTRANFLAGSG')
-    if not env.has_key('SHF77FLAGS'):
-        env['SHF77FLAGS'] = '$F77FLAGS %s' % env.subst('$_SHFORTRANFLAGSG')
+    if has_f77:
+        if not env.has_key('F77'):
+            env['F77'] = env.subst('$_FORTRANG')
+            # Basic safeguard against buggy fortran tools ...
+            assert len(env['F77']) > 0
+        if not env.has_key('F77FLAGS'):
+            env['F77FLAGS'] = env.subst('$_FORTRANFLAGSG')
+        if not env.has_key('SHF77FLAGS'):
+            env['SHF77FLAGS'] = '$F77FLAGS %s' % env.subst('$_SHFORTRANFLAGSG')
 
 def initialize_cxx(env, path_list):
     """Initialize C++ compiler from distutils info."""
@@ -313,6 +326,9 @@ def _get_numpy_env(args):
     # useful)
     Help(opts.GenerateHelpText(env))
 
+    import sys
+    if sys.platform == "win32":
+	    env["ENV"]["PATH"] = os.environ["PATH"]
     return env
 
 def set_site_config(env):
@@ -332,10 +348,10 @@ def customize_scons_dirs(env):
                              log_file = pjoin(env['build_dir'], 'config.log'))
     env.NumpyConfigure = NumpyConfigure
 
-    # XXX: Huge, ugly hack ! SConsign needs an absolute path or a path relative
-    # to where the SConstruct file is. We have to find the path of the build
-    # dir relative to the src_dir: we add n .., where n is the number of
-    # occurances of the path separator in the src dir.
+    # XXX: ugly hack ! SConsign needs an absolute path or a path relative to
+    # where the SConstruct file is. We have to find the path of the build dir
+    # relative to the src_dir: we add n .., where n is the number of occurances
+    # of the path separator in the src dir.
     def get_build_relative_src(srcdir, builddir):
         n = srcdir.count(os.sep)
         if len(srcdir) > 0 and not srcdir == '.':
@@ -345,6 +361,8 @@ def customize_scons_dirs(env):
     sconsign = pjoin(get_build_relative_src(env['src_dir'], 
                                             env['build_dir']),
                      '.sconsign.dblite')
+    if not pexists(pdirname(sconsign)):
+        os.makedirs(pdirname(sconsign))
     env.SConsignFile(sconsign)
 
 def add_custom_builders(env):
@@ -415,6 +433,12 @@ def customize_tools(env):
     for t in FindAllTools(DEF_OTHER_TOOLS, env):
         Tool(t)(env)
 
+    if built_with_mingw(env):
+        t = Tool("dllwrap", toolpath = get_additional_toolpaths(env))
+        t(env)
+        t = Tool("dlltool", toolpath = get_additional_toolpaths(env))
+        t(env)
+
     # Add our own, custom tools (f2py, from_template, etc...)
     t = Tool('f2py', toolpath = get_additional_toolpaths(env))
 
@@ -450,7 +474,11 @@ def customize_link_flags(env):
     env['LDMODULEFLAGSEND'] = []
 
     # For mingw tools, we do it in our custom mingw scons tool
-    if not env['cc_opt'] == 'mingw':
+    # XXX: this should be done at the tool level, that's the only way to avoid
+    # screwing things up....
+    if built_with_mstools(env) or built_with_mingw(env):
+        pass
+    else:
         env['LINKCOM'] = '%s $LINKFLAGSEND' % env['LINKCOM']
         env['SHLINKCOM'] = '%s $SHLINKFLAGSEND' % env['SHLINKCOM']
         env['LDMODULECOM'] = '%s $LDMODULEFLAGSEND' % env['LDMODULECOM']

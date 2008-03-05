@@ -1,11 +1,12 @@
 #! /usr/bin/env python
-# Last Change: Sat Jan 26 06:00 PM 2008 J
+# Last Change: Sun Feb 10 01:00 AM 2008 J
 
 """Module for blas/lapack/cblas/clapack checkers. Use perflib checkers
 implementations if available."""
 import sys
-from copy import copy
+from copy import copy, deepcopy
 
+from numscons.core.extension_scons import built_with_mstools
 from numscons.core.siteconfig import get_config_from_section, get_config
 from numscons.testcode_snippets import \
         cblas_sgemm as cblas_src, \
@@ -30,9 +31,12 @@ def _get_language_opts(context, language):
     elif language == 'F77':
         # We need C/F77 runtime info, otherwise, cannot proceed further
         if not context.env.has_key('F77_LDFLAGS') and not CheckF77Clib(context):
-            add_lib_info(context.env, libname, None)
+            #add_lib_info(context.env, libname, None)
             return 0
-        moreopts = {'linkflagsend' : copy(context.env['F77_LDFLAGS'])}
+        if built_with_mstools(context.env):
+            moreopts = deepcopy(context.env["F77_LDFLAGS"])
+        else:
+            moreopts = {'linkflagsend' : copy(context.env['F77_LDFLAGS'])}
     else:
         raise ValueError("language %s unknown" % language)
 
@@ -71,7 +75,7 @@ def _check(perflibs, context, libname, check_version, msg_template, test_src,
         if _check_perflib(p):
             return 1
 
-def _get_customization(context, section, libname, autoadd, language = 'C'):
+def _get_customization(context, section, libname, test_src, autoadd, language = 'C'):
     """Check whether customization is available through config files."""
     siteconfig = get_config()[0]
     cfgopts, found = get_config_from_section(siteconfig, section)
@@ -87,7 +91,7 @@ def _get_customization(context, section, libname, autoadd, language = 'C'):
             # Nothing to do, testopts and cfgopts are the same
             testopts = cfgopts
         if check_include_and_run(context, '% (from site.cfg) ' % libname, testopts,
-                                 [], cblas_src, autoadd):
+                                 [], test_src, autoadd):
             add_lib_info(context.env, libname, MetalibInfo(None, cfgopts, found))
             return 1
     return 0
@@ -102,7 +106,7 @@ def CheckCBLAS(context, autoadd = 1, check_version = 0):
         return _check(perflibs, context, libname, check_version, 'CBLAS (%s)',
                       cblas_src, autoadd) 
 
-    if _get_customization(context, section, libname, autoadd):
+    if _get_customization(context, section, libname, cblas_src, autoadd):
         return 1
     else:
         if sys.platform == 'darwin' and check(('Accelerate', 'vecLib')):
@@ -131,7 +135,8 @@ def CheckF77BLAS(context, autoadd = 1, check_version = 0):
         return _check(perflibs, context, libname, check_version, 'BLAS (%s)',
                       test_src, autoadd, language = 'F77') 
 
-    if _get_customization(context, section, libname, autoadd, language = 'F77'):
+    if _get_customization(context, section, libname, test_src, autoadd,
+		    	  language = 'F77'):
         return 1
     else:
         if sys.platform == 'darwin' and check(('Accelerate', 'vecLib')):
@@ -172,7 +177,8 @@ def CheckF77LAPACK(context, autoadd = 1, check_version = 0):
                       test_src, autoadd, language = 'F77') 
 
     # XXX: handle F77_LDFLAGS
-    if _get_customization(context, section, libname, autoadd, language = 'F77'):
+    if _get_customization(context, section, libname, test_src, autoadd,
+		    	  language = 'F77'):
         return 1
     else:
         if sys.platform == 'darwin' and check(('Accelerate', 'vecLib')):
@@ -204,7 +210,7 @@ def CheckCLAPACK(context, autoadd = 1, check_version = 0):
         return _check(perflibs, context, libname, check_version, 'CLAPACK (%s)',
                       clapack_src, autoadd) 
 
-    if _get_customization(context, section, libname, autoadd):
+    if _get_customization(context, section, libname, clapack_src, autoadd):
         return 1
     else:
         if sys.platform == 'darwin':

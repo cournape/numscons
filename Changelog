@@ -1,3 +1,25 @@
+Tue, 04 Mar 2008 21:09:03 +0900
+	* 0.4.2.1 release
+	* fix missing variable in is_f77_gnu
+
+Sat, 01 Mar 2008 02:30:56 +0900
+	* 0.4.2 release
+	* source distribution fix: include .cfg files in MANIFEST.in
+
+Tue, 19 Feb 2008 03:32:25 +0900
+	* 0.4.1.1 release
+	* Egg fix
+
+Tue, 19 Feb 2008 03:32:25 +0900
+	* 0.4.1 release
+	* this relases main feature is support for MS compiler + g77 on
+	windows. This means compiling scipy on windows with MS compiler is not
+	that far anymore.
+
+Thu, 14 Feb 2008 01:03:27 +0900
+	* 0.4.0 release
+	* this relases main feature is support for MS compiler on windows.
+
 Mon, 28 Jan 2008 13:00:08 +0900
 	* 0.3.4 release
 	* this relases main feature is rewritten f77 link parser.
