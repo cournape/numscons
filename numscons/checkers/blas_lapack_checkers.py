@@ -1,5 +1,5 @@
 #! /usr/bin/env python
-# Last Change: Wed Mar 05 02:00 PM 2008 J
+# Last Change: Wed Mar 05 10:00 PM 2008 J
 
 """Module for blas/lapack/cblas/clapack checkers. Use perflib checkers
 implementations if available."""
@@ -213,6 +213,6 @@ CheckCBLAS = CheckerFactory(CBLAS_PERFLIBS, 'cblas', 'cblas', 'CBLAS (%s)',
 CheckF77BLAS = CheckerFactory(BLAS_PERFLIBS, 'blas', 'blas', 'BLAS (%s)',
                               _blas_test_src, language = 'F77')
 CheckCLAPACK = CheckerFactory(CLAPACK_PERFLIBS, 'clapack', 'clapack', 'CLAPACK (%s)',
-                              _lapack_test_src, language = 'F77')
+                              _clapack_test_src, language = 'F77')
 CheckF77LAPACK = CheckerFactory(LAPACK_PERFLIBS, 'lapack', 'lapack', 'LAPACK (%s)',
                               _lapack_test_src, language = 'F77')
