@@ -27,7 +27,7 @@ def save_and_set(env, opts, keys = None):
                         []
     kw = zip([_arg2env[k] for k in keys], [opts[k] for k in keys])
     kw = dict(kw)
-    env.AppendUnique(**kw)
+    env.Append(**kw)
     return saved_keys
 
 def restore(env, saved):
