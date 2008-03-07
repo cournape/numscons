@@ -1,8 +1,9 @@
 #! /usr/bin/env python
-# Last Change: Fri Mar 07 01:00 PM 2008 J
+# Last Change: Fri Mar 07 04:00 PM 2008 J
 
 """Module for blas/lapack/cblas/clapack checkers. Use perflib checkers
 implementations if available."""
+import os
 import sys
 from copy import copy, deepcopy
 
@@ -48,6 +49,7 @@ def _check(perflibs, context, libname, check_version, msg_template, test_src,
 
     perflibs should be a list of perflib to check (the names which can be used
     are the keys of CONFIG."""
+    
     moreopts = _get_language_opts(context, language)
     def _check_perflib(pname):
         """pname is the name of the perflib."""
@@ -97,7 +99,7 @@ def _get_customization(context, section, libname, test_src, autoadd, language = 
     return 0
 
 class CheckerFactory:
-    def __init__(self, perflibs, section, libname, msg_template, test, language = 'C'):
+    def __init__(self, perflibs, section, libname, dispname, test, language = 'C'):
         """Create a Meta-Checker from a list of perlibs and basic informations.
 
         perflibs: dict
@@ -118,17 +120,25 @@ class CheckerFactory:
         """
         self._libname = libname
         self._section = section
-        self._msg = msg_template
+        self._disp = dispname
 
         self._test = test    
         self._perflibs = perflibs
         self._lang = language
 
     def _check(self, context, perflib, check_version, test_src, autoadd):
-        return _check(perflib, context, self._libname, check_version, self._msg,
+        return _check(perflib, context, self._libname, check_version, 
+                      self._disp + ' (%s)',
                       test_src, autoadd, self._lang) 
 
     def __call__(self, context, autoadd = 1, check_version = 0):
+
+        # Is customized from user environment ?
+        if os.environ.has_key(self._disp) and os.environ[self._disp] == 'None':
+            context.Message("Checking %s ... " % self._disp)
+            context.Result('Disabled from env through var %s !' % self._disp)
+            return 0
+
         # Get the source code of the test
         src, st = self._test(context)
         if st:
@@ -208,12 +218,12 @@ def _lapack_test_src(context):
     return test_src, 0
 
 # Checkers
-CheckCBLAS = CheckerFactory(CBLAS_PERFLIBS, 'cblas', 'cblas', 'CBLAS (%s)',
+CheckCBLAS = CheckerFactory(CBLAS_PERFLIBS, 'cblas', 'cblas', 'CBLAS',
                             _cblas_test_src)
-CheckCLAPACK = CheckerFactory(CLAPACK_PERFLIBS, 'clapack', 'clapack', 'CLAPACK (%s)',
+CheckCLAPACK = CheckerFactory(CLAPACK_PERFLIBS, 'clapack', 'clapack', 'CLAPACK',
                               _clapack_test_src, language = 'F77')
 
-CheckF77BLAS = CheckerFactory(BLAS_PERFLIBS, 'blas', 'blas', 'BLAS (%s)',
+CheckF77BLAS = CheckerFactory(BLAS_PERFLIBS, 'blas', 'blas', 'BLAS',
                               _blas_test_src, language = 'F77')
-CheckF77LAPACK = CheckerFactory(LAPACK_PERFLIBS, 'lapack', 'lapack', 'LAPACK (%s)',
+CheckF77LAPACK = CheckerFactory(LAPACK_PERFLIBS, 'lapack', 'lapack', 'LAPACK',
                               _lapack_test_src, language = 'F77')
