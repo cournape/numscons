@@ -1,5 +1,5 @@
 #! /usr/bin/env python
-# Last Change: Fri Mar 07 07:00 PM 2008 J
+# Last Change: Fri Mar 07 09:00 PM 2008 J
 """This module contains the infrastructure to get all the necessary options for
 perflib checkers from the perflib configuration file."""
 
@@ -62,9 +62,11 @@ def build_config():
 
     cfg = SafeConfigParser()
 
-    st = cfg.read(pjoin(pdirname(__file__), 'perflib.cfg'))
-    # XXX: check this properly
-    assert len(st) > 0
+    pfcname = pjoin(pdirname(__file__), 'perflib.cfg')
+    st = cfg.read(pfcname)
+    if len(st) == 0:
+        raise IOError("the file %s was not found. "\
+                      "This is an installation problem." % pfcname)
 
     def get_perflib_config(name):
         yop = DefaultDict.fromcallable(list_opts, lambda: [])
