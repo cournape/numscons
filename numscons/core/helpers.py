@@ -343,11 +343,8 @@ def set_site_config(env):
                                          get_scons_configres_filename())
 
 def customize_scons_dirs(env):
-    # Put config code and log in separate dir for each subpackage
-    NumpyConfigure = partial(env.Configure, 
-                             conf_dir = pjoin(env['build_dir'], '.sconf'), 
-                             log_file = pjoin(env['build_dir'], 'config.log'))
-    env.NumpyConfigure = NumpyConfigure
+    # Keep NumpyConfigure for backward compatibility...
+    env.NumpyConfigure = env.Configure
 
     # Put sconsign file in build dir
 
