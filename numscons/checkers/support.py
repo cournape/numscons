@@ -1,5 +1,5 @@
 #! /usr/bin/env python
-# Last Change: Wed Mar 05 06:00 PM 2008 J
+# Last Change: Fri Mar 07 04:00 PM 2008 J
 
 """This module defines some helper functions, to be used by high level
 checkers."""
@@ -17,7 +17,8 @@ _arg2env = {'include_dirs' : 'CPPPATH',
             'frameworks' : 'FRAMEWORKS'}
 
 def save_and_set(env, opts, keys = None):
-    """Put informations from option configuration into a scons environment, and returns the savedkeys given as config opts args."""
+    """Put informations from option configuration into a scons environment, and
+    returns the savedkeys given as config opts args."""
     saved_keys = {}
     if keys is None:
         keys = opts.keys()

@@ -1,5 +1,5 @@
 #! /usr/bin/env python
-# Last Change: Fri Mar 07 04:00 PM 2008 J
+# Last Change: Fri Mar 07 07:00 PM 2008 J
 
 """Module for blas/lapack/cblas/clapack checkers. Use perflib checkers
 implementations if available."""
@@ -126,8 +126,8 @@ class CheckerFactory:
         self._perflibs = perflibs
         self._lang = language
 
-    def _check(self, context, perflib, check_version, test_src, autoadd):
-        return _check(perflib, context, self._libname, check_version, 
+    def _check(self, context, perflibs, check_version, test_src, autoadd):
+        return _check(perflibs, context, self._libname, check_version, 
                       self._disp + ' (%s)',
                       test_src, autoadd, self._lang) 
 
