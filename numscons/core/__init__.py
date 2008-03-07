@@ -1,3 +1,3 @@
-from numpyenv import GetNumpyEnvironment
+from helpers import GetNumpyEnvironment
 
 __all__ = ['GetNumpyEnvironment']
