@@ -1,3 +1,7 @@
+Sat, 08 Mar 2008 20:08:20 +0900
+	* Do not use -fast with sun compilers, because it cause random
+	crashes, and can break IEEE conformance anyway.
+
 Fri, 07 Mar 2008 22:26:31 +0900
 	* GetNumpyEnvironment now returns NumpyEnvironment, a subclass of
 	scons Environment. The long-term goal is to implement most code which
