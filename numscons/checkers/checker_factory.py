@@ -14,6 +14,7 @@ from numscons.core.siteconfig import get_config_from_section, get_config
 from numscons.checkers.perflib_info import add_lib_info, MetalibInfo
 from numscons.checkers.perflib import CONFIG, get_perflib_info
 from numscons.checkers.support import check_include_and_run
+from numscons.checkers.configuration import BuildConfig
 
 from fortran import CheckF77Mangling, CheckF77Clib
 
@@ -78,17 +79,24 @@ def _get_customization(context, section, libname, test_src, autoadd, language = 
     siteconfig = get_config()[0]
     cfgopts, found = get_config_from_section(siteconfig, section)
     if found:
+        ncfgopts = BuildConfig()
+        for k, v in cfgopts.items():
+            ncfgopts[k] = v
+        # XXX: grrr....
+        if ncfgopts.has_key('library_dirs'):
+            ncfgopts['rpath'] = copy(ncfgopts['library_dirs'])
+        moreopts = _get_language_opts(context, language)
         if moreopts:
             # More options are necessary to check the code snippet (fortran
             # runtime, etc...), so we create a new BuildConfig which contain
             # those info.
-            testopts = copy(cfgopts)
+            testopts = copy(ncfgopts)
             for k, v in moreopts.items():
                 testopts[k].extend(v)
         else:
             # Nothing to do, testopts and cfgopts are the same
-            testopts = cfgopts
-        if check_include_and_run(context, '% (from site.cfg) ' % libname, testopts,
+            testopts = ncfgopts
+        if check_include_and_run(context, '%s (from site.cfg) ' % libname, testopts,
                                  [], test_src, autoadd):
             add_lib_info(context.env, libname, MetalibInfo(None, cfgopts, found))
             return 1
