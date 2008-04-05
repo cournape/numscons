@@ -31,7 +31,7 @@ from numscons.tools.substinfile import TOOL_SUBST
 from misc import get_scons_build_dir, get_scons_configres_dir,\
                  get_scons_configres_filename, built_with_mingw
 
-__all__ = ['GetNumpyEnvironment']
+__all__ = ['GetNumpyEnvironment', 'distutils_dirs_emitter']
 
 DEF_LINKERS, DEF_C_COMPILERS, DEF_CXX_COMPILERS, DEF_ASSEMBLERS, \
 DEF_FORTRAN_COMPILERS, DEF_ARS, DEF_OTHER_TOOLS = tool_list(pyplat2sconsplat())
@@ -487,3 +487,10 @@ def customize_link_flags(env):
         env['LINKCOM'] = '%s $LINKFLAGSEND' % env['LINKCOM']
         env['SHLINKCOM'] = '%s $SHLINKFLAGSEND' % env['SHLINKCOM']
         env['LDMODULECOM'] = '%s $LDMODULEFLAGSEND' % env['LDMODULECOM']
+
+def distutils_dirs_emitter(target, source, env):
+    source = [pjoin(env['build_dir'], str(i)) for i in source]
+    target = [pjoin(env['build_dir'], str(i)) for i in target]
+
+    return target, source
+
