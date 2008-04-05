@@ -1,0 +1,21 @@
+# vim:syntax=python
+from numscons import GetNumpyEnvironment
+
+env = GetNumpyEnvironment(ARGUMENTS)
+
+bld = Builder(action = "$DWPCOM", suffix = ".dll")
+env['BUILDERS']["Static2Dll"] = bld
+
+bld = Builder(action = "$DLLTOOLCOM", emitter = env['DLLTOOLEMITTER'])
+env['BUILDERS']["Dll2Import"] = bld
+
+env.Static2Dll('blas', source = "libblas.a", 
+               DWPFLAGS = "--export-all-symbols", DWPLIBS = "g2c")
+env.Static2Dll('lapack', source = "liblapack.a", 
+	       DWPFLAGS = "--export-all-symbols", DWPDLL = 'blas', 
+	       DWPLIBS = "g2c")
+
+env.Dll2Import('blas', source = 'libblas.a', 
+            DLLTOOLFLAGS = '--export-all-symbols')
+env.Dll2Import('lapack', source = 'liblapack.a', 
+            DLLTOOLFLAGS = '--export-all-symbols')

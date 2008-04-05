@@ -1,5 +1,5 @@
 #! /usr/bin/env python
-# Last Change: Wed Jan 16 09:00 PM 2008 J
+# Last Change: Fri Mar 07 09:00 PM 2008 J
 """This module contains the infrastructure to get all the necessary options for
 perflib checkers from the perflib configuration file."""
 
@@ -52,18 +52,21 @@ class _PerflibConfig:
 # Perflib specific configuration and helpers
 #-------------------------------------------
 def build_config():
+    from numscons.numdist.numdist_copy import default_lib_dirs
     # list_opts contain a list of all available options available in
     # perflib.cfg which can be a list.
     list_opts = build_config_factory_flags()
 
-    #defint = {'atlas_def_libs' : 
+    #defint = {'atlas_libpath' : 
     #          ','.join([pjoin(i, 'atlas') for i in default_lib_dirs])}
 
     cfg = SafeConfigParser()
 
-    st = cfg.read(pjoin(pdirname(__file__), 'perflib.cfg'))
-    # XXX: check this properly
-    assert len(st) > 0
+    pfcname = pjoin(pdirname(__file__), 'perflib.cfg')
+    st = cfg.read(pfcname)
+    if len(st) == 0:
+        raise IOError("the file %s was not found. "\
+                      "This is an installation problem." % pfcname)
 
     def get_perflib_config(name):
         yop = DefaultDict.fromcallable(list_opts, lambda: [])
@@ -79,8 +82,11 @@ def build_config():
 
         # Now get all optional options 
         for i in opts:
-            #yop[i] =  cfg.get(name, i, vars = defint)
-            yop[i] =  cfg.get(name, i).split(',')
+            # XXX: this condition is an hack. This is necessary to avoid
+            # writing default values, but there may be a better solution.
+            if i in list_opts:
+                #yop[i] =  cfg.get(name, i, vars = defint)
+                yop[i] =  cfg.get(name, i).split(',')
 
         return _PerflibConfig(dispname, sitename, yop)
 
@@ -112,3 +118,9 @@ class GetVersionFactory:
         def func(env):
             return env['NUMPY_PKG_CONFIG']['PERFLIB'][name].version
         self.func = func
+
+if __name__ == '__main__':
+    for k, v in  CONFIG.items():
+        print "++++++++++++++++++++++"
+        print k, v
+        print '\t',v.opts_factory.clapack_config()

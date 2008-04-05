@@ -9,7 +9,7 @@ from copy import deepcopy
 from numscons.core.utils import popen_wrapper
 from numscons.core.extension_scons import built_with_mstools, \
     built_with_mingw, built_with_gnu_f77
-from fortran import parse_f77link, check_link_verbose, gnu_to_ms_link
+from fortran import parse_f77link, check_link_verbose, gnu_to_scons_flags
 
 __all__ = ['CheckF77Clib', 'CheckF77Mangling']
 
@@ -103,11 +103,10 @@ def CheckF77Clib(context):
         final_flags = parse_f77link(cnt)
         if built_with_mstools(env) and built_with_gnu_f77(env):
             from fortran import get_g2c_libs
-            #final_flags = gnu_to_ms_link(final_flags)
-            parsed = env.ParseFlags(final_flags)
-            final_flags = gnu_g2c_libs(parsed['LIBS'], parsed['LIBPATH'])
-            print final_flags
-        env['F77_LDFLAGS'] = final_flags
+            rtdir, msrtlibs = get_g2c_libs(env, final_flags)
+            env["F77_LDFLAGS"] = {"library_dirs": [rtdir], "libraries": msrtlibs}
+        else:
+            env['F77_LDFLAGS'] = final_flags
         context.Result(' '.join(env['F77_LDFLAGS']))
     else:
         context.Result('Failed !')

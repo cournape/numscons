@@ -2,7 +2,7 @@
 #
 # SCons - a Software Constructor
 #
-# Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007 The SCons Foundation
+# Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008 The SCons Foundation
 #
 # Permission is hereby granted, free of charge, to any person obtaining
 # a copy of this software and associated documentation files (the
@@ -24,15 +24,15 @@
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #
 
-__revision__ = "src/script/scons.py 2523 2007/12/12 09:37:41 knight"
+__revision__ = "src/script/scons.py 2725 2008/03/31 12:52:02 knight"
 
-__version__ = "0.97.0d20071212"
+__version__ = "0.98.0"
 
-__build__ = "r2523"
+__build__ = "r2725"
 
 __buildsys__ = "bangkok"
 
-__date__ = "2007/12/12 09:37:41"
+__date__ = "2008/03/31 12:52:02"
 
 __developer__ = "knight"
 
@@ -157,5 +157,6 @@ sys.path = libs + sys.path
 # END STANDARD SCons SCRIPT HEADER
 ##############################################################################
 
-import SCons.Script
-SCons.Script.main()
+if __name__ == "__main__":
+    import SCons.Script
+    SCons.Script.main()

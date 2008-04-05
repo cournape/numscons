@@ -1,5 +1,5 @@
 #! /usr/bin/env python
-# Last Change: Sat Jan 26 05:00 PM 2008 J
+# Last Change: Fri Mar 07 04:00 PM 2008 J
 
 """This module defines some helper functions, to be used by high level
 checkers."""
@@ -16,23 +16,25 @@ _arg2env = {'include_dirs' : 'CPPPATH',
             'rpath' : 'RPATH',
             'frameworks' : 'FRAMEWORKS'}
 
-def save_and_set(env, opts):
-    """keys given as config opts args."""
+def save_and_set(env, opts, keys = None):
+    """Put informations from option configuration into a scons environment, and
+    returns the savedkeys given as config opts args."""
     saved_keys = {}
-    keys = opts.keys()
+    if keys is None:
+        keys = opts.keys()
     for k in keys:
         saved_keys[k] = (env.has_key(_arg2env[k]) and\
                          deepcopy(env[_arg2env[k]])) or\
                         []
     kw = zip([_arg2env[k] for k in keys], [opts[k] for k in keys])
     kw = dict(kw)
-    env.AppendUnique(**kw)
+    env.Append(**kw)
     return saved_keys
 
-def restore(env, saved_keys):
-    keys = saved_keys.keys()
+def restore(env, saved):
+    keys = saved.keys()
     kw = zip([_arg2env[k] for k in keys],
-             [saved_keys[k] for k in keys])
+             [saved[k] for k in keys])
     kw = dict(kw)
     env.Replace(**kw)
 
@@ -57,30 +59,27 @@ return 0;
     code.append(extra)
     return context.TryLink('\n'.join(code), '.c')
 
-def _check_headers(context, cpppath, cflags, headers, autoadd):
+def _check_headers(context, opts, headers, autoadd):
     """Try to compile code including the given headers."""
     env = context.env
 
     #----------------------------
     # Check headers are available
     #----------------------------
-    # XXX: this should be rewritten using save/restore...
-    oldCPPPATH = (env.has_key('CPPPATH') and deepcopy(env['CPPPATH'])) or []
-    oldCFLAGS = (env.has_key('CFLAGS') and deepcopy(env['CFLAGS'])) or []
-    env.AppendUnique(CPPPATH = cpppath)
-    env.AppendUnique(CFLAGS = cflags)
-    # XXX: handle context
-    hcode = ['#include <%s>' % h for h in headers]
+    keys = ('include_dirs', 'cflags')
+    saved = save_and_set(context.env, opts, keys)
+    try:
+        # XXX: handle context
+        hcode = ['#include <%s>' % h for h in headers]
 
-    # HACK: we add cpppath in the command of the source, to add dependency of
-    # the check on the cpppath.
-    hcode.extend(['#if 0', '%s' % cpppath, '#endif\n'])
-    src = '\n'.join(hcode)
-
-    ret = context.TryCompile(src, '.c')
-    if ret == 0 or autoadd == 0:
-        env.Replace(CPPPATH = oldCPPPATH)
-        env.Replace(CFLAGS = oldCFLAGS)
+        # HACK: we add cpppath in the command of the source, to add dependency of
+        # the check on the cpppath.
+        hcode.extend(['#if 0', str(opts), '#endif\n'])
+        src = '\n'.join(hcode)
+        ret = context.TryCompile(src, '.c')
+    finally:
+        if ret == 0 or autoadd == 0:
+            restore(context.env, saved)
 
     return ret
 
@@ -107,8 +106,7 @@ def check_include_and_run(context, name, opts, headers, run_src, autoadd = 1):
     context.Message('Checking for %s ... ' % name)
     env = context.env
 
-    ret = _check_headers(context, opts['include_dirs'], opts['cflags'], headers,
-                         autoadd)
+    ret = _check_headers(context, opts, headers, autoadd)
     if not ret:
         context.Result('Failed: %s include not found' % name)
         return 0
@@ -116,6 +114,7 @@ def check_include_and_run(context, name, opts, headers, run_src, autoadd = 1):
     #------------------------------
     # Check a simple example works
     #------------------------------
+    keys = ('library_dirs', 'cflags')
     saved = save_and_set(env, opts)
     try:
         # HACK: we add libpath and libs at the end of the source as a comment,

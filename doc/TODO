@@ -1,24 +1,33 @@
+.. vim:syntax=rest
+
+Basic tasks
+===========
+
 Then, those are the old remaining things to do (once we get to the point we
 were when scons was inside numpy repository):
-    - check windows: in perticular MS studio + g77 (0.4* serie)
+    - remove duplicate between check_code and check_include_and_run.
+    - remove code for building empty programs: replace it by proper sconf (see
+      below)
+    - f2py tool: see F2PY section 
     - clean the code of numpyenv; in perticular: builder creation (should be
-      done through tools), remove _glob (scons has the functionality now),
-      rename functions, and set the order right (0.5* serie).
-    - clean up numpy.core building (0.5* serie)
-    - add a function to set up distutils build dirs and call the builder
+      done through tools), rename functions, and set the order right (0.6*
+      serie).
+    - clean up numpy.core building (0.6* serie): avoid explicit build dir and co
     - CXX optimizations flags + Control cxxflags from env
-    - umfpack checker
     - Add CPPPDEFINES in perflib checkers 
     - handle inplace
     - doc
-    - finish scipy
     - CLAPACK: check old atlas
+    - setuptools integration
+    - solution to handle sdist (source files)
+    - automatic handling of python header and python lib for python extensions.
+    - handle numpy headers, too
 
-Goals:
-    - 0.4: should work on linux/mac os X/windows (on windows: MS + g77 should
-      work too at this point)
-    - 0.5: clean numscons.core, in particular builders
-
+Meta Goals:
+    - 0.5: make scipy buildable by numscons.
+    - 0.6: Python Extension builder + upstream Fortran changes
+    - 0.7: f2py tool thread-safe, fortran improvements
+    
 Cleaning checkers modules:
     - Refactor site config custom: remove duplicate between core.libinfo and
       checkers.perflib_info
@@ -32,12 +41,9 @@ Things to implement / problems to solve:
 F2py:
     - Numpy version to handle build dir issues
     - Difference between .f and .pyf:
-
-Builder:
-    - Get a PythonExtension builder independant of distutils for upstream
-      integration
-    - Get a CtypesExtension builder independant of distutils for upstream
-      integration
+    - Make it thread-safe: through scons or python execution (using f2py on one
+      file is generally time-consuming, so launching it through python exec
+      should not be too bad; the other solution is to handle it at scons level)
 
 Tests:
     - What can be tested ?
@@ -53,7 +59,37 @@ Not so important things:
     - Generic Api builders (with dep tracking)
     - Generic FromTemplate builder (with dep tracking)
 
+Upstream scons changes needed:
+==============================
+
+(we cannot use external scons before those are integrated in scons)
+
+Builder
+-------
+
+New builders we can add to scons (and needed by numscons):
+
+    - a PythonExtension builder independant of distutils
+    - a CtypesExtension builder
+    - pyrex builder ?
+
+Fortran code
+------------
+
+Finish work on refactored scons
+
+Misc
+----
+
+We need the following:
+        
+    - Being able to run a builder and capture its output (both stdout and
+      stderr)
+    - building blocks for checkers
+
 Documentation:
+==============
     - scons / distutils integration, global design (BuildDir, directories, etc...)
     - use cases: package developers (examples, etc...), numpy developers,
       building numpy with scons, etc...
+

@@ -1,5 +1,5 @@
 #! /usr/bin/env python
-# Last Change: Tue Nov 06 07:00 PM 2007 J
+# Last Change: Wed Mar 05 06:00 PM 2008 J
 
 """Module for support to look for external code (replacement of
 numpy.distutils.system_info). scons dependant code."""
@@ -101,13 +101,14 @@ def NumpyCheckLibAndHeader(context, libs, symbols = None, headers = None,
     # Check whether the library is available (CheckLib-like checker)
     saved = save_and_set(env, opts)
     try:
-        for sym in symbols:
-            # Add opts at the end of the source code to force dependency of
-            # check from options.
-            extra = [r'#if 0', str(opts), r'#endif', '\n']
-            st = check_symbol(context, None, sym, '\n'.join(extra))
-            if not st:
-                break
+        if symbols:
+            for sym in symbols:
+                # Add opts at the end of the source code to force dependency of
+                # check from options.
+                extra = [r'#if 0', str(opts), r'#endif', '\n']
+                st = check_symbol(context, None, sym, '\n'.join(extra))
+                if not st:
+                    break
     finally:
         if st == 0 or autoadd == 0:
             restore(env, saved)

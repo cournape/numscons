@@ -4,8 +4,10 @@
 # test module for utils module
 import os
 import unittest
+from copy import deepcopy
 
 from numscons.core.utils import pkg_to_path, _rsplit, DefaultDict, delconsdup
+from numscons.core.utils import unique
 
 class PkgToPathTester(unittest.TestCase):
     def setUp(self):
@@ -89,6 +91,16 @@ class DelConsDupTester(unittest.TestCase):
         """Check seq with several dups is correctly processed."""
         a = [1, 2, 3, 3, 2, 1, 1, 2]
         assert delconsdup(a) == [1, 2, 3, 2, 1, 2]
+
+class UniqueTest(unittest.TestCase):
+    def test_donothing(self):
+        a = [1, 2]
+        b = deepcopy(a)
+        assert unique(b) == a
+
+    def test_basic(self):
+        a = [1, 2, 2, 1]
+        assert unique(a) == [1, 2]
 
 if __name__ == "__main__":
     unittest.main()

@@ -1,3 +1,49 @@
+Sat, 05 Apr 2008 09:22:10 -0700
+	* Update our local copy of scons to 0.98.0. We should not need our own
+	modified copy anymore, the upstream one should be enough !
+
+Sat, 08 Mar 2008 20:08:20 +0900
+	* Do not use -fast with sun compilers, because it cause random
+	crashes, and can break IEEE conformance anyway.
+
+Fri, 07 Mar 2008 22:26:31 +0900
+	* GetNumpyEnvironment now returns NumpyEnvironment, a subclass of
+	scons Environment. The long-term goal is to implement most code which
+	makes cooperation with distutils into this class.
+
+Thu, 06 Mar 2008 20:17:41 +0900
+	* Do not use AppendUnique in save_set, because it is too fragile
+	(imply reordering of some flags, e.g. libraries order, etc...).
+
+Wed, 05 Mar 2008 23:23:58 +0900
+	* 0.5.0 release
+	* fix serious issue regarding build directories created outside the
+	top directory of packages using numscons
+	* fix an issue related to site.cfg customization for
+	NumpyCheckLibAndHeader
+	* various import fixes
+	* NumpyGlob now internally uses scons Glob instead of glob.glob
+	* Blas/Lapack checkers are refactored; all of them now use the same
+	codepath
+
+Sat, 01 Mar 2008 02:30:56 +0900
+	* 0.4.2 release
+	* source distribution fix: include .cfg files in MANIFEST.in
+
+Tue, 19 Feb 2008 03:32:25 +0900
+	* 0.4.1.1 release
+	* Egg fix
+
+Tue, 19 Feb 2008 03:32:25 +0900
+	* 0.4.1 release
+	* this relases main feature is support for MS compiler + g77 on
+	windows. This means compiling scipy on windows with MS compiler is not
+	that far anymore.
+
+Thu, 14 Feb 2008 01:03:27 +0900
+	* 0.4.0 release
+	* this relases main feature is support for MS compiler on windows.
+
 Mon, 28 Jan 2008 13:00:08 +0900
 	* 0.3.4 release
 	* this relases main feature is rewritten f77 link parser.
