@@ -28,7 +28,35 @@ def _f2pySuffixEmitter(env, source):
 def _mangle_fortranobject(targetname, filename):
     basename = os.path.splitext(os.path.basename(targetname))[0]
     return '%s_%s' % (basename, filename)
-    
+
+# XXX: Taken from numpy/distutils/command/build_src
+_f2py_module_name_match = re.compile(r'\s*python\s*module\s*(?P<name>[\w_]+)',
+                                re.I).match
+_f2py_user_module_name_match = re.compile(r'\s*python\s*module\s*(?P<name>[\w_]*?'\
+                                     '__user__[\w_]*)',re.I).match
+
+def get_f2py_modulename(source):
+    name = None
+    f = open(source)
+    f_readlines = getattr(f,'xreadlines',f.readlines)
+    for line in f_readlines():
+        m = _f2py_module_name_match(line)
+        if m:
+            if _f2py_user_module_name_match(line): # skip *__user__* names
+                continue
+            name = m.group('name')
+            break
+    f.close()
+    return name
+# End of code taken from numpy/distutils/command/build_src
+
+def get_f2py_modulename_from_node(node):
+    # XXX: is srcnode() call the right method ? We cannot just use the node
+    # itself, because it may not still exists in the FS (because of VariantDir,
+    # etc...)
+    src = node.srcnode()
+    return get_f2py_modulename(str(src))
+
 def _f2pyEmitter(target, source, env):
     build_dir = os.path.dirname(str(target[0]))
     target.append(SCons.Node.FS.default_fs.Entry(
