@@ -13,7 +13,6 @@ were when scons was inside numpy repository):
       done through tools), rename functions, and set the order right (0.6*
       serie).
     - clean up numpy.core building (0.6* serie): avoid explicit build dir and co
-    - add a function to set up distutils build dirs and call the builder (0.6)
     - CXX optimizations flags + Control cxxflags from env
     - Add CPPPDEFINES in perflib checkers 
     - handle inplace
