@@ -8,69 +8,57 @@ selection method.
 
 """
 
-import os.path
+import os
+from os.path import join as pjoin, dirname as pdirname
 import re
+import sys
+import subprocess
 
 import SCons.Action
 import SCons.Defaults
 import SCons.Scanner
 import SCons.Tool
 import SCons.Util
-import SCons.Node
+from SCons.Node.FS.default_fs import Entry
 
 # XXX: this whole thing needs cleaning !
 
-def _f2pySuffixEmitter(env, source):
+def F2pySuffixEmitter(env, source):
     return '$F2PYCFILESUFFIX'
 
-#_reModule = re.compile(r'%module\s+(.+)')
+def F2pyEmitter(target, source, env):
+    build_dir = pdirname(str(target[0]))
+    target.append(Entry(pjoin(build_dir, 
+                              _mangle_fortranobject(str(target[0]), 
+                                                    'fortranobject.c'))))
+    if _is_pyf(str(source[0])):
+        basename = os.path.splitext(os.path.basename(str(target[0])))
+        basename = basename[0]
+        basename = basename.split('module')[0]
+        target.append(Entry(pjoin(build_dir, '%s-f2pywrappers.f' % basename)))
+    return (target, source)
 
 def _mangle_fortranobject(targetname, filename):
     basename = os.path.splitext(os.path.basename(targetname))[0]
     return '%s_%s' % (basename, filename)
 
-# XXX: Taken from numpy/distutils/command/build_src
-_f2py_module_name_match = re.compile(r'\s*python\s*module\s*(?P<name>[\w_]+)',
-                                re.I).match
-_f2py_user_module_name_match = re.compile(r'\s*python\s*module\s*(?P<name>[\w_]*?'\
-                                     '__user__[\w_]*)',re.I).match
-
-def get_f2py_modulename(source):
-    name = None
-    f = open(source)
-    f_readlines = getattr(f,'xreadlines',f.readlines)
-    for line in f_readlines():
-        m = _f2py_module_name_match(line)
-        if m:
-            if _f2py_user_module_name_match(line): # skip *__user__* names
-                continue
-            name = m.group('name')
-            break
-    f.close()
-    return name
-# End of code taken from numpy/distutils/command/build_src
-
-def get_f2py_modulename_from_node(node):
-    # XXX: is srcnode() call the right method ? We cannot just use the node
-    # itself, because it may not still exists in the FS (because of VariantDir,
-    # etc...)
-    src = node.srcnode()
-    return get_f2py_modulename(str(src))
-
-def _f2pyEmitter(target, source, env):
-    build_dir = os.path.dirname(str(target[0]))
-    target.append(SCons.Node.FS.default_fs.Entry(
-        os.path.join(build_dir, _mangle_fortranobject(str(target[0]), 'fortranobject.c'))))
-    if _is_pyf(str(source[0])):
-        basename = os.path.splitext(os.path.basename(str(target[0])))
-        basename = basename[0]
-        basename = basename.split('module')[0]
-        target.append(SCons.Node.FS.default_fs.Entry(
-            os.path.join(build_dir, '%s-f2pywrappers.f' % basename)))
-    return (target, source)
-
 def _is_pyf(source_file):
     return os.path.splitext(source_file)[1] == '.pyf'
+
+def _f2py_cmd_exec(cmd):
+    """Executes a f2py command.
+    
+    cmd should be a sequence.
+    
+    The point is to execute in a new process to avoid race issues when using
+    multible jobs with scons."""
+    f2py_cmd = [sys.executable, '-c', 
+                '"from numpy.f2py.f2py2e import run_main;run_main(%s)"' % repr(cmd)]
+    p = subprocess.Popen(" ".join(f2py_cmd), shell = True, stdout = subprocess.PIPE)
+    for i in p.stdout.readlines():
+        print i.rstrip('\n')
+    id, st = os.waitpid(p.pid, 0)
+    return st
 
 def _pyf2c(target, source, env):
     import numpy.f2py
@@ -82,18 +70,20 @@ def _pyf2c(target, source, env):
 
     # Get source files necessary for f2py generated modules
     d = os.path.dirname(numpy.f2py.__file__)
-    source_c = os.path.join(d,'src','fortranobject.c')
+    source_c = pjoin(d,'src','fortranobject.c')
 
     # Copy source files for f2py generated modules in the build dir
-    build_dir = os.path.dirname(target_file_names[0])
+    build_dir = pdirname(target_file_names[0])
 
     # XXX: blah
     if build_dir == '':
         build_dir = '.'
 
     try:
-        shutil.copy(source_c, os.path.join(build_dir, 
-               _mangle_fortranobject(target_file_names[0], 'fortranobject.c')))
+        shutil.copy(source_c, 
+                    pjoin(build_dir, 
+                          _mangle_fortranobject(target_file_names[0], 
+                                                'fortranobject.c')))
     except IOError, e:
         msg = "Error while copying fortran source files (error was %s)" % str(e)
         raise IOError(msg)
@@ -106,10 +96,10 @@ def _pyf2c(target, source, env):
         if len(source_file_names) > 1:
             raise NotImplementedError("FIXME: multiple source files")
         
-        wrapper = os.path.join(build_dir, '%s-f2pywrappers.f' % basename)
+        wrapper = pjoin(build_dir, '%s-f2pywrappers.f' % basename)
 
         cmd = env['F2PYOPTIONS'] + [source_file_names[0], '--build-dir', build_dir]
-        st = numpy.f2py.run_main(cmd)
+        st = _f2py_cmd_exec(cmd)
 
         if not os.path.exists(wrapper):
             f = open(wrapper, 'w')
@@ -118,7 +108,7 @@ def _pyf2c(target, source, env):
         cmd = env['F2PYOPTIONS'] + source_file_names + ['--build-dir', build_dir]
         # fortran files, we need to give the module name
         cmd.extend(['--lower', '-m', basename])
-        st = numpy.f2py.run_main(cmd)
+        st = _f2py_cmd_exec(cmd)
 
     return 0
 
@@ -126,19 +116,19 @@ def _pyf2c(target, source, env):
 def generate(env):
     """Add Builders and construction variables for swig to an Environment."""
     import numpy.f2py
-    d = os.path.dirname(numpy.f2py.__file__)
+    d = pdirname(numpy.f2py.__file__)
 
     c_file, cxx_file = SCons.Tool.createCFileBuilders(env)
 
-    c_file.suffix['.pyf'] = _f2pySuffixEmitter
+    c_file.suffix['.pyf'] = F2pySuffixEmitter
 
     c_file.add_action('.pyf', SCons.Action.Action(_pyf2c))
-    c_file.add_emitter('.pyf', _f2pyEmitter)
+    c_file.add_emitter('.pyf', F2pyEmitter)
 
     env['F2PYOPTIONS']      = SCons.Util.CLVar('')
     env['F2PYBUILDDIR']     = ''
     env['F2PYCFILESUFFIX']  = 'module$CFILESUFFIX'
-    env['F2PYINCLUDEDIR']   = os.path.join(d, 'src')
+    env['F2PYINCLUDEDIR']   = pjoin(d, 'src')
 
     # XXX: adding a scanner using c_file.add_scanner does not work...
     expr = '(<)include_file=(\S+)>'
@@ -146,23 +136,8 @@ def generate(env):
     env.Append(SCANNERS = scanner)
 
     env['BUILDERS']['F2py'] = SCons.Builder.Builder(action = _pyf2c, 
-                                                    emitter = _f2pyEmitter,
-                                                    suffix = _f2pySuffixEmitter)
-
-_MINC = re.compile(r'<include_file=(\S+)>')                                              
-def _pyf_scanner(node, env, path):
-    print "================== SCANNING ===================="
-    cnt = node.get_contents()
-    return _parse(cnt)
-
-def _parse(lines):                                                                        
-    """Return list of included files in .pyf from include_file directive."""
-    dep = []                                                                             
-    for line in lines:                                                                   
-        m = _MINC.search(line)                                                           
-        if m:                                                                            
-            dep.append(m.group(1))                                                       
-    return dep  
+                                                    emitter = F2pyEmitter,
+                                                    suffix = F2pySuffixEmitter)
 
 def exists(env):
     try:
