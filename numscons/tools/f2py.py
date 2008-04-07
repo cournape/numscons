@@ -19,7 +19,7 @@ import SCons.Defaults
 import SCons.Scanner
 import SCons.Tool
 import SCons.Util
-from SCons.Node.FS.default_fs import Entry
+from SCons.Node.FS import default_fs 
 
 # XXX: this whole thing needs cleaning !
 
@@ -28,14 +28,14 @@ def F2pySuffixEmitter(env, source):
 
 def F2pyEmitter(target, source, env):
     build_dir = pdirname(str(target[0]))
-    target.append(Entry(pjoin(build_dir, 
+    target.append(default_fs.Entry(pjoin(build_dir, 
                               _mangle_fortranobject(str(target[0]), 
                                                     'fortranobject.c'))))
     if _is_pyf(str(source[0])):
         basename = os.path.splitext(os.path.basename(str(target[0])))
         basename = basename[0]
         basename = basename.split('module')[0]
-        target.append(Entry(pjoin(build_dir, '%s-f2pywrappers.f' % basename)))
+        target.append(default_fs.Entry(pjoin(build_dir, '%s-f2pywrappers.f' % basename)))
     return (target, source)
 
 def _mangle_fortranobject(targetname, filename):
