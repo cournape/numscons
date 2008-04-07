@@ -26,6 +26,44 @@ from SCons.Node.FS import default_fs
 def F2pySuffixEmitter(env, source):
     return '$F2PYCFILESUFFIX'
 
+# Copied from build_src in numpy.distutils.command
+
+_f2py_module_name_match = re.compile(r'\s*python\s*module\s*(?P<name>[\w_]+)',
+                                re.I).match
+_f2py_user_module_name_match = re.compile(r'\s*python\s*module\s*(?P<name>[\w_]*?'\
+                                     '__user__[\w_]*)',re.I).match
+
+def get_f2py_modulename(source):
+    name = None
+    f = open(source)
+    f_readlines = getattr(f,'xreadlines',f.readlines)
+    for line in f_readlines():
+        m = _f2py_module_name_match(line)
+        if m:
+            if _f2py_user_module_name_match(line): # skip *__user__* names
+                continue
+            name = m.group('name')
+            break
+    f.close()
+    return name
+
+# End of copy
+
+def get_f2py_modulename_from_txt(source):
+    """This returns the name of the module from the pyf source file.
+
+    source is expected to be one string, containing the whole source file
+    code."""
+    name = None
+    for line in source.splitlines():
+        m = _f2py_module_name_match(line)
+        if m:
+            if _f2py_user_module_name_match(line): # skip *__user__* names
+                continue
+            name = m.group('name')
+            break
+    return name
+
 def F2pyEmitter(target, source, env):
     build_dir = pdirname(str(target[0]))
     if _is_pyf(str(source[0])):
