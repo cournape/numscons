@@ -28,14 +28,14 @@ def F2pySuffixEmitter(env, source):
 
 def F2pyEmitter(target, source, env):
     build_dir = pdirname(str(target[0]))
-    target.append(default_fs.Entry(pjoin(build_dir, 
-                              _mangle_fortranobject(str(target[0]), 
-                                                    'fortranobject.c'))))
+    fobj = pjoin(build_dir, _mangle_fortranobject(str(target[0]), 'fortranobject.c'))
+    target.append(default_fs.Entry(fobj))
     if _is_pyf(str(source[0])):
         basename = os.path.splitext(os.path.basename(str(target[0])))
         basename = basename[0]
         basename = basename.split('module')[0]
-        target.append(default_fs.Entry(pjoin(build_dir, '%s-f2pywrappers.f' % basename)))
+        f2pywrap = pjoin(build_dir, '%s-f2pywrappers.f' % basename)
+        target.append(default_fs.Entry(f2pywrap))
     return (target, source)
 
 def _mangle_fortranobject(targetname, filename):
