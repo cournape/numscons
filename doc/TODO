@@ -41,11 +41,9 @@ Things to implement / problems to solve:
 F2py:
     - Numpy version to handle build dir issues
     - Difference between .f and .pyf:
-    - Make it thread-safe: through scons or python execution (using f2py on one
-      file is generally time-consuming, so launching it through python exec
-      should not be too bad; the other solution is to handle it at scons level)
     - how to handle extension name: target name depends on src file content,
-      but there are issues with BuildDir
+      but there are issues with BuildDir (e.g. reading the content in the
+      emitter does not work).
 
 Tests:
     - What can be tested ?
