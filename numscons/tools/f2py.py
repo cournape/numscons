@@ -64,6 +64,27 @@ def get_f2py_modulename_from_txt(source):
             break
     return name
 
+def get_f2py_modulename_from_node(source):
+    """This function returns the module name of the pyf file.
+
+    The argument should be a scons node. This should work even if the node is
+    generated from another scons builder."""
+    # See email on scons-users from 6th April 2008 (Dmitry Mikhin).
+    name = None
+    node = source.rfile()
+    if node.exists() or not node.is_derived():
+        name = get_f2py_modulename_from_txt(node.get_contents())
+    try:
+        # XXX: I don't understand this part
+        snode = source.sources[0].rfile()
+        if snode.is_derived():
+            snode = snode.sources[0].rfile()
+        cnt = snode.get_contents()
+        name = get_f2py_modulename_from_txt(cnt)
+    except AttributeError:
+        pass
+    return name
+
 def F2pyEmitter(target, source, env):
     build_dir = pdirname(str(target[0]))
     if _is_pyf(str(source[0])):
