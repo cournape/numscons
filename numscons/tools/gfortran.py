@@ -50,11 +50,15 @@ def generate(env):
     env['_FORTRAND'] = 'gfortran'
     env['FORTRAN'] = 'gfortran'
     env['SHFORTRAN'] = 'gfortran'
+    env['F77INCPREFIX'] = '-I'
+    env['F77INCSUFFIX'] = ''
 
     if env['PLATFORM'] in ['cygwin', 'win32']:
         env['SHFORTRANFLAGS'] = SCons.Util.CLVar('$FORTRANFLAGS')
     else:
         env['SHFORTRANFLAGS'] = SCons.Util.CLVar('$FORTRANFLAGS -fPIC')
+    env['F77INCSUFFIX'] = '-I'
+    env['F77INCSUFFIX'] = ''
 
     # XXX; Link problems: we need to add -lgfortran somewhere...
 
