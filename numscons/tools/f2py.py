@@ -125,8 +125,7 @@ def _f2py_cmd_exec(cmd):
     p = subprocess.Popen(" ".join(f2py_cmd), shell = True, stdout = subprocess.PIPE)
     for i in p.stdout.readlines():
         print i.rstrip('\n')
-    id, st = os.waitpid(p.pid, 0)
-    return st
+    return p.wait()
 
 def _pyf2c(target, source, env):
     import numpy.f2py
