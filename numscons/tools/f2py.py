@@ -86,14 +86,18 @@ def get_f2py_modulename_from_node(source):
     return name
 
 def F2pyEmitter(target, source, env):
+    def get_base(target):
+        """Return the basename of target (without module or suffix)."""
+        basename = os.path.splitext(os.path.basename(str(target)))
+        basename = basename[0]
+        return basename.split('module')[0]
+
     build_dir = pdirname(str(target[0]))
     if _is_pyf(str(source[0])):
         ntarget = target
         fobj = pjoin(build_dir, _mangle_fortranobject(str(target[0]), 'fortranobject.c'))
         ntarget.append(default_fs.Entry(fobj))
-        basename = os.path.splitext(os.path.basename(str(target[0])))
-        basename = basename[0]
-        basename = basename.split('module')[0]
+        basename = get_base(target[0])
         f2pywrap = pjoin(build_dir, '%s-f2pywrappers.f' % basename)
         target.append(default_fs.Entry(f2pywrap))
     else:
