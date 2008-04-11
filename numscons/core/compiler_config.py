@@ -72,6 +72,26 @@ class F77CompilerConfig:
                 d[k] = v.split()
         return d
         
+class CXXCompilerConfig:
+    """Put config objects value into a dictionary usable by scons. C++ compiler
+    version"""
+    def __init__(self, cfg):
+        self._cfg = cfg
+
+    def get_flags_dict(self):
+        d = {'NUMPY_OPTIM_CXXFLAGS' : self._cfg['optim'],
+             'NUMPY_WARN_CXXFLAGS' : self._cfg['warn'],
+             'NUMPY_THREAD_CXXFLAGS' : self._cfg['thread'],
+             'NUMPY_EXTRA_CXXFLAGS' : self._cfg['debug'],
+             'NUMPY_DEBUG_CXXFLAGS' : self._cfg['debug'],
+             'NUMPY_DEBUG_SYMBOL_CXXFLAGS' : self._cfg['debug_sym']}
+        for k, v in d.items():
+            if v is None:
+                d[k] = []
+            else:
+                d[k] = v.split()
+        return d
+        
 def get_config(name, language):
     # XXX name should be a list
     config = ConfigParser()
@@ -81,6 +101,9 @@ def get_config(name, language):
     elif language == 'f77':
         cfgfname = pjoin(pdirname(__file__), "fcompiler.cfg")
         cmpcfg = F77CompilerConfig
+    elif language == 'cxx':
+        cfgfname = pjoin(pdirname(__file__), "cxxcompiler.cfg")
+        cmpcfg = CXXCompilerConfig
     else:
         raise NoCompilerConfig("language %s not recognized !" % language)
 
@@ -99,6 +122,7 @@ def get_config(name, language):
 
 get_cc_config = partial(get_config, language = 'c')
 get_f77_config = partial(get_config, language = 'f77')
+get_cxx_config = partial(get_config, language = 'cxx')
 
 if __name__ == '__main__':
     cfg = get_cc_config('gcc')
