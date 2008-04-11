@@ -261,7 +261,7 @@ def initialize_cxx(env, path_list):
             t(env) 
             path_list.append(env['cxx_opt_path'])
     else:
-        def_fcompiler =  FindTool(DEF_FORTRAN_COMPILERS, env)
+        def_fcompiler =  FindTool(DEF_CXX_COMPILERS, env)
         if def_fcompiler:
             t = Tool(def_fcompiler, toolpath = get_additional_toolpaths(env))
             t(env)
