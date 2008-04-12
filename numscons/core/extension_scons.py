@@ -3,7 +3,7 @@
 
 # Module for support to build python extension. scons specific code goes here.
 import sys
-from copy import deepcopy
+from copy import copy
 
 from distutils.unixccompiler import UnixCCompiler
 from numscons.numdist import msvc_runtime_library
@@ -17,7 +17,7 @@ def PythonExtension(env, target, source, *args, **kw):
     # thing is a mess.
     def floupi(key):
         if env.has_key(key):
-            narg = deepcopy(env[key])
+            narg = copy(env[key])
         else:
             narg = []
 
