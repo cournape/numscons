@@ -87,12 +87,6 @@ def get_f2py_modulename_from_node(source):
     return name
 
 def F2pyEmitter(target, source, env):
-    def get_base(target):
-        """Return the basename of target (without module or suffix)."""
-        basename = os.path.splitext(os.path.basename(str(target)))
-        basename = basename[0]
-        return basename.split('module')[0]
-
     build_dir = pdirname(str(target[0]))
     if _is_pyf(str(source[0])):
         basename = get_f2py_modulename_from_node(source[0])
