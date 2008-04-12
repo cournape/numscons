@@ -30,20 +30,6 @@ _f2py_module_name_match = re.compile(r'\s*python\s*module\s*(?P<name>[\w_]+)',
 _f2py_user_module_name_match = re.compile(r'\s*python\s*module\s*(?P<name>[\w_]*?'\
                                      '__user__[\w_]*)',re.I).match
 
-def get_f2py_modulename(source):
-    name = None
-    f = open(source)
-    f_readlines = getattr(f,'xreadlines',f.readlines)
-    for line in f_readlines():
-        m = _f2py_module_name_match(line)
-        if m:
-            if _f2py_user_module_name_match(line): # skip *__user__* names
-                continue
-            name = m.group('name')
-            break
-    f.close()
-    return name
-
 # End of copy
 
 def get_f2py_modulename_from_txt(source):
@@ -86,12 +72,19 @@ def get_f2py_modulename_from_node(source):
 def F2pyEmitter(target, source, env):
     build_dir = pdirname(str(target[0]))
     if _is_pyf(str(source[0])):
+        # target is (in this order):
+        # - the C file which will contain the generated code
+        # - the fortranobject.c file
+        # - the f2py fortran wrapper
         basename = get_f2py_modulename_from_node(source[0])
         ntarget = []
+
         ntarget.append(default_fs.Entry(pjoin(build_dir, '%smodule.c' % basename)))
+
         fobj = pjoin(build_dir, _mangle_fortranobject('%s' % basename, 
                                                       'fortranobject.c'))
         ntarget.append(default_fs.Entry(fobj))
+
         f2pywrap = pjoin(build_dir, '%s-f2pywrappers.f' % basename)
         ntarget.append(default_fs.Entry(f2pywrap))
     else:
