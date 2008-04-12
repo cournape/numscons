@@ -93,7 +93,7 @@ def F2pyEmitter(target, source, env):
                                                       'fortranobject.c'))
         ntarget.append(default_fs.Entry(fobj))
         f2pywrap = pjoin(build_dir, '%s-f2pywrappers.f' % basename)
-        target.append(default_fs.Entry(f2pywrap))
+        ntarget.append(default_fs.Entry(f2pywrap))
     else:
         ntarget = target
         fobj = pjoin(build_dir, _mangle_fortranobject(str(target[0]), 'fortranobject.c'))
