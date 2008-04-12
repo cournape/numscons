@@ -9,13 +9,13 @@ selection method.
 """
 
 import os
-from os.path import join as pjoin, dirname as pdirname
+from os.path import join as pjoin, dirname as pdirname, \
+                    basename as pbasename, splitext
 import re
 import sys
 import subprocess
 
 import SCons.Action
-import SCons.Defaults
 import SCons.Scanner
 import SCons.Tool
 import SCons.Util
@@ -89,16 +89,17 @@ def F2pyEmitter(target, source, env):
         ntarget.append(default_fs.Entry(f2pywrap))
     else:
         ntarget = target
-        fobj = pjoin(build_dir, mangle_fortranobject(str(target[0]), FOBJECT_FILE))
+        fobj = pjoin(build_dir, mangle_fortranobject(str(target[0]),
+                     FOBJECT_FILE))
         ntarget.append(default_fs.Entry(fobj))
     return (ntarget, source)
 
 def mangle_fortranobject(targetname, filename):
-    basename = os.path.basename(targetname).split('module')[0]
+    basename = pbasename(targetname).split('module')[0]
     return '%s_%s' % (basename, filename)
 
 def is_pyf(source_file):
-    return os.path.splitext(source_file)[1] == '.pyf'
+    return splitext(source_file)[1] == '.pyf'
 
 def f2py_cmd_exec(cmd):
     """Executes a f2py command.
@@ -108,8 +109,10 @@ def f2py_cmd_exec(cmd):
     
     cmd should be a sequence. """
     f2py_cmd = [sys.executable, '-c', 
-                '"from numpy.f2py.f2py2e import run_main;run_main(%s)"' % repr(cmd)]
-    p = subprocess.Popen(" ".join(f2py_cmd), shell = True, stdout = subprocess.PIPE)
+                '"from numpy.f2py.f2py2e import run_main;run_main(%s)"' \
+                % repr(cmd)]
+    p = subprocess.Popen(" ".join(f2py_cmd), shell = True, stdout =
+                         subprocess.PIPE)
     for i in p.stdout.readlines():
         print i.rstrip('\n')
     return p.wait()
@@ -150,14 +153,16 @@ def pyf2c(target, source, env):
         
         wrapper = pjoin(build_dir, FWRAP_TEMPLATE % basename)
 
-        cmd = env['F2PYOPTIONS'] + [source_file_names[0], '--build-dir', build_dir]
+        cmd = env['F2PYOPTIONS'] + \
+              [source_file_names[0], '--build-dir', build_dir]
         st = f2py_cmd_exec(cmd)
 
         if not os.path.exists(wrapper):
             f = open(wrapper, 'w')
             f.close()
     else:
-        cmd = env['F2PYOPTIONS'] + source_file_names + ['--build-dir', build_dir]
+        cmd = env['F2PYOPTIONS'] + source_file_names + \
+              ['--build-dir', build_dir]
         # fortran files, we need to give the module name
         cmd.extend(['--lower', '-m', basename])
         st = f2py_cmd_exec(cmd)
