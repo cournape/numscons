@@ -175,9 +175,11 @@ def generate(env):
     import numpy.f2py
     d = pdirname(numpy.f2py.__file__)
 
+    f2pyac = SCons.Action.Action(pyf2c, '$F2PYSTRCOM')
+
     c_file, cxx_file = SCons.Tool.createCFileBuilders(env)
 
-    c_file.add_action('.pyf', SCons.Action.Action(pyf2c))
+    c_file.add_action('.pyf', SCons.Action.Action(f2pyac))
     c_file.add_emitter('.pyf', F2pyEmitter)
 
     env['F2PYOPTIONS']      = SCons.Util.CLVar('')
@@ -189,8 +191,6 @@ def generate(env):
     expr = '(<)include_file=(\S+)>'
     scanner = SCons.Scanner.ClassicCPP("F2PYScan", ".pyf", "F2PYPATH", expr)
     env.Append(SCANNERS = scanner)
-
-    f2pyac = SCons.Action.Action(pyf2c, '$F2PYSTRCOM')
 
     env['BUILDERS']['F2py'] = SCons.Builder.Builder(action = f2pyac,
                                                     emitter = F2pyEmitter)
