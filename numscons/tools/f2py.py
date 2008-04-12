@@ -102,10 +102,10 @@ def is_pyf(source_file):
 def f2py_cmd_exec(cmd):
     """Executes a f2py command.
     
-    cmd should be a sequence.
-    
     The point to execute f2py in a new process instead of using f2py.mainto
-    avoid race issues when using multible jobs with scons."""
+    avoid race issues when using multible jobs with scons.
+    
+    cmd should be a sequence. """
     f2py_cmd = [sys.executable, '-c', 
                 '"from numpy.f2py.f2py2e import run_main;run_main(%s)"' % repr(cmd)]
     p = subprocess.Popen(" ".join(f2py_cmd), shell = True, stdout = subprocess.PIPE)
