@@ -23,9 +23,6 @@ from SCons.Node.FS import default_fs
 
 # XXX: this whole thing needs cleaning !
 
-def F2pySuffixEmitter(env, source):
-    return '$F2PYCFILESUFFIX'
-
 # Copied from build_src in numpy.distutils.command
 
 _f2py_module_name_match = re.compile(r'\s*python\s*module\s*(?P<name>[\w_]+)',
@@ -183,14 +180,11 @@ def generate(env):
 
     c_file, cxx_file = SCons.Tool.createCFileBuilders(env)
 
-    c_file.suffix['.pyf'] = F2pySuffixEmitter
-
     c_file.add_action('.pyf', SCons.Action.Action(_pyf2c))
     c_file.add_emitter('.pyf', F2pyEmitter)
 
     env['F2PYOPTIONS']      = SCons.Util.CLVar('')
     env['F2PYBUILDDIR']     = ''
-    env['F2PYCFILESUFFIX']  = '$CFILESUFFIX'
     env['F2PYINCLUDEDIR']   = pjoin(d, 'src')
 
     # XXX: adding a scanner using c_file.add_scanner does not work...
@@ -200,7 +194,7 @@ def generate(env):
 
     env['BUILDERS']['F2py'] = SCons.Builder.Builder(action = _pyf2c, 
                                                     emitter = F2pyEmitter,
-                                                    suffix = F2pySuffixEmitter)
+                                                    suffix = '$CFILESUFFIX')
 
 def exists(env):
     try:
