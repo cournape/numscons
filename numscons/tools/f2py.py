@@ -92,7 +92,7 @@ def F2pyEmitter(target, source, env):
         basename = get_f2py_modulename_from_node(source[0])
         ntarget = []
         ntarget.append(default_fs.Entry(pjoin(build_dir, '%smodule.c' % basename)))
-        fobj = pjoin(build_dir, _mangle_fortranobject('%smodule' % basename, 
+        fobj = pjoin(build_dir, _mangle_fortranobject('%s' % basename, 
                                                       'fortranobject.c'))
         ntarget.append(default_fs.Entry(fobj))
         f2pywrap = pjoin(build_dir, '%s-f2pywrappers.f' % basename)
@@ -104,7 +104,7 @@ def F2pyEmitter(target, source, env):
     return (ntarget, source)
 
 def _mangle_fortranobject(targetname, filename):
-    basename = os.path.splitext(os.path.basename(targetname))[0]
+    basename = os.path.basename(targetname).split('module')[0]
     return '%s_%s' % (basename, filename)
 
 def _is_pyf(source_file):
@@ -144,10 +144,9 @@ def _pyf2c(target, source, env):
         build_dir = '.'
 
     try:
-        shutil.copy(source_c, 
-                    pjoin(build_dir, 
-                          _mangle_fortranobject(target_file_names[0], 
-                                                'fortranobject.c')))
+        cpi = _mangle_fortranobject(target_file_names[0], 'fortranobject.c')
+        print "COPIED ", cpi
+        shutil.copy(source_c, pjoin(build_dir, cpi))
     except IOError, e:
         msg = "Error while copying fortran source files (error was %s)" % str(e)
         raise IOError(msg)
@@ -191,7 +190,7 @@ def generate(env):
 
     env['F2PYOPTIONS']      = SCons.Util.CLVar('')
     env['F2PYBUILDDIR']     = ''
-    env['F2PYCFILESUFFIX']  = 'module$CFILESUFFIX'
+    env['F2PYCFILESUFFIX']  = '$CFILESUFFIX'
     env['F2PYINCLUDEDIR']   = pjoin(d, 'src')
 
     # XXX: adding a scanner using c_file.add_scanner does not work...
