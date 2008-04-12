@@ -79,7 +79,8 @@ def F2pyEmitter(target, source, env):
         basename = get_f2py_modulename_from_node(source[0])
         ntarget = []
 
-        ntarget.append(default_fs.Entry(pjoin(build_dir, CGENMODULE % basename)))
+        cgename = (CGEN_TEMPLATE % basename) + env['CFILESUFFIX']
+        ntarget.append(default_fs.Entry(pjoin(build_dir, cgename)))
 
         fobj = pjoin(build_dir, mangle_fortranobject(basename, FOBJECT_FILE))
         ntarget.append(default_fs.Entry(fobj))
@@ -133,7 +134,7 @@ def pyf2c(target, source, env):
         build_dir = '.'
 
     try:
-        cpi = _mangle_fortranobject(target_file_names[0], FOBJECT_FILE)
+        cpi = mangle_fortranobject(target_file_names[0], FOBJECT_FILE)
         shutil.copy(source_c, pjoin(build_dir, cpi))
     except IOError, e:
         msg = "Error while copying fortran source files (error was %s)" % str(e)
@@ -142,7 +143,7 @@ def pyf2c(target, source, env):
     basename = os.path.basename(str(target[0]).split('module')[0])
 
     # XXX: handle F2PYOPTIONS being a string instead of a list
-    if _is_pyf(source_file_names[0]):
+    if is_pyf(source_file_names[0]):
         # XXX: scons has a way to force buidler to only use one source file
         if len(source_file_names) > 1:
             raise NotImplementedError("FIXME: multiple source files")
@@ -150,7 +151,7 @@ def pyf2c(target, source, env):
         wrapper = pjoin(build_dir, FWRAP_TEMPLATE % basename)
 
         cmd = env['F2PYOPTIONS'] + [source_file_names[0], '--build-dir', build_dir]
-        st = _f2py_cmd_exec(cmd)
+        st = f2py_cmd_exec(cmd)
 
         if not os.path.exists(wrapper):
             f = open(wrapper, 'w')
@@ -159,7 +160,7 @@ def pyf2c(target, source, env):
         cmd = env['F2PYOPTIONS'] + source_file_names + ['--build-dir', build_dir]
         # fortran files, we need to give the module name
         cmd.extend(['--lower', '-m', basename])
-        st = _f2py_cmd_exec(cmd)
+        st = f2py_cmd_exec(cmd)
 
     return 0
 
@@ -171,7 +172,7 @@ def generate(env):
 
     c_file, cxx_file = SCons.Tool.createCFileBuilders(env)
 
-    c_file.add_action('.pyf', SCons.Action.Action(_pyf2c))
+    c_file.add_action('.pyf', SCons.Action.Action(pyf2c))
     c_file.add_emitter('.pyf', F2pyEmitter)
 
     env['F2PYOPTIONS']      = SCons.Util.CLVar('')
@@ -184,8 +185,7 @@ def generate(env):
     env.Append(SCANNERS = scanner)
 
     env['BUILDERS']['F2py'] = SCons.Builder.Builder(action = pyf2c, 
-                                                    emitter = F2pyEmitter,
-                                                    suffix = '$CFILESUFFIX')
+                                                    emitter = F2pyEmitter)
 
 def exists(env):
     try:
