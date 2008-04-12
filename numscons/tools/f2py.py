@@ -182,7 +182,7 @@ def generate(env):
     c_file.add_action('.pyf', SCons.Action.Action(f2pyac))
     c_file.add_emitter('.pyf', F2pyEmitter)
 
-    env['F2PYOPTIONS']      = SCons.Util.CLVar('')
+    env['F2PYOPTIONS']      = SCons.Util.CLVar('--quiet')
     env['F2PYBUILDDIR']     = ''
     env['F2PYINCLUDEDIR']   = pjoin(d, 'src')
     env['F2PYSTRCOM']       = "f2py: generating $TARGET from $SOURCE"
