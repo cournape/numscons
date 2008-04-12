@@ -178,13 +178,16 @@ def generate(env):
     env['F2PYOPTIONS']      = SCons.Util.CLVar('')
     env['F2PYBUILDDIR']     = ''
     env['F2PYINCLUDEDIR']   = pjoin(d, 'src')
+    env['F2PYSTRCOM']       = "f2py: generating $TARGET from $SOURCE"
 
     # XXX: adding a scanner using c_file.add_scanner does not work...
     expr = '(<)include_file=(\S+)>'
     scanner = SCons.Scanner.ClassicCPP("F2PYScan", ".pyf", "F2PYPATH", expr)
     env.Append(SCANNERS = scanner)
 
-    env['BUILDERS']['F2py'] = SCons.Builder.Builder(action = pyf2c, 
+    f2pyac = SCons.Action.Action(pyf2c, '$F2PYSTRCOM')
+
+    env['BUILDERS']['F2py'] = SCons.Builder.Builder(action = f2pyac,
                                                     emitter = F2pyEmitter)
 
 def exists(env):
