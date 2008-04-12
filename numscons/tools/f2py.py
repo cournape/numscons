@@ -26,9 +26,9 @@ FOBJECT_FILE    = 'fortranobject.c'
 FWRAP_TEMPLATE  = '%s-f2pywrappers.f'
 
 # Those regex are copied from build_src in numpy.distutils.command
-_f2py_module_name_match = re.compile(r'\s*python\s*module\s*(?P<name>[\w_]+)',
+F2PY_MODNAME_MATCH = re.compile(r'\s*python\s*module\s*(?P<name>[\w_]+)',
                                 re.I).match
-_f2py_user_module_name_match = re.compile(r'\s*python\s*module\s*(?P<name>[\w_]*?'\
+F2PY_UMODNAME_MATCH = re.compile(r'\s*python\s*module\s*(?P<name>[\w_]*?'\
                                      '__user__[\w_]*)',re.I).match
 # End of copy
 
@@ -39,9 +39,9 @@ def get_f2py_modulename_from_txt(source):
     code."""
     name = None
     for line in source.splitlines():
-        m = _f2py_module_name_match(line)
+        m = F2PY_MODNAME_MATCH(line)
         if m:
-            if _f2py_user_module_name_match(line): # skip *__user__* names
+            if F2PY_UMODNAME_MATCH(line): # skip *__user__* names
                 continue
             name = m.group('name')
             break
