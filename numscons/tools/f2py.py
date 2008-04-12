@@ -142,7 +142,6 @@ def _pyf2c(target, source, env):
 
     try:
         cpi = _mangle_fortranobject(target_file_names[0], 'fortranobject.c')
-        print "COPIED ", cpi
         shutil.copy(source_c, pjoin(build_dir, cpi))
     except IOError, e:
         msg = "Error while copying fortran source files (error was %s)" % str(e)
