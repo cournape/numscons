@@ -1,7 +1,13 @@
+Sat, 12 Apr 2008 19:04:02 -0400
+	* 0.6.0 release
+
 Sat, 12 Apr 2008 18:03:26 -0400
 	* f2py tool has been heavily updated. It now works with the --jobs
 	option, and correctly emit the right target name automatically.
 	* C++ has now its configuration file for c++ compilers.
+	* fortran tools are modified such as F*COM use fortran specific
+	include flag (-I) instead of the one from the C compiler, which cause
+	problems for the VS/mingw32 combination.
 
 Sat, 05 Apr 2008 09:22:10 -0700
 	* Update our local copy of scons to 0.98.0. We should not need our own
