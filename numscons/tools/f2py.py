@@ -21,15 +21,15 @@ import SCons.Tool
 import SCons.Util
 from SCons.Node.FS import default_fs 
 
-# XXX: this whole thing needs cleaning !
+CGEN_TEMPLATE   = '%smodule'
+FOBJECT_FILE    = 'fortranobject.c'
+FWRAP_TEMPLATE  = '%s-f2pywrappers.f'
 
-# Copied from build_src in numpy.distutils.command
-
+# Those regex are copied from build_src in numpy.distutils.command
 _f2py_module_name_match = re.compile(r'\s*python\s*module\s*(?P<name>[\w_]+)',
                                 re.I).match
 _f2py_user_module_name_match = re.compile(r'\s*python\s*module\s*(?P<name>[\w_]*?'\
                                      '__user__[\w_]*)',re.I).match
-
 # End of copy
 
 def get_f2py_modulename_from_txt(source):
@@ -71,7 +71,7 @@ def get_f2py_modulename_from_node(source):
 
 def F2pyEmitter(target, source, env):
     build_dir = pdirname(str(target[0]))
-    if _is_pyf(str(source[0])):
+    if is_pyf(str(source[0])):
         # target is (in this order):
         # - the C file which will contain the generated code
         # - the fortranobject.c file
@@ -79,34 +79,33 @@ def F2pyEmitter(target, source, env):
         basename = get_f2py_modulename_from_node(source[0])
         ntarget = []
 
-        ntarget.append(default_fs.Entry(pjoin(build_dir, '%smodule.c' % basename)))
+        ntarget.append(default_fs.Entry(pjoin(build_dir, CGENMODULE % basename)))
 
-        fobj = pjoin(build_dir, _mangle_fortranobject('%s' % basename, 
-                                                      'fortranobject.c'))
+        fobj = pjoin(build_dir, mangle_fortranobject(basename, FOBJECT_FILE))
         ntarget.append(default_fs.Entry(fobj))
 
-        f2pywrap = pjoin(build_dir, '%s-f2pywrappers.f' % basename)
+        f2pywrap = pjoin(build_dir, FWRAP_TEMPLATE % basename)
         ntarget.append(default_fs.Entry(f2pywrap))
     else:
         ntarget = target
-        fobj = pjoin(build_dir, _mangle_fortranobject(str(target[0]), 'fortranobject.c'))
+        fobj = pjoin(build_dir, mangle_fortranobject(str(target[0]), FOBJECT_FILE))
         ntarget.append(default_fs.Entry(fobj))
     return (ntarget, source)
 
-def _mangle_fortranobject(targetname, filename):
+def mangle_fortranobject(targetname, filename):
     basename = os.path.basename(targetname).split('module')[0]
     return '%s_%s' % (basename, filename)
 
-def _is_pyf(source_file):
+def is_pyf(source_file):
     return os.path.splitext(source_file)[1] == '.pyf'
 
-def _f2py_cmd_exec(cmd):
+def f2py_cmd_exec(cmd):
     """Executes a f2py command.
     
     cmd should be a sequence.
     
-    The point is to execute in a new process to avoid race issues when using
-    multible jobs with scons."""
+    The point to execute f2py in a new process instead of using f2py.mainto
+    avoid race issues when using multible jobs with scons."""
     f2py_cmd = [sys.executable, '-c', 
                 '"from numpy.f2py.f2py2e import run_main;run_main(%s)"' % repr(cmd)]
     p = subprocess.Popen(" ".join(f2py_cmd), shell = True, stdout = subprocess.PIPE)
@@ -114,7 +113,7 @@ def _f2py_cmd_exec(cmd):
         print i.rstrip('\n')
     return p.wait()
 
-def _pyf2c(target, source, env):
+def pyf2c(target, source, env):
     import numpy.f2py
     import shutil
 
@@ -124,7 +123,7 @@ def _pyf2c(target, source, env):
 
     # Get source files necessary for f2py generated modules
     d = os.path.dirname(numpy.f2py.__file__)
-    source_c = pjoin(d,'src','fortranobject.c')
+    source_c = pjoin(d, 'src', FOBJECT_FILE)
 
     # Copy source files for f2py generated modules in the build dir
     build_dir = pdirname(target_file_names[0])
@@ -134,7 +133,7 @@ def _pyf2c(target, source, env):
         build_dir = '.'
 
     try:
-        cpi = _mangle_fortranobject(target_file_names[0], 'fortranobject.c')
+        cpi = _mangle_fortranobject(target_file_names[0], FOBJECT_FILE)
         shutil.copy(source_c, pjoin(build_dir, cpi))
     except IOError, e:
         msg = "Error while copying fortran source files (error was %s)" % str(e)
@@ -148,7 +147,7 @@ def _pyf2c(target, source, env):
         if len(source_file_names) > 1:
             raise NotImplementedError("FIXME: multiple source files")
         
-        wrapper = pjoin(build_dir, '%s-f2pywrappers.f' % basename)
+        wrapper = pjoin(build_dir, FWRAP_TEMPLATE % basename)
 
         cmd = env['F2PYOPTIONS'] + [source_file_names[0], '--build-dir', build_dir]
         st = _f2py_cmd_exec(cmd)
@@ -184,7 +183,7 @@ def generate(env):
     scanner = SCons.Scanner.ClassicCPP("F2PYScan", ".pyf", "F2PYPATH", expr)
     env.Append(SCANNERS = scanner)
 
-    env['BUILDERS']['F2py'] = SCons.Builder.Builder(action = _pyf2c, 
+    env['BUILDERS']['F2py'] = SCons.Builder.Builder(action = pyf2c, 
                                                     emitter = F2pyEmitter,
                                                     suffix = '$CFILESUFFIX')
 

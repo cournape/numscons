@@ -41,9 +41,6 @@ Things to implement / problems to solve:
 F2py:
     - Numpy version to handle build dir issues
     - Difference between .f and .pyf:
-    - how to handle extension name: target name depends on src file content,
-      but there are issues with BuildDir (e.g. reading the content in the
-      emitter does not work).
 
 Tests:
     - What can be tested ?
