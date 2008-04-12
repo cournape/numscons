@@ -1,3 +1,8 @@
+Sat, 12 Apr 2008 18:03:26 -0400
+	* f2py tool has been heavily updated. It now works with the --jobs
+	option, and correctly emit the right target name automatically.
+	* C++ has now its configuration file for c++ compilers.
+
 Sat, 05 Apr 2008 09:22:10 -0700
 	* Update our local copy of scons to 0.98.0. We should not need our own
 	modified copy anymore, the upstream one should be enough !

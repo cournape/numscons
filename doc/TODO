@@ -8,7 +8,6 @@ were when scons was inside numpy repository):
     - remove duplicate between check_code and check_include_and_run.
     - remove code for building empty programs: replace it by proper sconf (see
       below)
-    - f2py tool: see F2PY section 
     - clean the code of numpyenv; in perticular: builder creation (should be
       done through tools), rename functions, and set the order right (0.6*
       serie).
@@ -26,7 +25,7 @@ were when scons was inside numpy repository):
 Meta Goals:
     - 0.5: make scipy buildable by numscons.
     - 0.6: Python Extension builder + upstream Fortran changes
-    - 0.7: f2py tool thread-safe, fortran improvements
+    - 0.7: fortran improvements
     
 Cleaning checkers modules:
     - Refactor site config custom: remove duplicate between core.libinfo and
