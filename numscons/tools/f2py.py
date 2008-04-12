@@ -74,15 +74,16 @@ def get_f2py_modulename_from_node(source):
     node = source.rfile()
     if node.exists() or not node.is_derived():
         name = get_f2py_modulename_from_txt(node.get_contents())
-    try:
-        # XXX: I don't understand this part
-        snode = source.sources[0].rfile()
-        if snode.is_derived():
-            snode = snode.sources[0].rfile()
-        cnt = snode.get_contents()
-        name = get_f2py_modulename_from_txt(cnt)
-    except AttributeError:
-        pass
+    else:
+        try:
+            # XXX: I don't understand this part
+            snode = source.sources[0].rfile()
+            if snode.is_derived():
+                snode = snode.sources[0].rfile()
+            cnt = snode.get_contents()
+            name = get_f2py_modulename_from_txt(cnt)
+        except AttributeError:
+            pass
     return name
 
 def F2pyEmitter(target, source, env):
