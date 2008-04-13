@@ -10,7 +10,7 @@ from numscons.numdist import msvc_runtime_library
 
 from extension import get_pythonlib_dir, get_python_inc
 from misc import built_with_mstools, built_with_mingw, built_with_gnu_f77, \
-                 get_pythonlib_name, isfortran
+                 get_pythonlib_name, isfortran, isf2py
 
 def PythonExtension(env, target, source, *args, **kw):
     # XXX: Some things should not be set here... Actually, this whole
@@ -54,7 +54,7 @@ def PythonExtension(env, target, source, *args, **kw):
             # point.
             from SCons.Node.FS import default_fs
             snodes = [default_fs.Entry(s) for s in source]
-            if isfortran(env, snodes):
+            if isfortran(env, snodes) or isf2py(env, snodes):
                 LIBS.append(get_pythonlib_name())
             else:
                 LIBS.extend([get_pythonlib_name(), py_runtime_library])

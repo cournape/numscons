@@ -149,3 +149,18 @@ def isfortran(env, source):
                 return 1
     return 0
 
+def isf2py(env, source):
+    """Return 1 if any of code in source has f2py interface files in it, 0
+    otherwise."""
+    fsuffixes = ['.pyf']
+
+    if not source:
+        # Source might be None for unusual cases like SConf.
+        return 0
+    for s in source:
+        if s.sources:
+            ext = os.path.splitext(str(s.sources[0]))[1]
+            if ext in fsuffixes:
+                return 1
+    return 0
+
