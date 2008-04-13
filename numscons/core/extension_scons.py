@@ -54,7 +54,7 @@ def PythonExtension(env, target, source, *args, **kw):
             # point.
             from SCons.Node.FS import default_fs
             snodes = [default_fs.Entry(s) for s in source]
-            if isfortran(snodes):
+            if isfortran(env, snodes):
                 LIBS.append(get_pythonlib_name())
             else:
                 LIBS.extend([get_pythonlib_name(), py_runtime_library])
