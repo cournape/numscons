@@ -10,7 +10,7 @@ from numscons.numdist import msvc_runtime_library
 
 from extension import get_pythonlib_dir, get_python_inc
 from misc import built_with_mstools, built_with_mingw, built_with_gnu_f77, \
-                 get_pythonlib_name
+                 get_pythonlib_name, isfortran
 
 def PythonExtension(env, target, source, *args, **kw):
     # XXX: Some things should not be set here... Actually, this whole
@@ -49,7 +49,10 @@ def PythonExtension(env, target, source, *args, **kw):
             # built with MSVC >= 7.0 (MinGW standard is msvcrt)
             py_runtime_library = msvc_runtime_library()
             LIBPATH.append(get_pythonlib_dir())
-            LIBS.extend([get_pythonlib_name(), py_runtime_library])
+            if isfortran(source):
+                LIBS.append(get_pythonlib_name())
+            else:
+                LIBS.extend([get_pythonlib_name(), py_runtime_library])
     elif sys.platform == "darwin":
         # XXX: When those should be used ? (which version of Mac OS X ?)
         LINKFLAGS.extend(['-undefined', 'dynamic_lookup'])
