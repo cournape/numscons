@@ -49,7 +49,12 @@ def PythonExtension(env, target, source, *args, **kw):
             # built with MSVC >= 7.0 (MinGW standard is msvcrt)
             py_runtime_library = msvc_runtime_library()
             LIBPATH.append(get_pythonlib_dir())
-            if isfortran(source):
+            # XXX: this is really ugly. This is all because I am too lazy to do
+            # a real python extension builder, which I should really do at some
+            # point.
+            from SCons.Node.FS import default_fs
+            snodes = [default_fs.Entry(s) for s in source]
+            if isfortran(snodes):
                 LIBS.append(get_pythonlib_name())
             else:
                 LIBS.extend([get_pythonlib_name(), py_runtime_library])
