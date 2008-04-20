@@ -11,8 +11,8 @@ from os.path import join as pjoin, dirname as pdirname, basename as pbasename, \
 from distutils.sysconfig import get_config_vars
 
 from numscons.core.default import tool_list
-from numscons.core.compiler_config import get_cc_config, get_f77_config,\
-     NoCompilerConfig, Config, CompilerConfig, F77CompilerConfig
+from numscons.core.compiler_config import get_cc_config, get_f77_config, get_cxx_config, \
+     NoCompilerConfig, Config, CompilerConfig, F77CompilerConfig, CXXCompilerConfig
 from numscons.core.custom_builders import NumpySharedLibrary, NumpyCtypes, \
      NumpyPythonExtension, NumpyStaticExtLibrary
 from numscons.core.siteconfig import get_config
@@ -95,13 +95,22 @@ def customize_f77(name, env):
     """Customize env options related to the given tool (F77 compiler)."""
     # XXX: this should be handled somewhere else...
     if sys.platform == "win32" and is_f77_gnu(env):
-	name = "%s_mingw" % name
+        name = "%s_mingw" % name
 
     try:
         cfg = get_f77_config(name)
     except NoCompilerConfig, e:
         print "compiler %s has no customization available" % name
         cfg = F77CompilerConfig(Config())
+    env.AppendUnique(**cfg.get_flags_dict())
+
+def customize_cxx(name, env):
+    """Customize env options related to the given tool (CXX compiler)."""
+    try:
+        cfg = get_cxx_config(name)
+    except NoCompilerConfig, e:
+        print "compiler %s has no customization available" % name
+        cfg = CXXCompilerConfig(Config())
     env.AppendUnique(**cfg.get_flags_dict())
 
 def finalize_env(env):
@@ -133,6 +142,8 @@ def GetNumpyEnvironment(args):
     extensions, fortran builders, etc... Generally, call it with args =
     ARGUMENTS, which contain the arguments given to the scons process."""
     env = _get_numpy_env(args)
+
+    # XXX: this is messy, refactor that crap
 
     #------------------------------
     # C compiler last customization
@@ -166,6 +177,21 @@ def GetNumpyEnvironment(args):
                                          env['NUMPY_DEBUG_SYMBOL_FFLAGS'] +
                                          env['NUMPY_EXTRA_FFLAGS'] +
                                          env['NUMPY_THREAD_FFLAGS'])
+
+    #--------------------------------
+    # CXX compiler last customization
+    #--------------------------------
+    if env.has_key('CXX'):
+        if 'CXXFLAGS' in os.environ:
+            env.Append(CXXFLAGS = "%s" % os.environ['CXXFLAGS'])
+            env.AppendUnique(CXXFLAGS = env['NUMPY_EXTRA_CXXFLAGS'] +
+                                        env['NUMPY_THREAD_CXXFLAGS'])
+        else: 
+    	    env.AppendUnique(CXXFLAGS  = env['NUMPY_WARN_CXXFLAGS'] +
+                                         env['NUMPY_OPTIM_CXXFLAGS'] +
+                                         env['NUMPY_DEBUG_SYMBOL_CXXFLAGS'] +
+                                         env['NUMPY_EXTRA_CXXFLAGS'] +
+                                         env['NUMPY_THREAD_CXXFLAGS'])
     #print env.Dump('F77')
     #print env.Dump('F77FLAGS')
     #print env.Dump('SHF77FLAGS')
@@ -260,11 +286,13 @@ def initialize_cxx(env, path_list):
                      toolpath = get_additional_toolpaths(env))
             t(env) 
             path_list.append(env['cxx_opt_path'])
+            customize_cxx(t.name, env)
     else:
-        def_fcompiler =  FindTool(DEF_CXX_COMPILERS, env)
-        if def_fcompiler:
-            t = Tool(def_fcompiler, toolpath = get_additional_toolpaths(env))
+        def_cxxcompiler =  FindTool(DEF_CXX_COMPILERS, env)
+        if def_cxxcompiler:
+            t = Tool(def_cxxcompiler, toolpath = get_additional_toolpaths(env))
             t(env)
+            customize_cxx(t.name, env)
         else:
             print "========== NO CXX COMPILER FOUND ==========="
 
