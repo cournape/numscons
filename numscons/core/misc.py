@@ -4,7 +4,8 @@ import sys
 import os
 import re
 
-from os.path import join as pjoin, dirname as pdirname, basename as pbasename
+from os.path import join as pjoin, dirname as pdirname, \
+                    basename as pbasename, splitext
 
 import numscons
 
@@ -127,4 +128,39 @@ def get_vs_version(env):
             raise RuntimeError("FIXME: failed to parse VS version")
     except KeyError:
         raise RuntimeError("Could not get VS version !")
+
+def isfortran(env, source):
+    """Return 1 if any of code in source has fortran files in it, 0
+    otherwise."""
+    try:
+        fsuffixes = env['FORTRANSUFFIXES']
+    except KeyError:
+        # If no FORTRANSUFFIXES, no fortran tool, so there is no need to look
+        # for fortran sources.
+        return 0
+
+    if not source:
+        # Source might be None for unusual cases like SConf.
+        return 0
+    for s in source:
+        if s.sources:
+            ext = os.path.splitext(str(s.sources[0]))[1]
+            if ext in fsuffixes:
+                return 1
+    return 0
+
+def isf2py(env, source):
+    """Return 1 if any of code in source has f2py interface files in it, 0
+    otherwise."""
+    fsuffixes = ['.pyf']
+
+    if not source:
+        # Source might be None for unusual cases like SConf.
+        return 0
+    for s in source:
+        if s.sources:
+            ext = os.path.splitext(str(s.sources[0]))[1]
+            if ext in fsuffixes:
+                return 1
+    return 0
 
