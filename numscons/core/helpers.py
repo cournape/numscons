@@ -134,6 +134,8 @@ def GetNumpyEnvironment(args):
     ARGUMENTS, which contain the arguments given to the scons process."""
     env = _get_numpy_env(args)
 
+    # XXX: this is messy, refactor that crap
+
     #------------------------------
     # C compiler last customization
     #------------------------------
@@ -166,6 +168,21 @@ def GetNumpyEnvironment(args):
                                          env['NUMPY_DEBUG_SYMBOL_FFLAGS'] +
                                          env['NUMPY_EXTRA_FFLAGS'] +
                                          env['NUMPY_THREAD_FFLAGS'])
+
+    #--------------------------------
+    # CXX compiler last customization
+    #--------------------------------
+    if env.has_key('CXX'):
+        if 'CXXFLAGS' in os.environ:
+            env.Append(CXXFLAGS = "%s" % os.environ['CXXFLAGS'])
+            env.AppendUnique(CXXFLAGS = env['NUMPY_EXTRA_CXXFLAGS'] +
+                                        env['NUMPY_THREAD_CXXFLAGS'])
+        else: 
+    	    env.AppendUnique(CXXFLAGS  = env['NUMPY_WARN_CXXFLAGS'] +
+                                         env['NUMPY_OPTIM_CXXFLAGS'] +
+                                         env['NUMPY_DEBUG_SYMBOL_CXXFLAGS'] +
+                                         env['NUMPY_EXTRA_CXXFLAGS'] +
+                                         env['NUMPY_THREAD_CXXFLAGS'])
     #print env.Dump('F77')
     #print env.Dump('F77FLAGS')
     #print env.Dump('SHF77FLAGS')
