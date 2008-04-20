@@ -1,3 +1,8 @@
+Sun, 20 Apr 2008 23:17:21 +0900
+	* 0.6.1 release
+	* numscons now successfully build numpy and scipy on linux + gcc,
+	Win32 + mingw and Mac OS X + gcc
+
 Sat, 12 Apr 2008 19:04:02 -0400
 	* 0.6.0 release
 
