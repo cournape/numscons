@@ -175,7 +175,7 @@ def generate(env):
     import numpy.f2py
     d = pdirname(numpy.f2py.__file__)
 
-    f2pyac = SCons.Action.Action(pyf2c, '$F2PYSTRCOM')
+    f2pyac = SCons.Action.Action(pyf2c, '$F2PYCOMSTR')
 
     c_file, cxx_file = SCons.Tool.createCFileBuilders(env)
 
