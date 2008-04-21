@@ -374,6 +374,9 @@ def set_verbosity(env):
         env['CCCOMSTR']         = "CC                 $SOURCE"
         env['SHCCCOMSTR']       = "SHCC               $SOURCE"
 
+        env['CXXCOMSTR']        = "CXX                $SOURCE"
+        env['SHCXXCOMSTR']      = "SHCXX              $SOURCE"
+
         env['F77COMSTR']        = "F77                $SOURCE"
         env['SHF77COMSTR']      = "SHF77              $SOURCE"
 
