@@ -80,6 +80,9 @@ def GetNumpyOptions(args):
     opts.Add('cxx_opt', 'name of C compiler', '')
     opts.Add('cxx_opt_path', 'path of the C compiler set in cc_opt', '')
 
+    # Silent mode
+    opts.Add('silent', '0 means max verbose, 1 less verbose, and 2 almost nothing', '0')
+
     return opts
 
 def customize_cc(name, env):
@@ -351,6 +354,8 @@ def _get_numpy_env(args):
     if os.environ.has_key('HOME'):
         env['ENV']['HOME'] = os.environ['HOME']
 
+    set_verbosity(env)
+
     # Generate help (if calling scons directly during debugging, this could be
     # useful)
     Help(opts.GenerateHelpText(env))
@@ -359,6 +364,24 @@ def _get_numpy_env(args):
     if sys.platform == "win32":
 	    env["ENV"]["PATH"] = os.environ["PATH"]
     return env
+
+def set_verbosity(env):
+    level = env['silent']
+
+    if level > 0:
+        env['F2PYCOMSTR']       = "F2PY     $SOURCE"
+
+        env['CCCOMSTR']         = "CC       $SOURCE"
+        env['SHCCCOMSTR']       = "SHCC     $SOURCE"
+
+        env['F77COMSTR']        = "F77      $SOURCE"
+        env['SHF77COMSTR']      = "SHF77    $SOURCE"
+
+        env['ARCOMSTR']         = "AR       $SOURCE"
+        env['RANLIBCOMSTR']     = "RANLIB   $SOURCE"
+        env['LDMODULECOMSTR']   = "LDMODULE $SOURCE"
+
+        env['INSTALLSTR']       = "INSTALL  $SOURCE"
 
 def set_site_config(env):
     config = get_config()
