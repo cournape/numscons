@@ -369,19 +369,24 @@ def set_verbosity(env):
     level = env['silent']
 
     if level > 0:
-        env['F2PYCOMSTR']       = "F2PY     $SOURCE"
+        env['F2PYCOMSTR']       = "F2PY               $SOURCE"
 
-        env['CCCOMSTR']         = "CC       $SOURCE"
-        env['SHCCCOMSTR']       = "SHCC     $SOURCE"
+        env['CCCOMSTR']         = "CC                 $SOURCE"
+        env['SHCCCOMSTR']       = "SHCC               $SOURCE"
 
-        env['F77COMSTR']        = "F77      $SOURCE"
-        env['SHF77COMSTR']      = "SHF77    $SOURCE"
+        env['F77COMSTR']        = "F77                $SOURCE"
+        env['SHF77COMSTR']      = "SHF77              $SOURCE"
 
-        env['ARCOMSTR']         = "AR       $SOURCE"
-        env['RANLIBCOMSTR']     = "RANLIB   $SOURCE"
-        env['LDMODULECOMSTR']   = "LDMODULE $SOURCE"
+        env['ARCOMSTR']         = "AR                 $SOURCE"
+        env['RANLIBCOMSTR']     = "RANLIB             $SOURCE"
+        env['LDMODULECOMSTR']   = "LDMODULE           $SOURCE"
 
-        env['INSTALLSTR']       = "INSTALL  $SOURCE"
+        env['INSTALLSTR']       = "INSTALL            $SOURCE"
+
+        env['ARRAPIGENCOMSTR']  = "GENERATE ARRAY API $SOURCE"
+        env['UFUNCAPIGENCOMSTR']= "GENERATE UFUNC API $SOURCE"
+        env['TEMPLATECOMSTR']   = "FROM TEMPLATE      $SOURCE"
+        env['UMATHCOMSTR']      = "GENERATE UMATH     $SOURCE"
 
 def set_site_config(env):
     config = get_config()
