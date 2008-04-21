@@ -11,7 +11,7 @@ were when scons was inside numpy repository):
     - clean the code of numpyenv; in perticular: builder creation (should be
       done through tools), rename functions, and set the order right (0.6*
       serie).
-    - clean up numpy.core building (0.6* serie): avoid explicit build dir and co
+    - clean up numpy.core building (0.6 serie): avoid explicit build dir and co
     - CXX optimizations flags + Control cxxflags from env
     - Add CPPPDEFINES in perflib checkers 
     - handle inplace
@@ -23,9 +23,8 @@ were when scons was inside numpy repository):
     - handle numpy headers, too
 
 Meta Goals:
-    - 0.5: make scipy buildable by numscons.
-    - 0.6: Python Extension builder + upstream Fortran changes
-    - 0.7: fortran improvements
+    - 0.6: upstream Fortran changes
+    - 0.7: Python Extension builder
     
 Cleaning checkers modules:
     - Refactor site config custom: remove duplicate between core.libinfo and
@@ -72,7 +71,7 @@ New builders we can add to scons (and needed by numscons):
 Fortran code
 ------------
 
-Finish work on refactored scons
+Finish work on refactored scons: fortran revamp work integrated in scons 0.98.2
 
 Misc
 ----
