@@ -46,7 +46,7 @@ def _glob(env, path):
 
 def GetNumpyOptions(args):
     """Call this with args=ARGUMENTS to take into account command line args."""
-    from SCons.Options import Options
+    from SCons.Options import Options, EnumOption
 
     opts = Options(None, args)
 
@@ -81,7 +81,12 @@ def GetNumpyOptions(args):
     opts.Add('cxx_opt_path', 'path of the C compiler set in cc_opt', '')
 
     # Silent mode
-    opts.Add('silent', '0 means max verbose, 1 less verbose, and 2 almost nothing', '0')
+    # XXX: scons does not have a canned option for integer, EnumOption won't
+    # accept integers...
+    opts.Add(EnumOption('silent', 
+                        '0 means max verbose, 1 less verbose, and 2 '\
+                        'almost nothing', 
+                        '0', allowed_values = ('0', '1', '2')))
 
     return opts
 
@@ -366,7 +371,7 @@ def _get_numpy_env(args):
     return env
 
 def set_verbosity(env):
-    level = env['silent']
+    level = int(env['silent'])
 
     if level > 0:
         env['F2PYCOMSTR']       = "F2PY               $SOURCE"
