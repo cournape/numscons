@@ -514,9 +514,11 @@ def customize_tools(env):
     try:
         t(env)
     except Exception, e:
-        msg = "===== BOOTSTRAPPING, f2py scons tool not available (%s) =====" \
-              % e
-        print msg
+        #msg = "===== BOOTSTRAPPING, f2py scons tool not available (%s) =====" \
+        #      % e
+        #print msg
+        pass
+
     # XXX: understand how registration of source files work before reenabling
     # those
 
