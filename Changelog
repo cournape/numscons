@@ -1,3 +1,6 @@
+Tue, 22 Apr 2008 17:52:59 +0900
+	* 0.6.3 release
+
 Tue, 22 Apr 2008 17:42:43 +0900
 	* CheckF77Clib now returns the same kind of output for unix-like
 	linkers and MS linkers (something that can be fed to LINKFLAGS).
