@@ -185,7 +185,7 @@ def generate(env):
     env['F2PYOPTIONS']      = SCons.Util.CLVar('--quiet')
     env['F2PYBUILDDIR']     = ''
     env['F2PYINCLUDEDIR']   = pjoin(d, 'src')
-    env['F2PYSTRCOM']       = "f2py: generating $TARGET from $SOURCE"
+    env['F2PYCOMSTR']       = "f2py: generating $TARGET from $SOURCE"
 
     # XXX: adding a scanner using c_file.add_scanner does not work...
     expr = '(<)include_file=(\S+)>'
