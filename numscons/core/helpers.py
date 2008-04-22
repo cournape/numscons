@@ -556,8 +556,10 @@ def customize_link_flags(env):
         env['LDMODULECOM'] = '%s $LDMODULEFLAGSEND' % env['LDMODULECOM']
 
 def distutils_dirs_emitter(target, source, env):
-    source = [pjoin(env['build_dir'], str(i)) for i in source]
-    target = [pjoin(env['build_dir'], str(i)) for i in target]
+    from SCons.Node.FS import default_fs 
+
+    source = [default_fs.Entry(pjoin(env['build_dir'], str(i))) for i in source]
+    target = [default_fs.Entry(pjoin(env['build_dir'], str(i))) for i in target]
 
     return target, source
 
