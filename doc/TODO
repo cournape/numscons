@@ -9,9 +9,9 @@ were when scons was inside numpy repository):
     - remove code for building empty programs: replace it by proper sconf (see
       below)
     - clean the code of numpyenv; in perticular: builder creation (should be
-      done through tools), rename functions, and set the order right (0.6*
+      done through tools), rename functions, and set the order right (0.7*
       serie).
-    - clean up numpy.core building (0.6 serie): avoid explicit build dir and co
+    - clean up numpy.core building (0.7 serie): avoid explicit build dir and co
     - CXX optimizations flags + Control cxxflags from env
     - Add CPPPDEFINES in perflib checkers 
     - handle inplace
@@ -23,8 +23,9 @@ were when scons was inside numpy repository):
     - handle numpy headers, too
 
 Meta Goals:
-    - 0.6: upstream Fortran changes
-    - 0.7: Python Extension builder
+    - 0.6: handle VS builds of numpy and scipy
+    - 0.7: upstream Fortran changes in scons, handle fortran dialects
+    - 0.8: Python Extension builder
     
 Cleaning checkers modules:
     - Refactor site config custom: remove duplicate between core.libinfo and
@@ -38,7 +39,6 @@ Things to implement / problems to solve:
 
 F2py:
     - Numpy version to handle build dir issues
-    - Difference between .f and .pyf:
 
 Tests:
     - What can be tested ?
