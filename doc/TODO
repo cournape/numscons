@@ -5,13 +5,9 @@ Basic tasks
 
 Then, those are the old remaining things to do (once we get to the point we
 were when scons was inside numpy repository):
-    - remove duplicate between check_code and check_include_and_run.
-    - remove code for building empty programs: replace it by proper sconf (see
-      below)
     - clean the code of numpyenv; in perticular: builder creation (should be
       done through tools), rename functions, and set the order right (0.7*
       serie).
-    - clean up numpy.core building (0.7 serie): avoid explicit build dir and co
     - CXX optimizations flags + Control cxxflags from env
     - Add CPPPDEFINES in perflib checkers 
     - handle inplace
@@ -19,26 +15,29 @@ were when scons was inside numpy repository):
     - CLAPACK: check old atlas
     - setuptools integration
     - solution to handle sdist (source files)
-    - automatic handling of python header and python lib for python extensions.
     - handle numpy headers, too
 
 Meta Goals:
     - 0.6: handle VS builds of numpy and scipy
-    - 0.7: upstream Fortran changes in scons, handle fortran dialects
-    - 0.8: Python Extension builder
+    - 0.7: upstream Fortran changes in scons, handle fortran dialects.
+    - 0.8: Python Extension builder, make clear difference between Numpy and
+      Distutils builders, automatically handle libpath, cpppath for numpy
+      header, etc...
+    - 0.9: clean up core and checkers code. Remove duplicated code, clean-up
+      numpyenv, etc\.\.\. Handles setuptools integration (inplace, etc...) +
+      sdist problems. Put documentation in shape.
     
 Cleaning checkers modules:
     - Refactor site config custom: remove duplicate between core.libinfo and
       checkers.perflib_info
     - Have test for fortran
+    - remove duplicate between check_code and check_include_and_run.
 
-Things to implement / problems to solve:
+Things to implement in scons (upstream):
     - Make 'real' python extension builders
-    - f2py interoperability ?
-    - fortran compiler optimization / option (underscore and so on)
-
-F2py:
-    - Numpy version to handle build dir issues
+    - automatic handling of python header and python lib for python extensions.
+    - remove code for building empty programs: replace it by proper sconf (see
+      below)
 
 Tests:
     - What can be tested ?
@@ -87,4 +86,3 @@ Documentation:
     - scons / distutils integration, global design (BuildDir, directories, etc...)
     - use cases: package developers (examples, etc...), numpy developers,
       building numpy with scons, etc...
-
