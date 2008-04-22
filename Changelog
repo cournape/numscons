@@ -1,3 +1,9 @@
+Tue, 22 Apr 2008 11:06:27 +0900
+	* Handle a silent option passed by the distutils scons command. For
+	any level > 0, we don't display the full compilation commands anymore,
+	but only terse message with the source file(s) through the scons
+	COMSTR mechanism.
+
 Sun, 20 Apr 2008 23:17:21 +0900
 	* 0.6.1 release
 	* numscons now successfully build numpy and scipy on linux + gcc,
