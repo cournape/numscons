@@ -9,6 +9,7 @@ import os.path
 from os.path import join as pjoin, dirname as pdirname, basename as pbasename, \
     exists as pexists, abspath as pabspath
 from distutils.sysconfig import get_config_vars
+from copy import deepcopy
 
 from numscons.core.default import tool_list
 from numscons.core.compiler_config import get_cc_config, get_f77_config, get_cxx_config, \
@@ -513,7 +514,7 @@ def customize_tools(env):
 
     try:
         t(env)
-    except Exception, e:
+    except ImportError, e:
         #msg = "===== BOOTSTRAPPING, f2py scons tool not available (%s) =====" \
         #      % e
         #print msg
