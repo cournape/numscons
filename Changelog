@@ -1,3 +1,11 @@
+Tue, 22 Apr 2008 17:42:43 +0900
+	* CheckF77Clib now returns the same kind of output for unix-like
+	linkers and MS linkers (something that can be fed to LINKFLAGS).
+	* Consequently, less special-casing for ms tools for perflib checkers
+	(in fortran runtime support).
+	* Link commands are customize in the ms linker case too, now, to
+	handle LINKFLAGSEND flag.
+
 Tue, 22 Apr 2008 13:53:27 +0900
 	* 0.6.2 release
 
