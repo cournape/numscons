@@ -1,3 +1,6 @@
+Tue, 22 Apr 2008 13:53:27 +0900
+	* 0.6.2 release
+
 Tue, 22 Apr 2008 13:26:58 +0900
 	* Add a NumpyF2py builder, to avoid having to take care of distutils
 	directories explictly.
