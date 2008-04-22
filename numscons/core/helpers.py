@@ -514,6 +514,9 @@ def customize_tools(env):
 
     try:
         t(env)
+        bld = deepcopy(env['BUILDERS']['F2py'])
+        bld.emitter.insert(0, distutils_dirs_emitter)
+        env['BUILDERS']['NumpyF2py'] = bld
     except ImportError, e:
         #msg = "===== BOOTSTRAPPING, f2py scons tool not available (%s) =====" \
         #      % e

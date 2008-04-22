@@ -67,6 +67,7 @@ def get_f2py_modulename_from_node(source):
             name = get_f2py_modulename_from_txt(cnt)
         except AttributeError:
             pass
+    assert name is not None
     return name
 
 def F2pyEmitter(target, source, env):
@@ -193,7 +194,7 @@ def generate(env):
     env.Append(SCANNERS = scanner)
 
     env['BUILDERS']['F2py'] = SCons.Builder.Builder(action = f2pyac,
-                                                    emitter = F2pyEmitter)
+            emitter = [F2pyEmitter])
 
 def exists(env):
     try:
