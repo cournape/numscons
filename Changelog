@@ -1,3 +1,7 @@
+Tue, 22 Apr 2008 18:31:59 +0900
+	* 0.6.3.1 release
+	* Fix f2py issues when bootstrapping numpy build
+
 Tue, 22 Apr 2008 17:52:59 +0900
 	* 0.6.3 release
 
