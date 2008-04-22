@@ -200,8 +200,8 @@ def exists(env):
     try:
         import numpy.f2py
         st = 1
-    except ImportError, e:
-        print "Warning : f2py tool not found, error was %s" % e
+    except Exception, e:
+        #print "Warning : f2py tool not found, error was %s" % e
         st = 0
 
     return st
