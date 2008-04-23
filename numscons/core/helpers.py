@@ -397,6 +397,9 @@ def set_verbosity(env):
         env['TEMPLATECOMSTR']   = "FROM TEMPLATE      $SOURCE"
         env['UMATHCOMSTR']      = "GENERATE UMATH     $SOURCE"
 
+        env['CTEMPLATECOMSTR']  = "FROM C TEMPLATE    $SOURCE"
+        env['FTEMPLATECOMSTR']  = "FROM F TEMPLATE    $SOURCE"
+
 def set_site_config(env):
     config = get_config()
     env['NUMPY_SITE_CONFIG'] = config
@@ -439,6 +442,7 @@ def add_custom_builders(env):
     """Call this to add all our custom builders to the environment."""
     from SCons.Scanner import Scanner
     from SCons.Builder import Builder
+    from SCons.Action import Action
 
     # Add the file substitution tool
     TOOL_SUBST(env)
@@ -452,12 +456,12 @@ def add_custom_builders(env):
     tpl_scanner = Scanner(function = generate_from_template_scanner, 
                           skeys = ['.src'])
     env['BUILDERS']['FromCTemplate'] = Builder(
-                action = generate_from_c_template, 
+                action = Action(generate_from_c_template, '$CTEMPLATECOMSTR'), 
                 emitter = generate_from_template_emitter,
                 source_scanner = tpl_scanner)
 
     env['BUILDERS']['FromFTemplate'] = Builder(
-                action = generate_from_f_template, 
+                action = Action(generate_from_f_template, '$FTEMPLATECOMSTR'),
                 emitter = generate_from_template_emitter,
                 source_scanner = tpl_scanner)
 
