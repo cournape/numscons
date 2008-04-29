@@ -1,3 +1,7 @@
+Tue, 29 Apr 2008 20:54:50 +0900
+	* 0.7.0 release
+	* Update to scons 0.98.2
+
 Tue, 22 Apr 2008 18:31:59 +0900
 	* 0.6.3.1 release
 	* Fix f2py issues when bootstrapping numpy build
