@@ -3,7 +3,7 @@ from os.path import join as pjoin
 
 from SCons.Environment import Environment
 
-from numscons.core.misc import get_additional_toolpaths
+from numscons.core.misc import get_numscons_toolpaths
 
 class NumpyEnvironment(Environment):
     """An SCons Environment subclass which knows how to deal with distutils
@@ -24,7 +24,7 @@ class NumpyEnvironment(Environment):
         """Like SCons.Tool, but knows about numscons specific toolpaths."""
         if path:
             return Environment.Tool(self, toolname, 
-                    path + get_additional_toolpaths(self))
+                    path + get_numscons_toolpaths(self))
         else:
-            return Environment.Tool(self, toolname, get_additional_toolpaths(self))
+            return Environment.Tool(self, toolname, get_numscons_toolpaths(self))
 

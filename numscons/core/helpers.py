@@ -21,7 +21,7 @@ from numscons.core.extension_scons import PythonExtension, built_with_mstools, \
      createStaticExtLibraryBuilder
 from numscons.core.utils import pkg_to_path, partial
 from numscons.core.misc import pyplat2sconsplat, is_cc_suncc, \
-     get_additional_toolpaths as get_numscons_toolpaths, \
+     get_numscons_toolpaths, \
      is_f77_gnu, get_vs_version
 from numscons.core.template_generators import generate_from_c_template, \
      generate_from_f_template, generate_from_template_emitter, \
@@ -33,7 +33,7 @@ from numscons.tools.substinfile import TOOL_SUBST
 from misc import get_scons_build_dir, get_scons_configres_dir,\
                  get_scons_configres_filename, built_with_mingw
 
-__all__ = ['GetNumpyEnvironment', 'distutils_dirs_emitter', 'get_numscons_toolpaths']
+__all__ = ['GetNumpyEnvironment', 'distutils_dirs_emitter']
 
 DEF_LINKERS, DEF_C_COMPILERS, DEF_CXX_COMPILERS, DEF_ASSEMBLERS, \
 DEF_FORTRAN_COMPILERS, DEF_ARS, DEF_OTHER_TOOLS = tool_list(pyplat2sconsplat())
