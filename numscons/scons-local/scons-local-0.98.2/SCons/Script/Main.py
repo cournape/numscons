@@ -1172,7 +1172,13 @@ def _exec_main(parser, values):
         import pdb
         pdb.Pdb().runcall(_main, parser)
     elif options.profile_file:
-        from profile import Profile
+        try:
+            from cProfile import Profile
+            from numscons.misc import KCacheGrind
+        except ImportError:
+            msg = "Error importing cProfile: no profiling possible."
+            print msg
+            return
 
         # Some versions of Python 2.4 shipped a profiler that had the
         # wrong 'c_exception' entry in its dispatch table.  Make sure
@@ -1186,15 +1192,22 @@ def _exec_main(parser, values):
         else:
             dispatch['c_exception'] = Profile.trace_dispatch_return
 
+        def dump_kcache(p):
+            if os.environ.has_key('NUMSCONS_USE_KCACHE'):
+                kg = KCacheGrind(p)
+                kg.output(file(options.profile_file, 'w'))
+            else:
+                p.dump_stats(options.profile_file)
+                             
         prof = Profile()
         try:
             prof.runcall(_main, parser)
         except SConsPrintHelpException, e:
-            prof.dump_stats(options.profile_file)
+            dump_kcache(prof)
             raise e
         except SystemExit:
             pass
-        prof.dump_stats(options.profile_file)
+        dump_kcache(prof)
     else:
         _main(parser)
 
