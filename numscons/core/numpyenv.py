@@ -3,6 +3,8 @@ from os.path import join as pjoin
 
 from SCons.Environment import Environment
 
+from numscons.core.misc import get_numscons_toolpaths
+
 class NumpyEnvironment(Environment):
     """An SCons Environment subclass which knows how to deal with distutils
     idiosyncraties."""
@@ -17,3 +19,12 @@ class NumpyEnvironment(Environment):
             kw['conf_dir'] = pjoin(self['build_dir'], '.sconf')
             kw['log_file'] = pjoin(self['build_dir'], 'config.log')
         return Environment.Configure(self, *args, **kw)
+
+    def Tool(self, toolname, path = None):
+        """Like SCons.Tool, but knows about numscons specific toolpaths."""
+        if path:
+            return Environment.Tool(self, toolname, 
+                    path + get_numscons_toolpaths(self))
+        else:
+            return Environment.Tool(self, toolname, get_numscons_toolpaths(self))
+

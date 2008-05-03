@@ -97,7 +97,7 @@ def get_custom_toolpaths(env):
     """Returns the list of user-customized pathnames for scons tools."""
     return env['scons_tool_path'].split(os.pathsep)
 
-def get_additional_toolpaths(env):
+def get_numscons_toolpaths(env):
     """Returns the full list of pathnames where to look for scons tools."""
     toolp = []
     # Put custom toolpath FIRST !
