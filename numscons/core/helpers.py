@@ -21,7 +21,8 @@ from numscons.core.extension_scons import PythonExtension, built_with_mstools, \
      createStaticExtLibraryBuilder
 from numscons.core.utils import pkg_to_path, partial
 from numscons.core.misc import pyplat2sconsplat, is_cc_suncc, \
-     get_additional_toolpaths, is_f77_gnu, get_vs_version
+     get_additional_toolpaths as get_numscons_toolpaths, \
+     is_f77_gnu, get_vs_version
 from numscons.core.template_generators import generate_from_c_template, \
      generate_from_f_template, generate_from_template_emitter, \
      generate_from_template_scanner
@@ -32,7 +33,7 @@ from numscons.tools.substinfile import TOOL_SUBST
 from misc import get_scons_build_dir, get_scons_configres_dir,\
                  get_scons_configres_filename, built_with_mingw
 
-__all__ = ['GetNumpyEnvironment', 'distutils_dirs_emitter']
+__all__ = ['GetNumpyEnvironment', 'distutils_dirs_emitter', 'get_numscons_toolpaths']
 
 DEF_LINKERS, DEF_C_COMPILERS, DEF_CXX_COMPILERS, DEF_ASSEMBLERS, \
 DEF_FORTRAN_COMPILERS, DEF_ARS, DEF_OTHER_TOOLS = tool_list(pyplat2sconsplat())
@@ -217,7 +218,7 @@ def initialize_cc(env, path_list):
                 # path, so we use this one instead of changing
                 # env['ENV']['PATH'].
                 t = Tool(env['cc_opt'], 
-                         toolpath = get_additional_toolpaths(env), 
+                         toolpath = get_numscons_toolpaths(env), 
                          topdir = os.path.split(env['cc_opt_path'])[0])
                 t(env) 
                 customize_cc(t.name, env)
@@ -225,14 +226,14 @@ def initialize_cc(env, path_list):
                 if is_cc_suncc(pjoin(env['cc_opt_path'], env['cc_opt'])):
                     env['cc_opt'] = 'suncc'
                 t = Tool(env['cc_opt'], 
-                         toolpath = get_additional_toolpaths(env))
+                         toolpath = get_numscons_toolpaths(env))
                 t(env) 
                 customize_cc(t.name, env)
                 path_list.append(env['cc_opt_path'])
         else:
             # Do not care about PATH info because none given from scons
             # distutils command
-            t = Tool(env['cc_opt'], toolpath = get_additional_toolpaths(env))
+            t = Tool(env['cc_opt'], toolpath = get_numscons_toolpaths(env))
             t(env) 
             customize_cc(t.name, env)
 
@@ -240,7 +241,7 @@ def initialize_cc(env, path_list):
         set_cc_from_distutils()
     else:
         t = Tool(FindTool(DEF_C_COMPILERS, env), 
-                 toolpath = get_additional_toolpaths(env))
+                 toolpath = get_numscons_toolpaths(env))
         t(env)
         customize_cc(t.name, env)
 
@@ -252,7 +253,7 @@ def initialize_f77(env, path_list):
     if len(env['f77_opt']) > 0:
         if len(env['f77_opt_path']) > 0:
             t = Tool(env['f77_opt'], 
-                     toolpath = get_additional_toolpaths(env))
+                     toolpath = get_numscons_toolpaths(env))
             t(env) 
             path_list.append(env['f77_opt_path'])
             customize_f77(t.name, env)
@@ -260,7 +261,7 @@ def initialize_f77(env, path_list):
     else:
         def_fcompiler =  FindTool(DEF_FORTRAN_COMPILERS, env)
         if def_fcompiler:
-            t = Tool(def_fcompiler, toolpath = get_additional_toolpaths(env))
+            t = Tool(def_fcompiler, toolpath = get_numscons_toolpaths(env))
             t(env)
             customize_f77(t.name, env)
 	    has_f77 = True
@@ -292,14 +293,14 @@ def initialize_cxx(env, path_list):
     if len(env['cxx_opt']) > 0:
         if len(env['cxx_opt_path']) > 0:
             t = Tool(env['cxx_opt'], 
-                     toolpath = get_additional_toolpaths(env))
+                     toolpath = get_numscons_toolpaths(env))
             t(env) 
             path_list.append(env['cxx_opt_path'])
             customize_cxx(t.name, env)
     else:
         def_cxxcompiler =  FindTool(DEF_CXX_COMPILERS, env)
         if def_cxxcompiler:
-            t = Tool(def_cxxcompiler, toolpath = get_additional_toolpaths(env))
+            t = Tool(def_cxxcompiler, toolpath = get_numscons_toolpaths(env))
             t(env)
             customize_cxx(t.name, env)
         else:
@@ -508,13 +509,13 @@ def customize_tools(env):
         Tool(t)(env)
 
     if built_with_mingw(env):
-        t = Tool("dllwrap", toolpath = get_additional_toolpaths(env))
+        t = Tool("dllwrap", toolpath = get_numscons_toolpaths(env))
         t(env)
-        t = Tool("dlltool", toolpath = get_additional_toolpaths(env))
+        t = Tool("dlltool", toolpath = get_numscons_toolpaths(env))
         t(env)
 
     # Add our own, custom tools (f2py, from_template, etc...)
-    t = Tool('f2py', toolpath = get_additional_toolpaths(env))
+    t = Tool('f2py', toolpath = get_numscons_toolpaths(env))
 
     if t.exists(env):
         t(env)
