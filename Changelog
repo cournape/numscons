@@ -1,3 +1,10 @@
+Sat, 03 May 2008 15:13:26 +0900
+	* Add a Tool method to NumpyEnvironment, which knows about numscons
+	toolpaths (internal and customized).
+	* f2py is not loaded anymore by default, because it is quite costly
+	(needs to import numpy.f2py).
+	* numpyf2py tool is added.
+
 Tue, 29 Apr 2008 20:54:50 +0900
 	* 0.7.0 release
 	* Update to scons 0.98.2
