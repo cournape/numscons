@@ -516,17 +516,12 @@ def customize_tools(env):
 
     # Add our own, custom tools (f2py, from_template, etc...)
     t = Tool('f2py', toolpath = get_numscons_toolpaths(env))
-
     if t.exists(env):
         t(env)
-        bld = deepcopy(env['BUILDERS']['F2py'])
-        bld.emitter.insert(0, distutils_dirs_emitter)
-        env['BUILDERS']['NumpyF2py'] = bld
-    else:
-        #msg = "===== BOOTSTRAPPING, f2py scons tool not available (%s) =====" \
-        #      % e
-        #print msg
-        pass
+
+    t = Tool('numpyf2py', toolpath = get_numscons_toolpaths(env))
+    if t.exists(env):
+        t(env)
 
     # XXX: understand how registration of source files work before reenabling
     # those
