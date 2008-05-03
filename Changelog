@@ -1,3 +1,6 @@
+Sat, 03 May 2008 16:05:52 +0900
+	* Add a way to generate kcachegrind compatible profile from scons.
+
 Sat, 03 May 2008 15:13:26 +0900
 	* Add a Tool method to NumpyEnvironment, which knows about numscons
 	toolpaths (internal and customized).
