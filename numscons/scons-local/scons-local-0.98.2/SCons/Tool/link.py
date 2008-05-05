@@ -46,8 +46,10 @@ def smart_link(source, target, env, for_signature):
     has_cplusplus = cplusplus.iscplusplus(source)
     has_fortran = isfortran(env, source)
     if has_cplusplus and has_fortran:
-        raise SCons.Errors.InternalError(
+        if not env.has_key('F77_LDFLAGS'):
+            raise SCons.Errors.InternalError(
                 "Sorry, scons cannot yet link c++ and fortran code together.")
+        return '$CXX'
     elif has_fortran:
         return '$FORTRAN'
     elif has_cplusplus:
