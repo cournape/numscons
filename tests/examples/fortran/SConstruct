@@ -1,0 +1,14 @@
+# vim:syntax=python
+from numscons import GetNumpyEnvironment
+from numscons import CheckF77Mangling, CheckF77Clib
+
+env = GetNumpyEnvironment(ARGUMENTS)
+
+config = env.NumpyConfigure(custom_tests = {'CheckF77Clib' : CheckF77Clib})
+
+config.CheckF77Clib()
+
+config.Finish()
+
+env.Append(LINKFLAGSEND = env['F77_LDFLAGS'])
+env.Program(["main.cxx", "hello.f"])
