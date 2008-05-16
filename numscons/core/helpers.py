@@ -182,12 +182,11 @@ def GetNumpyEnvironment(args):
             env.AppendUnique(F77FLAGS = env['NUMPY_EXTRA_FFLAGS'] +
                                         env['NUMPY_THREAD_FFLAGS'])
         else: 
-    	    env.AppendUnique(F77FLAGS  = env['NUMPY_WARN_FFLAGS'] +
+            env.AppendUnique(F77FLAGS  = env['NUMPY_WARN_FFLAGS'] +
                                          env['NUMPY_OPTIM_FFLAGS'] +
                                          env['NUMPY_DEBUG_SYMBOL_FFLAGS'] +
                                          env['NUMPY_EXTRA_FFLAGS'] +
                                          env['NUMPY_THREAD_FFLAGS'])
-
     #--------------------------------
     # CXX compiler last customization
     #--------------------------------
@@ -197,14 +196,11 @@ def GetNumpyEnvironment(args):
             env.AppendUnique(CXXFLAGS = env['NUMPY_EXTRA_CXXFLAGS'] +
                                         env['NUMPY_THREAD_CXXFLAGS'])
         else: 
-    	    env.AppendUnique(CXXFLAGS  = env['NUMPY_WARN_CXXFLAGS'] +
+            env.AppendUnique(CXXFLAGS  = env['NUMPY_WARN_CXXFLAGS'] +
                                          env['NUMPY_OPTIM_CXXFLAGS'] +
                                          env['NUMPY_DEBUG_SYMBOL_CXXFLAGS'] +
                                          env['NUMPY_EXTRA_CXXFLAGS'] +
                                          env['NUMPY_THREAD_CXXFLAGS'])
-    #print env.Dump('F77')
-    #print env.Dump('F77FLAGS')
-    #print env.Dump('SHF77FLAGS')
     return env
 
 def initialize_cc(env, path_list):
@@ -249,42 +245,22 @@ def initialize_f77(env, path_list):
     """Initialize F77 compiler from distutils info."""
     from SCons.Tool import Tool, FindTool
 
-    has_f77 = False
     if len(env['f77_opt']) > 0:
         if len(env['f77_opt_path']) > 0:
+            env.AppendUnique(F77FILESUFFIXES = ['.f'])
             t = Tool(env['f77_opt'], 
                      toolpath = get_numscons_toolpaths(env))
-            t(env) 
+            t(env)
             path_list.append(env['f77_opt_path'])
             customize_f77(t.name, env)
-	    has_f77 = True
     else:
         def_fcompiler =  FindTool(DEF_FORTRAN_COMPILERS, env)
         if def_fcompiler:
             t = Tool(def_fcompiler, toolpath = get_numscons_toolpaths(env))
             t(env)
             customize_f77(t.name, env)
-	    has_f77 = True
         else:
             print "========== NO FORTRAN COMPILER FOUND ==========="
-
-    # scons handles fortran tools in a really convoluted way which does not
-    # much make sense to me. Depending on the tool, different set of
-    # construction variables are defined. As long as this is not fixed or
-    # better understood, I do the following:
-    #   - if F77* variables do not exist, define them
-    #   - the only guaranteed variables for fortran are the list generators, so
-    #   use them through env.subst to get any compiler, and set F77* to them if
-    #   they are not already defined.
-    if has_f77:
-        if not env.has_key('F77'):
-            env['F77'] = env.subst('$_FORTRANG')
-            # Basic safeguard against buggy fortran tools ...
-            assert len(env['F77']) > 0
-        if not env.has_key('F77FLAGS'):
-            env['F77FLAGS'] = env.subst('$_FORTRANFLAGSG')
-        if not env.has_key('SHF77FLAGS'):
-            env['SHF77FLAGS'] = '$F77FLAGS %s' % env.subst('$_SHFORTRANFLAGSG')
 
 def initialize_cxx(env, path_list):
     """Initialize C++ compiler from distutils info."""
@@ -369,7 +345,7 @@ def _get_numpy_env(args):
 
     import sys
     if sys.platform == "win32":
-	    env["ENV"]["PATH"] = os.environ["PATH"]
+        env["ENV"]["PATH"] = os.environ["PATH"]
     return env
 
 def set_verbosity(env):
@@ -550,24 +526,24 @@ def customize_link_flags(env):
     env['LDMODULEFLAGSEND'] = []
 
     if built_with_mingw(env) and not built_with_mstools(env):
-	# For mingw tools, we do it in our custom mingw
-	# scons tool XXX: this should be done at the tool
-	# level, that's the only way to avoid screwing
-	# things up....
-	pass
+        # For mingw tools, we do it in our custom mingw
+        # scons tool XXX: this should be done at the tool
+        # level, that's the only way to avoid screwing
+        # things up....
+        pass
     elif built_with_mstools(env):
-	# Sanity check: in case scons changes and we are not
-	# aware of it
-	assert isinstance(env["SHLINKCOM"], ListAction)
-	assert isinstance(env["LDMODULECOM"], ListAction)
-	# We replace the "real" shlib action of mslink by our
-	# own, which only differ in the linkdlagsend flags.
-	newshlibaction = Action('${TEMPFILE("$SHLINK $SHLINKFLAGS $_SHLINK_TARGETS $( $_LIBDIRFLAGS $) $_LIBFLAGS $SHLINKFLAGSEND $_PDB $_SHLINK_SOURCES")}')
-	env["SHLINKCOM"].list[0] = newshlibaction
-	env["LDMODULECOM"].list[0] = newshlibaction
+        # Sanity check: in case scons changes and we are not
+        # aware of it
+        assert isinstance(env["SHLINKCOM"], ListAction)
+        assert isinstance(env["LDMODULECOM"], ListAction)
+        # We replace the "real" shlib action of mslink by our
+        # own, which only differ in the linkdlagsend flags.
+        newshlibaction = Action('${TEMPFILE("$SHLINK $SHLINKFLAGS $_SHLINK_TARGETS $( $_LIBDIRFLAGS $) $_LIBFLAGS $SHLINKFLAGSEND $_PDB $_SHLINK_SOURCES")}')
+        env["SHLINKCOM"].list[0] = newshlibaction
+        env["LDMODULECOM"].list[0] = newshlibaction
 
-	newlibaction = '${TEMPFILE("$LINK $LINKFLAGS /OUT:$TARGET.windows $( $_LIBDIRFLAGS $) $_LIBFLAGS $LINKFLAGSEND $_PDB $SOURCES.windows")}'
-	env["LINKCOM"] = newlibaction
+        newlibaction = '${TEMPFILE("$LINK $LINKFLAGS /OUT:$TARGET.windows $( $_LIBDIRFLAGS $) $_LIBFLAGS $LINKFLAGSEND $_PDB $SOURCES.windows")}'
+        env["LINKCOM"] = newlibaction
     else:
         env['LINKCOM'] = '%s $LINKFLAGSEND' % env['LINKCOM']
         env['SHLINKCOM'] = '%s $SHLINKFLAGSEND' % env['SHLINKCOM']
