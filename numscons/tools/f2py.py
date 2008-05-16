@@ -67,7 +67,8 @@ def get_f2py_modulename_from_node(source):
             name = get_f2py_modulename_from_txt(cnt)
         except AttributeError:
             pass
-    assert name is not None
+    if name is None:
+        raise ValueError("f2py file %s not found ?" % str(source))
     return name
 
 def F2pyEmitter(target, source, env):
