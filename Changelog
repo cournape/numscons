@@ -1,3 +1,7 @@
+Fri, 16 May 2008 18:23:03 +0900
+	* Raise ValueError in f2py when source is not found
+	* release 0.7.1
+
 Sat, 03 May 2008 16:05:52 +0900
 	* Add a way to generate kcachegrind compatible profile from scons.
 
