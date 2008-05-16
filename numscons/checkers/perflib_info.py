@@ -49,7 +49,7 @@ def write_info(env):
 
 class PerflibInfo:
     """Instances of this class will keep all informations about a perflib (MKL,
-    etc...). 
+    etc...).
 
     The goal is that the first time a perflib checker is called, it will create
     an instance of this class, put it into a scons environment, and next time
@@ -81,7 +81,7 @@ class PerflibInfo:
 
 class MetalibInfo:
     """Instances of this class will keep all informations about a meta lib
-    (BLAS, etc...). 
+    (BLAS, etc...).
 
     This will primaly be used to generate build info, retrived from numpy/scipy
     through show_config function.."""
@@ -99,4 +99,3 @@ class MetalibInfo:
         """Return true is the lib uses pname as the underlying performance
         library."""
         return pname == self.pname
-

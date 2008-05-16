@@ -3,7 +3,7 @@ from os.path import join as pjoin, dirname as pdirname
 
 from numscons.core.utils import partial
 
-"""Module to handle compiler configuration. 
+"""Module to handle compiler configuration.
 
 Configurations are set into config files, and are obtained from get_*_config
 functions. The object returned by those functions have a method get_flags_dict
@@ -11,7 +11,7 @@ which returns a dictionary which can be copied into scons environments objects
 as construction variables."""
 
 # XXX: customization from site.cfg or other ?
-# XXX: how to cache this between different scons calls 
+# XXX: how to cache this between different scons calls
 _OPTIONS = ['optim', 'warn', 'debug_sym', 'debug', 'thread', 'extra',
             'link_optim']
 
@@ -27,10 +27,10 @@ class Config:
 
     def __getitem__(self, key):
         return self._dic[key]
-        
+
     def __setitem__(self, key, item):
         self._dic[key] = item
-        
+
 class CompilerConfig:
     """Put config objects value into a dictionary usable by scons. C compiler
     version"""
@@ -51,7 +51,7 @@ class CompilerConfig:
             else:
                 d[k] = v.split()
         return d
-        
+
 class F77CompilerConfig:
     """Put config objects value into a dictionary usable by scons. Fortran 77
     compiler version"""
@@ -71,7 +71,7 @@ class F77CompilerConfig:
             else:
                 d[k] = v.split()
         return d
-        
+
 class CXXCompilerConfig:
     """Put config objects value into a dictionary usable by scons. C++ compiler
     version"""
@@ -91,7 +91,7 @@ class CXXCompilerConfig:
             else:
                 d[k] = v.split()
         return d
-        
+
 def get_config(name, language):
     # XXX name should be a list
     config = ConfigParser()
@@ -116,7 +116,7 @@ def get_config(name, language):
     cfg = Config()
 
     for o in config.options(name):
-        cfg[o] = config.get(name, o)        
+        cfg[o] = config.get(name, o)
 
     return cmpcfg(cfg)
 

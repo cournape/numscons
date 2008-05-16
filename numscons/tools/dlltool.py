@@ -49,7 +49,7 @@ def dlltoolEmitter(target, source, env):
           "is with suffix %s and prefix %s" %\
           (env.subst("$DLLTOOL_GNU_LIBSUFFIX"),
            env.subst("$DLLTOOL_GNU_LIBPREFFIX"))
-    
+
     defname = env.ReplaceIxes(stname, "DLLTOOL_GNU_LIBPREFIX",
             "DLLTOOL_GNU_LIBSUFFIX", "WINDOWSDEFPREFIX", "WINDOWSDEFSUFFIX")
     libname = env.ReplaceIxes(stname, "DLLTOOL_GNU_LIBPREFIX",
@@ -62,7 +62,7 @@ def dlltoolEmitter(target, source, env):
 
     for i in (defname, libname, expname):
         rtarget.append(SCons.Node.FS.default_fs.Entry(i))
-    
+
     tmp = []
     tmp.append(dllname)
     tmp.extend(source)
@@ -85,9 +85,9 @@ def generate(env):
     # dlltool cwcan generate .def, .exp and .lib from static archive or object
     # files (Note that is is better to generate .lib with MS linker for
     # compatibilities with MS code).
-    env['DLLTOOL'] 	= 'dlltool'
+    env['DLLTOOL']      = 'dlltool'
     env['DLLTOOLFLAGS'] = SCons.Util.CLVar('')
-    env['DLLTOOLLIBS'] 	= SCons.Util.CLVar('')
+    env['DLLTOOLLIBS']  = SCons.Util.CLVar('')
     env['_DLLTOOLLINKFLAGS'] = SCons.Util.CLVar('')
     env['_DLLTOOLLIBS'] = SCons.Util.CLVar('')
     env['DLLTOOL_GNU_LIBPREFIX'] = 'lib'
@@ -98,7 +98,7 @@ def generate(env):
     env['DLLTOOLLIBSUFFIX'] = '.lib'
     env['DLLTOOLEXPPREFIX'] = ''
     env['DLLTOOLEXPSUFFIX'] = '.exp'
-    env['DLLTOOLCOM'] 	= dlltool_action
+    env['DLLTOOLCOM']   = dlltool_action
     env["DLLTOOLEMITTER"] = dlltoolEmitter
 
 def exists(env):

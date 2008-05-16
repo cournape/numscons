@@ -61,7 +61,7 @@ def NumpyCheckLibAndHeader(context, libs, symbols = None, headers = None,
     else:
         opts = BuildConfig()
         opts['libraries'] = libs
-    
+
     # Display message
     if symbols:
         sbstr = ', '.join(symbols)
@@ -112,11 +112,11 @@ def NumpyCheckLibAndHeader(context, libs, symbols = None, headers = None,
     finally:
         if st == 0 or autoadd == 0:
             restore(env, saved)
-        
+
     if not st:
         context.Result('Failed (could not check symbol %s : check config.log '\
                        'in %s for more details))' % (sym, env['build_dir']))
         return st
-        
+
     context.Result(st)
     return st

@@ -20,7 +20,7 @@ from fortran import CheckF77Mangling, CheckF77Clib
 
 def _get_language_opts(context, language):
     """Return additional options necessary depending on the language.
-    
+
     If no options is necessary (for C, for example), return None. Otherwise,
     returns a dictionary whose possible keys are the same than BuildConfig
     instances."""
@@ -43,7 +43,7 @@ def _check(perflibs, context, libname, check_version, msg_template, test_src,
 
     perflibs should be a list of perflib to check (the names which can be used
     are the keys of CONFIG."""
-    
+
     moreopts = _get_language_opts(context, language)
     def _check_perflib(pname):
         """pname is the name of the perflib."""
@@ -123,14 +123,14 @@ class CheckerFactory:
         self._section = section
         self._disp = dispname
 
-        self._test = test    
+        self._test = test
         self._perflibs = perflibs
         self._lang = language
 
     def _check(self, context, perflibs, check_version, test_src, autoadd):
-        return _check(perflibs, context, self._libname, check_version, 
+        return _check(perflibs, context, self._libname, check_version,
                       self._disp + ' (%s)',
-                      test_src, autoadd, self._lang) 
+                      test_src, autoadd, self._lang)
 
     def __call__(self, context, autoadd = 1, check_version = 0):
 
@@ -171,4 +171,3 @@ class CheckerFactory:
         # Nothing worked, fail
         add_lib_info(context.env, self._libname, None)
         return 0
-

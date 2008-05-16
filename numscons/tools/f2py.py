@@ -19,7 +19,7 @@ import SCons.Action
 import SCons.Scanner
 import SCons.Tool
 import SCons.Util
-from SCons.Node.FS import default_fs 
+from SCons.Node.FS import default_fs
 
 CGEN_TEMPLATE   = '%smodule'
 FOBJECT_FILE    = 'fortranobject.c'
@@ -105,12 +105,12 @@ def is_pyf(source_file):
 
 def f2py_cmd_exec(cmd):
     """Executes a f2py command.
-    
+
     The point to execute f2py in a new process instead of using f2py.mainto
     avoid race issues when using multible jobs with scons.
-    
+
     cmd should be a sequence. """
-    f2py_cmd = [sys.executable, '-c', 
+    f2py_cmd = [sys.executable, '-c',
                 '"from numpy.f2py.f2py2e import run_main;run_main(%s)"' \
                 % repr(cmd)]
     p = subprocess.Popen(" ".join(f2py_cmd), shell = True, stdout =
@@ -152,7 +152,7 @@ def pyf2c(target, source, env):
         # XXX: scons has a way to force buidler to only use one source file
         if len(source_file_names) > 1:
             raise NotImplementedError("FIXME: multiple source files")
-        
+
         wrapper = pjoin(build_dir, FWRAP_TEMPLATE % basename)
 
         cmd = env['F2PYOPTIONS'] + \

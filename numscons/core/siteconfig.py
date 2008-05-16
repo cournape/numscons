@@ -34,11 +34,11 @@ class ConfigOpts(DefaultDict):
 def get_config():
     """ This tries to read .cfg files in several locations, and merge its
     information into a ConfigParser object for the first found file.
-    
+
     Returns the ConfigParser instance. This copies the logic in system_info
     from numpy.distutils."""
     # Below is the feature we are copying from numpy.distutils:
-    # 
+    #
     # The file 'site.cfg' is looked for in
 
     # 1) Directory of main setup.py file being run.
@@ -79,13 +79,13 @@ def parse_config_param(var):
 def get_paths(var):
     """Given var, the output of ConfirParser.get(section, name), returns a list
     of each item of its content, assuming the content is a list of directoris.
-    
+
     Example: if var is foo:bar, it will return ['foo', 'bar'] on posix."""
     return var.split(os.pathsep)
 
 def get_config_from_section(siteconfig, section):
     """For the given siteconfig and section, return the found information.
-    
+
     Returns a tuple (info, found), where:
         info : ConfigOpts instance
         found: True if the section was found, False otherwise."""

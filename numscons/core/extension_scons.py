@@ -32,13 +32,13 @@ def PythonExtension(env, target, source, *args, **kw):
     LIBS = floupi('LIBS')
 
     CPPPATH.append(get_python_inc())
-    if sys.platform == 'win32': 
+    if sys.platform == 'win32':
         if built_with_mstools(env):
             # XXX: We add the path where to find python lib (or any other
             # version, of course). This seems to be necessary for MS compilers.
             #env.AppendUnique(LIBPATH = get_pythonlib_dir())
             LIBPATH.append(get_pythonlib_dir())
-    	elif built_with_mingw(env):
+        elif built_with_mingw(env):
             # XXX: this part should be moved elsewhere (mingw abstraction
             # for python)
 
@@ -69,20 +69,20 @@ def PythonExtension(env, target, source, *args, **kw):
     # Module, so use SharedLibrary with mingw.
     # XXX: this is supposed to be solved in 0.98.2, take a look at it
     if built_with_mingw(env) and not built_with_mstools(env):
-        wrap = env.SharedLibrary(target, source, SHLIBPREFIX = '', 
-                                 #LDMODULESUFFIX = '$PYEXTSUFFIX', 
-                                 SHLIBSUFFIX = '$PYEXTSUFFIX', 
-                                 LINKFLAGS = LINKFLAGS, 
-                                 LIBS = LIBS, 
-                                 LIBPATH = LIBPATH, 
+        wrap = env.SharedLibrary(target, source, SHLIBPREFIX = '',
+                                 #LDMODULESUFFIX = '$PYEXTSUFFIX',
+                                 SHLIBSUFFIX = '$PYEXTSUFFIX',
+                                 LINKFLAGS = LINKFLAGS,
+                                 LIBS = LIBS,
+                                 LIBPATH = LIBPATH,
                                  CPPPATH = CPPPATH, *args, **kw)
     else:
-        wrap = env.LoadableModule(target, source, SHLIBPREFIX = '', 
-                                  LDMODULESUFFIX = '$PYEXTSUFFIX', 
-                                  SHLIBSUFFIX = '$PYEXTSUFFIX', 
-                                  LINKFLAGS = LINKFLAGS, 
-                                  LIBS = LIBS, 
-                                  LIBPATH = LIBPATH, 
+        wrap = env.LoadableModule(target, source, SHLIBPREFIX = '',
+                                  LDMODULESUFFIX = '$PYEXTSUFFIX',
+                                  SHLIBSUFFIX = '$PYEXTSUFFIX',
+                                  LINKFLAGS = LINKFLAGS,
+                                  LIBS = LIBS,
+                                  LIBPATH = LIBPATH,
                                   CPPPATH = CPPPATH, *args, **kw)
     return wrap
 

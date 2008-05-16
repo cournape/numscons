@@ -14,11 +14,11 @@ _START_WITH_MINUS = re.compile('^\s*-')
 def popen_wrapper(cmd, merge = False):
     """This works like popen, but it returns both the status and the output.
 
-    If merge is True, then output contains both stdout and stderr. 
-    
+    If merge is True, then output contains both stdout and stderr.
+
     Returns: (st, out), where st is an integer (the return status of the
     subprocess, and out the string of the output).
-    
+
     NOTE:
         - it tries to be robust to find non existing command. For example, is
           cmd starts with a minus, a nonzero status is returned, and no junk is
@@ -90,7 +90,7 @@ class DefaultDict(dict):
         for k in self.keys():
             cpy[k] = copy(self[k])
         return cpy
-        
+
 def rsplit(s, sep, maxsplit = -1):
     """Equivalent of rsplit, but works on 2.3."""
     try:

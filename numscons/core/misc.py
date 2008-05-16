@@ -15,19 +15,19 @@ def get_scons_path():
 
 def get_scons_build_dir():
     """Return the top path where everything produced by scons will be put.
-    
+
     The path is relative to the top setup.py"""
     return pjoin('build', 'scons')
 
 def get_scons_configres_dir():
     """Return the top path where everything produced by scons will be put.
-    
+
     The path is relative to the top setup.py"""
     return pjoin('build', 'scons-configres')
 
 def get_scons_configres_filename():
     """Return the top path where everything produced by scons will be put.
-    
+
     The path is relative to the top setup.py"""
     return '__configres.py'
 
@@ -41,9 +41,9 @@ def built_with_mstools(env):
 def built_with_mingw(env):
     """Return true if built with mingw compiler."""
     return env['cc_opt'] == 'mingw' or \
-	   (sys.platform == 'win32' 
-	    and (env['f77_opt'] == 'g77' or
-		 env['f77_opt'] == 'gfortran'))  
+           (sys.platform == 'win32'
+            and (env['f77_opt'] == 'g77' or
+                 env['f77_opt'] == 'gfortran'))
 
 def built_with_gnu_f77(env):
     """Return true if f77 compiler is gnu (g77, gfortran, etc...)."""
@@ -59,12 +59,12 @@ def get_pythonlib_name(debug = 0):
     else:
         template = 'python%d%d'
 
-    return template % (sys.hexversion >> 24, 
-		       (sys.hexversion >> 16) & 0xff)
+    return template % (sys.hexversion >> 24,
+                       (sys.hexversion >> 16) & 0xff)
 
 def pyplat2sconsplat():
     """Returns the scons platform."""
-    # XXX: should see how env['PLATFORM'] is defined, make this a dictionary 
+    # XXX: should see how env['PLATFORM'] is defined, make this a dictionary
     if sys.platform[:5] == 'linux':
         return 'posix'
     elif sys.platform[:5] == 'sunos':
@@ -78,7 +78,7 @@ def is_cc_suncc(fullpath):
     # returns true if Sun is found in the output. We cannot check the status
     # code, because the compiler does not seem to have a way to do nothing
     # while returning success (0).
-    
+
     suncc = re.compile('Sun C')
     # Redirect stderr to stdout
     cmd = fullpath + ' -V 2>&1'
@@ -106,7 +106,7 @@ def get_numscons_toolpaths(env):
     return toolp
 
 def is_f77_gnu(env):
-    """Returns true if F77 in env is a Gnu fortran 
+    """Returns true if F77 in env is a Gnu fortran
     compiler."""
     # XXX: do this properly
     if env.has_key('F77'):
@@ -163,4 +163,3 @@ def isf2py(env, source):
             if ext in fsuffixes:
                 return 1
     return 0
-

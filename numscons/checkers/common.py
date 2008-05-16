@@ -106,7 +106,7 @@ def check_code(context, name, section, opts_factory, headers_to_check,
         return None
 
     # Check whether the library is available (CheckLib-like checker)
-    st = _check_symbol(context, opts, headers_to_check, funcs_to_check, 
+    st = _check_symbol(context, opts, headers_to_check, funcs_to_check,
                        autoadd)
     if not st:
         return None
