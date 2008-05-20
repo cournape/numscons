@@ -268,6 +268,8 @@ def initialize_cxx(env, path_list):
 
     if len(env['cxx_opt']) > 0:
         if len(env['cxx_opt_path']) > 0:
+            if is_cc_suncc(pjoin(env['cxx_opt_path'], env['cxx_opt'])):
+                env['cxx_opt'] = 'sunc++'
             t = Tool(env['cxx_opt'],
                      toolpath = get_numscons_toolpaths(env))
             t(env)
