@@ -5,6 +5,7 @@ Tue, 20 May 2008 21:38:07 +0900
 	scons deficiencies which disappear in 0.98.0
 	* Explicitly initialize DefaultEnvironment to avoid wasting time
 	initializing a second time our tools
+	* release 0.7.2
 
 Fri, 16 May 2008 18:23:03 +0900
 	* Raise ValueError in f2py when source is not found
