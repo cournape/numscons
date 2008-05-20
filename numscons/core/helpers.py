@@ -48,7 +48,7 @@ def _glob(env, path):
 
 def GetNumpyOptions(args):
     """Call this with args=ARGUMENTS to take into account command line args."""
-    from SCons.Options import Options, EnumOption
+    from SCons.Options import Options, EnumOption, BoolOption
 
     opts = Options(None, args)
 
@@ -89,6 +89,8 @@ def GetNumpyOptions(args):
                         '0 means max verbose, 1 less verbose, and 2 '\
                         'almost nothing',
                         '0', allowed_values = ('0', '1', '2')))
+    opts.Add(BoolOption('bootstrapping',
+                        "true if bootrapping numpy, false if not", 0))
 
     return opts
 
@@ -284,6 +286,14 @@ def initialize_cxx(env, path_list):
         else:
             print "========== NO CXX COMPILER FOUND ==========="
 
+def set_bootstrap(env):
+    import __builtin__
+    if env['bootstrapping']:
+        __builtin__.__NUMPY_SETUP__ = True
+
+def is_bootstrapping(env):
+    return env['bootstrapping']
+
 def _get_numpy_env(args):
     """Call this with args = ARGUMENTS."""
     from SCons.Script import BuildDir, Help
@@ -305,6 +315,8 @@ def _get_numpy_env(args):
     # We set tools to an empty list, to be sure that the custom options are
     # given first. We have to
     env = NumpyEnvironment(options = opts, tools = [], PYEXTSUFFIX = pyextsuffix)
+
+    set_bootstrap(env)
 
     # XXX: should we allow default environment at all ? It certainly won't work
     # as it is.
