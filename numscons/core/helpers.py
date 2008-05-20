@@ -287,6 +287,7 @@ def initialize_cxx(env, path_list):
 def _get_numpy_env(args):
     """Call this with args = ARGUMENTS."""
     from SCons.Script import BuildDir, Help
+    from SCons.Defaults import DefaultEnvironment
     from numpyenv import NumpyEnvironment
 
     # XXX: this function is too long and clumsy...
@@ -304,6 +305,13 @@ def _get_numpy_env(args):
     # We set tools to an empty list, to be sure that the custom options are
     # given first. We have to
     env = NumpyEnvironment(options = opts, tools = [], PYEXTSUFFIX = pyextsuffix)
+
+    # XXX: should we allow default environment at all ? It certainly won't work
+    # as it is.
+
+    # We explicily set DefaultEnvironment to avoid wasting time on initializing
+    # tools a second time.
+    DefaultEnvironment(tools = [])
 
     # Setting dirs according to command line options
     env.AppendUnique(build_dir = pjoin(env['build_prefix'], env['src_dir']))
