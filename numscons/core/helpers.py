@@ -285,6 +285,13 @@ def initialize_cxx(env, path_list):
             customize_cxx(t.name, env)
         else:
             print "========== NO CXX COMPILER FOUND ==========="
+            # Some scons tools initialize CXX env var even if no CXX available.
+            # This is just confusing, so remove the key here since we could not
+            # initialize any CXX tool.
+            try:
+                del env['CXX']
+            except KeyError:
+                pass
 
 def set_bootstrap(env):
     import __builtin__
