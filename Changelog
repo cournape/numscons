@@ -1,3 +1,6 @@
+Fri, 23 May 2008 18:26:14 +0900
+	* Update to scons 0.98.4
+
 Tue, 20 May 2008 21:38:07 +0900
 	* Update sunc++ tool because scons one is buggy (sent patch upstream).
 	* Fix bug in g77 (sent upstream too).
