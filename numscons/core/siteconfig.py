@@ -1,5 +1,5 @@
 #! /usr/bin/env python
-# Last Change: Wed Mar 05 06:00 PM 2008 J
+# Last Change: Sat Jun 07 07:00 PM 2008 J
 
 """This module has helper functions to get basic information from site.cfg-like
 files."""
@@ -46,12 +46,8 @@ def get_config():
     # 3) System wide directory (location of this file...)
 
     # The first one found is used to get system configuration options The
-    # format is that used by ConfigParser (i.e., Windows .INI style). The
-    # section DEFAULT has options that are the default for each section. The
-    # available sections are fftw, atlas, and x11. Appropiate defaults are
-    # used if nothing is specified.
+    # format is that used by ConfigParser (i.e., Windows .INI style). 
 
-    section = 'DEFAULT'
     defaults = {}
     defaults['libraries'] = ''
     defaults['library_dirs'] = os.pathsep.join(default_lib_dirs)
@@ -62,12 +58,6 @@ def get_config():
     files.extend(get_standard_file('.numpy-site.cfg'))
     files.extend(get_standard_file('site.cfg'))
 
-    def parse_config_files():
-        cp.read(files)
-        if not cp.has_section(section):
-            cp.add_section(section)
-
-    parse_config_files()
     return cp, files
 
 def parse_config_param(var):
