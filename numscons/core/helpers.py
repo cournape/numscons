@@ -563,13 +563,15 @@ def customize_link_flags(env):
     elif built_with_mstools(env):
         # Sanity check: in case scons changes and we are not
         # aware of it
-        assert isinstance(env["SHLINKCOM"], ListAction)
-        assert isinstance(env["LDMODULECOM"], ListAction)
+        if not isinstance(env["SHLINKCOM"], list):
+            raise InternalError("Internal consistency check failed for MS compiler. This is bug, please contact the maintainer")
+        if not isinstance(env["LDMODULECOM"], list):
+            raise InternalError("Internal consistency check failed for MS compiler. This is bug, please contact the maintainer")
         # We replace the "real" shlib action of mslink by our
         # own, which only differ in the linkdlagsend flags.
         newshlibaction = Action('${TEMPFILE("$SHLINK $SHLINKFLAGS $_SHLINK_TARGETS $( $_LIBDIRFLAGS $) $_LIBFLAGS $SHLINKFLAGSEND $_PDB $_SHLINK_SOURCES")}')
-        env["SHLINKCOM"].list[0] = newshlibaction
-        env["LDMODULECOM"].list[0] = newshlibaction
+        env["SHLINKCOM"][0] = newshlibaction
+        env["LDMODULECOM"][0] = newshlibaction
 
         newlibaction = '${TEMPFILE("$LINK $LINKFLAGS /OUT:$TARGET.windows $( $_LIBDIRFLAGS $) $_LIBFLAGS $LINKFLAGSEND $_PDB $SOURCES.windows")}'
         env["LINKCOM"] = newlibaction
