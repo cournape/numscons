@@ -70,30 +70,21 @@ class sdist(old_sdist):
                     src_data_files.append(os.path.join(roots, file))
             self.filelist.extend(src_data_files)
 
-def build_verstring():
-    return '%d.%d.%d' % (R.MAJOR, R.MINOR, R.MICRO)
-
-def build_fverstring():
-    if R.DEV:
-        return build_verstring() + 'dev'
-    else:
-        return build_verstring()
+# Main setup method
+import release as R
 
 def write_version():
     fname = os.path.join("numscons", "version.py")
     f = open(fname, "w")
-    f.writelines("VERSION = %s\n" % build_verstring())
+    f.writelines("VERSION = %s\n" % R.build_verstring())
     f.writelines("DEV = %s" % R.DEV)
     f.close()
     
-# Main setup method
-import release as R
-
 write_version()
 setup(cmdclass = {'install': install, 'install_data': install_data, 'sdist': sdist},
       distclass     = Distribution,
       name          = R.NAME,
-      version       = build_fverstring(),
+      version       = R.build_fverstring(),
       description   = R.DESCRIPTION,
       author        = R.AUTHOR,
       author_email  = R.AUTHOR_EMAIL,

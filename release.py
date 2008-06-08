@@ -16,7 +16,7 @@ NAME        = 'numscons'
 MAJOR       = 0
 MINOR       = 7
 MICRO       = 3
-DEV         = True
+DEV         = False
 DESCRIPTION = 'Enable to use scons within distutils to build extensions'
 CLASSIFIERS = filter(None, CLASSIFIERS.split('\n'))
 AUTHOR      = 'David Cournapeau'
@@ -27,3 +27,13 @@ PACKAGES    = ['numscons', 'numscons.core', 'numscons.checkers',
 PACKAGE_DATA = {'numscons.core' : ['compiler.cfg', 'fcompiler.cfg', 'cxxcompiler.cfg'], 
               'numscons.checkers' : ['perflib.cfg']}
 DATA_DIR    = ['numscons/scons-local']
+
+def build_verstring():
+    return '%d.%d.%d' % (MAJOR, MINOR, MICRO)
+
+def build_fverstring():
+    if DEV:
+        return build_verstring() + 'dev'
+    else:
+        return build_verstring()
+
