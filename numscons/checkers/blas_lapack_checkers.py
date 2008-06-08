@@ -15,12 +15,12 @@ __all__ = ['CheckF77BLAS', 'CheckF77LAPACK', 'CheckCBLAS', 'CheckCLAPACK']
 
 # CBLAS configuration
 CBLAS_PERFLIBS = {
-        'darwin': ('Accelerate', 'vecLib'), 
+        'darwin': ('Accelerate', 'vecLib'),
         'default': ('MKL', 'ATLAS', 'Sunperf')}
 
 # BLAS configuration
 BLAS_PERFLIBS = {
-        'darwin': ('Accelerate', 'vecLib'), 
+        'darwin': ('Accelerate', 'vecLib'),
         'default': ('MKL', 'ATLAS', 'Sunperf'),
         'fallback' : ('GenericBlas',)}
 
@@ -29,7 +29,7 @@ CLAPACK_PERFLIBS = { 'default': ('ATLAS',)}
 
 # LAPACK configuration
 LAPACK_PERFLIBS = {
-        'darwin': ('Accelerate', 'vecLib'), 
+        'darwin': ('Accelerate', 'vecLib'),
         'default': ('MKL', 'ATLAS', 'Sunperf'),
         'fallback' : ('GenericLapack',)}
 
@@ -53,7 +53,7 @@ def _lapack_test_src(context):
     if not context.env.has_key('F77_NAME_MANGLER') and \
        not CheckF77Mangling(context):
         return None, 1
-    
+
     # Get the mangled name of our test function
     sgesv_string = context.env['F77_NAME_MANGLER']('sgesv')
     test_src = lapack_sgesv % sgesv_string

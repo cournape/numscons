@@ -41,7 +41,7 @@ class BuildConfig(DefaultDict):
 class BuildConfigFactory:
     """This class can return cutomized BuildConfig instances according to some
     options.
-    
+
     For example, you would create a BuildConfigFactory with a MKL BuildConfig
     instance, and the factory would return customized BuildConfig for blas,
     lapack, 64 vs 32 bits, etc..."""
@@ -99,8 +99,8 @@ class BuildConfigFactory:
     def replace(self, cfg):
         """Given a dictionary cfg, replace all its value with the one of cfg,
         for every key in cfg.
-        
-        Similar to merge, but replace values instead of merging.""" 
+
+        Similar to merge, but replace values instead of merging."""
         for k, v in cfg.items():
             self._data[k] = v
         self._update_bld()
@@ -108,7 +108,7 @@ class BuildConfigFactory:
     def merge(self, cfg, append = False):
         """Given a dictionary cfg, merge all its value with the one of cfg, for
         every key in cfg.
-        
+
         Example: you have a BuildConfigFactory instance, and you want to modify
         some of its options from a BuildConfig instance (obtained from site.cfg
         customization)."""
@@ -121,7 +121,7 @@ class BuildConfigFactory:
         self._update_bld()
 
     def __repr__(self):
-        return '\n\t'.join(['%s: %s' % (k, v) 
+        return '\n\t'.join(['%s: %s' % (k, v)
                             for k, v in self._data.items() if len(v) > 0])
 
     def __getitem__(self, k):

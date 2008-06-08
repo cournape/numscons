@@ -44,7 +44,7 @@ def generate_from_template_emitter(target, source, env):
     base = splitext(pbasename(str(source[0])))[0]
     t = pjoin(pdirname(str(target[0])), base)
     return ([t], source)
-    
+
 _INCLUDE_RE = re.compile(r"include\s*['\"](\S+)['\"]", re.M)
 
 def generate_from_template_scanner(node, env, path, arg = None):

@@ -23,8 +23,7 @@ class NumpyEnvironment(Environment):
     def Tool(self, toolname, path = None):
         """Like SCons.Tool, but knows about numscons specific toolpaths."""
         if path:
-            return Environment.Tool(self, toolname, 
+            return Environment.Tool(self, toolname,
                     path + get_numscons_toolpaths(self))
         else:
             return Environment.Tool(self, toolname, get_numscons_toolpaths(self))
-

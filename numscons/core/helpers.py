@@ -48,26 +48,26 @@ def _glob(env, path):
 
 def GetNumpyOptions(args):
     """Call this with args=ARGUMENTS to take into account command line args."""
-    from SCons.Options import Options, EnumOption
+    from SCons.Options import Options, EnumOption, BoolOption
 
     opts = Options(None, args)
 
-    opts.Add('scons_tool_path', 
+    opts.Add('scons_tool_path',
              'comma-separated list of directories to look '\
-             'for tools (take precedence over internal ones)', 
+             'for tools (take precedence over internal ones)',
              '')
 
     # Add directories related info
-    opts.Add('pkg_name', 
+    opts.Add('pkg_name',
              'name of the package (including parent package if any)', '')
     opts.Add('src_dir', 'src dir relative to top called', '.')
-    opts.Add('build_prefix', 'build prefix (NOT including the package name)', 
+    opts.Add('build_prefix', 'build prefix (NOT including the package name)',
              get_scons_build_dir())
-    opts.Add('distutils_libdir', 
+    opts.Add('distutils_libdir',
              'build dir for libraries of distutils (NOT including '\
-             'the package name)', 
+             'the package name)',
              pjoin('build', 'lib'))
-    opts.Add('include_bootstrap', 
+    opts.Add('include_bootstrap',
              "include directories for boostraping numpy (if you do not know" \
              " what that means, you don't need it)" ,
              '')
@@ -85,10 +85,12 @@ def GetNumpyOptions(args):
     # Silent mode
     # XXX: scons does not have a canned option for integer, EnumOption won't
     # accept integers...
-    opts.Add(EnumOption('silent', 
+    opts.Add(EnumOption('silent',
                         '0 means max verbose, 1 less verbose, and 2 '\
-                        'almost nothing', 
+                        'almost nothing',
                         '0', allowed_values = ('0', '1', '2')))
+    opts.Add(BoolOption('bootstrapping',
+                        "true if bootrapping numpy, false if not", 0))
 
     return opts
 
@@ -132,13 +134,13 @@ def finalize_env(env):
         # For VS 8 and above (VS 2005), use manifest for DLL
         # XXX: this has nothing to do here, too
         if major >= 8:
-            env['LINKCOM'] = [env['LINKCOM'], 
+            env['LINKCOM'] = [env['LINKCOM'],
                       'mt.exe -nologo -manifest ${TARGET}.manifest '\
                       '-outputresource:$TARGET;1']
-            env['SHLINKCOM'] = [env['SHLINKCOM'], 
+            env['SHLINKCOM'] = [env['SHLINKCOM'],
                         'mt.exe -nologo -manifest ${TARGET}.manifest '\
                         '-outputresource:$TARGET;2']
-            env['LDMODULECOM'] = [env['LDMODULECOM'], 
+            env['LDMODULECOM'] = [env['LDMODULECOM'],
                         'mt.exe -nologo -manifest ${TARGET}.manifest '\
                         '-outputresource:$TARGET;2']
 
@@ -146,7 +148,7 @@ def finalize_env(env):
         env.AppendUnique(F77FLAGS = ['-fno-second-underscore'])
 
 def GetNumpyEnvironment(args):
-    """Returns a correctly initialized scons environment. 
+    """Returns a correctly initialized scons environment.
 
     This environment contains builders for python extensions, ctypes
     extensions, fortran builders, etc... Generally, call it with args =
@@ -181,7 +183,7 @@ def GetNumpyEnvironment(args):
             env.Append(F77FLAGS = "%s" % os.environ['FFLAGS'])
             env.AppendUnique(F77FLAGS = env['NUMPY_EXTRA_FFLAGS'] +
                                         env['NUMPY_THREAD_FFLAGS'])
-        else: 
+        else:
             env.AppendUnique(F77FLAGS  = env['NUMPY_WARN_FFLAGS'] +
                                          env['NUMPY_OPTIM_FFLAGS'] +
                                          env['NUMPY_DEBUG_SYMBOL_FFLAGS'] +
@@ -195,7 +197,7 @@ def GetNumpyEnvironment(args):
             env.Append(CXXFLAGS = "%s" % os.environ['CXXFLAGS'])
             env.AppendUnique(CXXFLAGS = env['NUMPY_EXTRA_CXXFLAGS'] +
                                         env['NUMPY_THREAD_CXXFLAGS'])
-        else: 
+        else:
             env.AppendUnique(CXXFLAGS  = env['NUMPY_WARN_CXXFLAGS'] +
                                          env['NUMPY_OPTIM_CXXFLAGS'] +
                                          env['NUMPY_DEBUG_SYMBOL_CXXFLAGS'] +
@@ -213,30 +215,30 @@ def initialize_cc(env, path_list):
                 # Intel Compiler SCons.Tool has a special way to set the
                 # path, so we use this one instead of changing
                 # env['ENV']['PATH'].
-                t = Tool(env['cc_opt'], 
-                         toolpath = get_numscons_toolpaths(env), 
+                t = Tool(env['cc_opt'],
+                         toolpath = get_numscons_toolpaths(env),
                          topdir = os.path.split(env['cc_opt_path'])[0])
-                t(env) 
+                t(env)
                 customize_cc(t.name, env)
             else:
                 if is_cc_suncc(pjoin(env['cc_opt_path'], env['cc_opt'])):
                     env['cc_opt'] = 'suncc'
-                t = Tool(env['cc_opt'], 
+                t = Tool(env['cc_opt'],
                          toolpath = get_numscons_toolpaths(env))
-                t(env) 
+                t(env)
                 customize_cc(t.name, env)
                 path_list.append(env['cc_opt_path'])
         else:
             # Do not care about PATH info because none given from scons
             # distutils command
             t = Tool(env['cc_opt'], toolpath = get_numscons_toolpaths(env))
-            t(env) 
+            t(env)
             customize_cc(t.name, env)
 
     if len(env['cc_opt']) > 0:
         set_cc_from_distutils()
     else:
-        t = Tool(FindTool(DEF_C_COMPILERS, env), 
+        t = Tool(FindTool(DEF_C_COMPILERS, env),
                  toolpath = get_numscons_toolpaths(env))
         t(env)
         customize_cc(t.name, env)
@@ -248,7 +250,7 @@ def initialize_f77(env, path_list):
     if len(env['f77_opt']) > 0:
         if len(env['f77_opt_path']) > 0:
             env.AppendUnique(F77FILESUFFIXES = ['.f'])
-            t = Tool(env['f77_opt'], 
+            t = Tool(env['f77_opt'],
                      toolpath = get_numscons_toolpaths(env))
             t(env)
             path_list.append(env['f77_opt_path'])
@@ -268,9 +270,11 @@ def initialize_cxx(env, path_list):
 
     if len(env['cxx_opt']) > 0:
         if len(env['cxx_opt_path']) > 0:
-            t = Tool(env['cxx_opt'], 
+            if is_cc_suncc(pjoin(env['cxx_opt_path'], env['cxx_opt'])):
+                env['cxx_opt'] = 'sunc++'
+            t = Tool(env['cxx_opt'],
                      toolpath = get_numscons_toolpaths(env))
-            t(env) 
+            t(env)
             path_list.append(env['cxx_opt_path'])
             customize_cxx(t.name, env)
     else:
@@ -281,10 +285,26 @@ def initialize_cxx(env, path_list):
             customize_cxx(t.name, env)
         else:
             print "========== NO CXX COMPILER FOUND ==========="
+            # Some scons tools initialize CXX env var even if no CXX available.
+            # This is just confusing, so remove the key here since we could not
+            # initialize any CXX tool.
+            try:
+                del env['CXX']
+            except KeyError:
+                pass
+
+def set_bootstrap(env):
+    import __builtin__
+    if env['bootstrapping']:
+        __builtin__.__NUMPY_SETUP__ = True
+
+def is_bootstrapping(env):
+    return env['bootstrapping']
 
 def _get_numpy_env(args):
     """Call this with args = ARGUMENTS."""
     from SCons.Script import BuildDir, Help
+    from SCons.Defaults import DefaultEnvironment
     from numpyenv import NumpyEnvironment
 
     # XXX: this function is too long and clumsy...
@@ -300,12 +320,21 @@ def _get_numpy_env(args):
     pyextsuffix = get_config_vars('SO')
 
     # We set tools to an empty list, to be sure that the custom options are
-    # given first. We have to 
+    # given first. We have to
     env = NumpyEnvironment(options = opts, tools = [], PYEXTSUFFIX = pyextsuffix)
+
+    set_bootstrap(env)
+
+    # XXX: should we allow default environment at all ? It certainly won't work
+    # as it is.
+
+    # We explicily set DefaultEnvironment to avoid wasting time on initializing
+    # tools a second time.
+    DefaultEnvironment(tools = [])
 
     # Setting dirs according to command line options
     env.AppendUnique(build_dir = pjoin(env['build_prefix'], env['src_dir']))
-    env.AppendUnique(distutils_installdir = pjoin(env['distutils_libdir'], 
+    env.AppendUnique(distutils_installdir = pjoin(env['distutils_libdir'],
                                                   pkg_to_path(env['pkg_name'])))
 
     #------------------------------------------------
@@ -383,8 +412,8 @@ def set_site_config(env):
 
     # This will be used to keep configuration information on a per package basis
     env['NUMPY_PKG_CONFIG'] = {'PERFLIB' : {}, 'LIB' : {}}
-    env['NUMPY_PKG_CONFIG_FILE'] = pjoin(get_scons_configres_dir(), 
-                                         env['src_dir'], 
+    env['NUMPY_PKG_CONFIG_FILE'] = pjoin(get_scons_configres_dir(),
+                                         env['src_dir'],
                                          get_scons_configres_filename())
 
 def customize_scons_dirs(env):
@@ -403,7 +432,7 @@ def customize_scons_dirs(env):
             n += 1
         return pjoin(os.sep.join([os.pardir for i in range(n)]), builddir)
 
-    sconsign = pjoin(get_build_relative_src(env['src_dir'], 
+    sconsign = pjoin(get_build_relative_src(env['src_dir'],
                                             env['build_dir']),
                      '.sconsign.dblite')
     asconsign = pabspath(env['build_dir'])
@@ -430,10 +459,10 @@ def add_custom_builders(env):
     env['BUILDERS']['PythonExtension'] = PythonExtension
     env['BUILDERS']['NumpyPythonExtension'] = NumpyPythonExtension
 
-    tpl_scanner = Scanner(function = generate_from_template_scanner, 
+    tpl_scanner = Scanner(function = generate_from_template_scanner,
                           skeys = ['.src'])
     env['BUILDERS']['FromCTemplate'] = Builder(
-                action = Action(generate_from_c_template, '$CTEMPLATECOMSTR'), 
+                action = Action(generate_from_c_template, '$CTEMPLATECOMSTR'),
                 emitter = generate_from_template_emitter,
                 source_scanner = tpl_scanner)
 
@@ -468,7 +497,7 @@ def customize_tools(env):
     # according to scons, don't ask me why, but this does not work as expected
     # for this tool.
     if not env['cc_opt'] == 'mingw':
-        for i in [DEF_LINKERS, DEF_CXX_COMPILERS, DEF_ASSEMBLERS, DEF_ARS]:
+        for i in [DEF_LINKERS, DEF_ASSEMBLERS, DEF_ARS]:
             t = FindTool(i, env) or i[0]
             Tool(t)(env)
     else:
@@ -477,10 +506,10 @@ def customize_tools(env):
             #env['LINK'] = None
         except EnvironmentError:
             raise RuntimeError('g++ not found: this is necessary with mingw32 '\
-                               'to build numpy !') 
+                               'to build numpy !')
         # XXX: is this really the right place ?
         env.AppendUnique(CFLAGS = '-mno-cygwin')
-            
+
     for t in FindAllTools(DEF_OTHER_TOOLS, env):
         Tool(t)(env)
 
@@ -502,11 +531,11 @@ def customize_tools(env):
     # XXX: understand how registration of source files work before reenabling
     # those
 
-    # t = Tool('npyctpl', 
+    # t = Tool('npyctpl',
     #          toolpath = )
     # t(env)
 
-    # t = Tool('npyftpl', 
+    # t = Tool('npyftpl',
     #          toolpath = )
     # t(env)
 
@@ -534,13 +563,15 @@ def customize_link_flags(env):
     elif built_with_mstools(env):
         # Sanity check: in case scons changes and we are not
         # aware of it
-        assert isinstance(env["SHLINKCOM"], ListAction)
-        assert isinstance(env["LDMODULECOM"], ListAction)
+        if not isinstance(env["SHLINKCOM"], list):
+            raise InternalError("Internal consistency check failed for MS compiler. This is bug, please contact the maintainer")
+        if not isinstance(env["LDMODULECOM"], list):
+            raise InternalError("Internal consistency check failed for MS compiler. This is bug, please contact the maintainer")
         # We replace the "real" shlib action of mslink by our
         # own, which only differ in the linkdlagsend flags.
         newshlibaction = Action('${TEMPFILE("$SHLINK $SHLINKFLAGS $_SHLINK_TARGETS $( $_LIBDIRFLAGS $) $_LIBFLAGS $SHLINKFLAGSEND $_PDB $_SHLINK_SOURCES")}')
-        env["SHLINKCOM"].list[0] = newshlibaction
-        env["LDMODULECOM"].list[0] = newshlibaction
+        env["SHLINKCOM"][0] = newshlibaction
+        env["LDMODULECOM"][0] = newshlibaction
 
         newlibaction = '${TEMPFILE("$LINK $LINKFLAGS /OUT:$TARGET.windows $( $_LIBDIRFLAGS $) $_LIBFLAGS $LINKFLAGSEND $_PDB $SOURCES.windows")}'
         env["LINKCOM"] = newlibaction
@@ -550,10 +581,9 @@ def customize_link_flags(env):
         env['LDMODULECOM'] = '%s $LDMODULEFLAGSEND' % env['LDMODULECOM']
 
 def distutils_dirs_emitter(target, source, env):
-    from SCons.Node.FS import default_fs 
+    from SCons.Node.FS import default_fs
 
     source = [default_fs.Entry(pjoin(env['build_dir'], str(i))) for i in source]
     target = [default_fs.Entry(pjoin(env['build_dir'], str(i))) for i in target]
 
     return target, source
-

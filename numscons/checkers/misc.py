@@ -12,7 +12,7 @@ from numscons.checkers.support import save_and_set, restore
 
 def get_sunperf_link_options(context, config):
     """If successefull, returns the link flags.
-    
+
     Returns:
         - st: int
             0 : failed
@@ -44,10 +44,10 @@ def get_sunperf_link_options(context, config):
         slast = str(context.lastTarget)
         prdir = dirname(slast)
         test_prog = pjoin(prdir, basename(slast).split('.')[0])
-    
-        cmd = context.env.subst('$LINKCOM', 
-            		    target = context.env.File(test_prog),
-            		    source = context.lastTarget)
+
+        cmd = context.env.subst('$LINKCOM',
+                            target = context.env.File(test_prog),
+                            source = context.lastTarget)
         st, out = popen_wrapper(cmd, merge = True)
     finally:
         restore(env, saved)
@@ -100,4 +100,3 @@ def sunperf_parser_link(out):
         t = parse(t)
 
     return keep
-

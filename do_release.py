@@ -1,12 +1,10 @@
 from subprocess import Popen, PIPE
 
-from release import VERSION
+from release import build_verstring, build_fverstring
+import release
 
-yop = VERSION.split('.')
-try:
-    micro = int(yop[-1])
-except ValueError:
-    raise Exception("Bad micro version: version is %s" % VERSION)
+if release.DEV:
+    raise Exception("Dev version ?")
 
 def nofailexec(cmd, cwd = None):
     p = Popen(cmd, cwd = cwd, shell = True)
@@ -20,11 +18,12 @@ def make_tarballs():
 def test_sanity():
     # This executes numscons unit tests: this is far from convering everything,
     # but at least guarantees basic sanity of the package
-    cmd = "tar -xjf numscons-%s.tar.bz2" % VERSION
+    ver = build_verstring()
+    cmd = "tar -xjf numscons-%s.tar.bz2" % ver
     nofailexec([cmd], cwd = "dist")
 
     cmd = "python setup.py scons"
-    nofailexec([cmd], cwd = "dist/numscons-%s/tests" % VERSION)
+    nofailexec([cmd], cwd = "dist/numscons-%s/tests" % ver)
 
 def make_eggs():
     # Build eggs for 2.4 and 2.5
@@ -49,3 +48,4 @@ make_tarballs()
 test_sanity()
 
 make_eggs()
+register()

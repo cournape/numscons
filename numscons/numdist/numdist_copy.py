@@ -93,4 +93,3 @@ def msvc_runtime_library():
     else:
         lib = None
     return lib
-

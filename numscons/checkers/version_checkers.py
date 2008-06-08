@@ -68,4 +68,3 @@ return 0;
         version = ''
 
     return vst, version
-

@@ -27,6 +27,14 @@ import checkers
 from checkers import *
 __all__ += checkers.__all__
 
+def get_version():
+    import version
+    return version.VERSION
+
+def is_dev_version():
+    import version
+    return version.DEV
+
 # XXX: this is ugly, better find the mathlibs with a checker 
 # XXX: this had nothing to do here, too...
 def scons_get_paths(paths):

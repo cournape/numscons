@@ -39,7 +39,7 @@ import SCons.Defaults
 
 def generate(env):
     """Add Builders and construction variables for dllwrap."""
-    env['DWP'] 	= 'dllwrap'
+    env['DWP']  = 'dllwrap'
     env['DWPFLAGS'] = SCons.Util.CLVar('')
 
     env['DWPLINKPREFIX'] = '-l'
@@ -52,13 +52,13 @@ def generate(env):
 
     # This is used to link gcc-style libs (-lfoo)
     env['_DWPLIBFLAGS'] = '${_stripixes(DWPLINKPREFIX, DWPLIBS, '\
-		    	  'DWPLINKSUFFIX, LIBPREFIX, LIBSUFFIX, __env__)}'
+                          'DWPLINKSUFFIX, LIBPREFIX, LIBSUFFIX, __env__)}'
     # This is used to link ms-style libs (foo.dll)
     env['_DWPDLLFLAGS'] = '${_stripixes(DWPSHLINKPREFIX, DWPDLL, '\
-		    	  'DWPSHLINKSUFFIX, SHLIBPREFIX, SHLIBSUFFIX, __env__)}'
+                          'DWPSHLINKSUFFIX, SHLIBPREFIX, SHLIBSUFFIX, __env__)}'
 
-    env['DWPCOM'] 	= '$DWP -o $TARGET $DWPFLAGS $SOURCES $_DWPDLLFLAGS '\
-		    	  '$_DWPLIBFLAGS'
+    env['DWPCOM']       = '$DWP -o $TARGET $DWPFLAGS $SOURCES $_DWPDLLFLAGS '\
+                          '$_DWPLIBFLAGS'
 
 def exists(env):
     return env.Detect('dllwrap')

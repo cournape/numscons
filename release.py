@@ -1,3 +1,5 @@
+import os
+
 CLASSIFIERS = """\
 Development Status :: 3 - Alpha
 Intended Audience :: Science/Research
@@ -13,7 +15,10 @@ Operating System :: MacOS
 """
 
 NAME        = 'numscons'
-VERSION     = '0.7.2dev'
+MAJOR       = 0
+MINOR       = 7
+MICRO       = 3
+DEV         = False
 DESCRIPTION = 'Enable to use scons within distutils to build extensions'
 CLASSIFIERS = filter(None, CLASSIFIERS.split('\n'))
 AUTHOR      = 'David Cournapeau'
@@ -24,3 +29,20 @@ PACKAGES    = ['numscons', 'numscons.core', 'numscons.checkers',
 PACKAGE_DATA = {'numscons.core' : ['compiler.cfg', 'fcompiler.cfg', 'cxxcompiler.cfg'], 
               'numscons.checkers' : ['perflib.cfg']}
 DATA_DIR    = ['numscons/scons-local']
+
+def build_verstring():
+    return '%d.%d.%d' % (MAJOR, MINOR, MICRO)
+
+def build_fverstring():
+    if DEV:
+        return build_verstring() + 'dev'
+    else:
+        return build_verstring()
+
+def write_version():
+    fname = os.path.join("numscons", "version.py")
+    f = open(fname, "w")
+    f.writelines("VERSION = %s\n" % build_verstring())
+    f.writelines("DEV = %s" % DEV)
+    f.close()
+    

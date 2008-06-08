@@ -22,8 +22,8 @@ _PERFLIBS = ('GenericBlas', 'GenericLapack', 'MKL', 'ATLAS', 'Accelerate',
 #------------------------
 class _PerflibConfig:
     """A class which contain all the information read from the configuration
-    file (perflib.cfg). 
-    
+    file (perflib.cfg).
+
     For a given performance library, this includes build options (cflags, libs,
     path, etc....) and meta information (name, version, how to check)."""
     def __init__(self, dispname, sitename, values):
@@ -57,7 +57,7 @@ def build_config():
     # perflib.cfg which can be a list.
     list_opts = build_config_factory_flags()
 
-    #defint = {'atlas_libpath' : 
+    #defint = {'atlas_libpath' :
     #          ','.join([pjoin(i, 'atlas') for i in default_lib_dirs])}
 
     cfg = SafeConfigParser()
@@ -80,7 +80,7 @@ def build_config():
         dispname = get_opt('dispname')
         sitename = get_opt('sitename')
 
-        # Now get all optional options 
+        # Now get all optional options
         for i in opts:
             # XXX: this condition is an hack. This is necessary to avoid
             # writing default values, but there may be a better solution.
@@ -95,7 +95,7 @@ def build_config():
         ret[i] = get_perflib_config(i)
 
     return ret
-        
+
 # A dictionary which keys are the name of the perflib (same than perflib.cfg
 # section name) and values a _PerflibConfig instance.
 CONFIG = build_config()
@@ -103,7 +103,7 @@ CONFIG = build_config()
 class IsFactory:
     def __init__(self, name):
         """Name should be one key of CONFIG."""
-        def func(env, libname): 
+        def func(env, libname):
             cache = env['NUMPY_PKG_CONFIG']['LIB'][libname]
             if cache:
                 return cache.uses_perflib(name)

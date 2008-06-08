@@ -79,7 +79,7 @@ IsVeclib = IsFactory('vecLib').func
 def CheckSunperf(context, autoadd = 1, check_version = 0):
     """Checker for sunperf."""
     cfg = CONFIG['Sunperf']
-    
+
     ret = _check(context, cfg, check_version, None, autoadd)
     if not ret:
         return 0
@@ -165,4 +165,3 @@ def get_perflib_info(context, pname):
             cache = get_cached_perflib_info(context.env, pname)
 
     return cache
-

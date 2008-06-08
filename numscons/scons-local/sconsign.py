@@ -24,15 +24,15 @@
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #
 
-__revision__ = "src/script/sconsign.py 2899 2008/04/21 00:10:00 knight"
+__revision__ = "src/script/sconsign.py 2949 2008/05/17 23:07:00 knight"
 
-__version__ = "0.98.2"
+__version__ = "0.98.4"
 
-__build__ = "r2899"
+__build__ = "r2949"
 
 __buildsys__ = "bangkok"
 
-__date__ = "2008/04/21 00:10:00"
+__date__ = "2008/05/17 23:07:00"
 
 __developer__ = "knight"
 
@@ -274,6 +274,8 @@ def nodeinfo_raw(name, ninfo, prefix=""):
     l = []
     for k in keys:
         l.append('%s: %s' % (repr(k), repr(d.get(k))))
+    if '\n' in name:
+        name = repr(name)
     return name + ': {' + string.join(l, ', ') + '}'
 
 def nodeinfo_cooked(name, ninfo, prefix=""):
@@ -282,6 +284,8 @@ def nodeinfo_cooked(name, ninfo, prefix=""):
     except AttributeError:
         field_list = []
     f = lambda x, ni=ninfo, v=Verbose: field(x, ni, v)
+    if '\n' in name:
+        name = repr(name)
     outlist = [name+':'] + filter(None, map(f, field_list))
     if Verbose:
         sep = '\n    ' + prefix
