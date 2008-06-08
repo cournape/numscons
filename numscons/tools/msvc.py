@@ -173,6 +173,7 @@ def query_vcvarsall(version, arch="x86"):
         raise ValueError("Error while parsing vcvarsall.bat settings")
 
     return result
+
 def validate_vars(env):
     """Validate the PCH and PCHSTOP construction variables."""
     if env.has_key('PCH') and env['PCH']:
@@ -285,6 +286,7 @@ def generate(env):
     env['SHOBJSUFFIX']    = '$OBJSUFFIX'
 
     try:
+        # XXX: handle VS version correctly
         version = 9.0
         res = query_vcvarsall(version)
 
