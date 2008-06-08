@@ -132,9 +132,13 @@ def generate(env):
     env['SHOBJSUFFIX']    = '$OBJSUFFIX'
 
     try:
-        env.PrependENVPath('INCLUDE', include_path)
-        env.PrependENVPath('LIB', lib_path)
-        env.PrependENVPath('PATH', exe_path)
+        from msvc_common import query_vcvarsall
+        version = 9.0
+        res = query_vscarsall(version)
+
+        env.PrependENVPath('INCLUDE', res['include'])
+        env.PrependENVPath('LIB', res['libpath'])
+        env.PrependENVPath('PATH', res['path'])
     except (SCons.Util.RegError, SCons.Errors.InternalError):
         pass
 
