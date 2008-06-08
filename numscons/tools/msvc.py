@@ -7,6 +7,7 @@ registry, to be simpler and more reliable.
 import os.path
 import re
 import string
+import subprocess
 
 import _winreg
 
