@@ -289,7 +289,8 @@ def generate(env):
         res = query_vcvarsall(version)
 
         env.PrependENVPath('INCLUDE', res['include'])
-        env.PrependENVPath('LIB', res['libpath'])
+        env.PrependENVPath('LIBPATH', res['libpath'])
+        env.PrependENVPath('LIB', res['lib'])
         env.PrependENVPath('PATH', res['path'])
     except (SCons.Util.RegError, SCons.Errors.InternalError):
         pass
