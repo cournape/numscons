@@ -1,4 +1,5 @@
 from subprocess import Popen, PIPE
+import os
 
 from release import build_verstring, build_fverstring
 import release
@@ -18,11 +19,11 @@ def make_tarballs():
 def test_sanity():
     # This executes numscons unit tests: this is far from convering everything,
     # but at least guarantees basic sanity of the package
-    ver = build_verstring()
+    ver = build_fverstring()
     cmd = "tar -xjf numscons-%s.tar.bz2" % ver
     nofailexec([cmd], cwd = "dist")
 
-    cmd = "python setup.py scons"
+    cmd = "PYTHONPATH=%s:$PYTHONPATH python setup.py scons" % os.path.join(os.getcwd(), "dist", "numscons-%s" % ver)
     nofailexec([cmd], cwd = "dist/numscons-%s/tests" % ver)
 
 def make_eggs():

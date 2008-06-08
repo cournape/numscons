@@ -5,6 +5,11 @@ def configuration(parent_package='',top_path=None):
     from numpy.distutils.misc_util import Configuration
     config = Configuration('scons_fake',parent_package,top_path)
 
+    from numscons import get_version
+    import numscons
+    print "++++++++++++++++++++++++++++++++"
+    print "Numscons Version is %s" % get_version()
+    print "++++++++++++++++++++++++++++++++"
     config.add_subpackage('checkers')
     config.add_subpackage('checklib')
     config.add_subpackage('ctypesext')

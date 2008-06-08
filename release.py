@@ -17,7 +17,7 @@ Operating System :: MacOS
 NAME        = 'numscons'
 MAJOR       = 0
 MINOR       = 7
-MICRO       = 3
+MICRO       = 4
 DEV         = False
 DESCRIPTION = 'Enable to use scons within distutils to build extensions'
 CLASSIFIERS = filter(None, CLASSIFIERS.split('\n'))
@@ -42,7 +42,7 @@ def build_fverstring():
 def write_version():
     fname = os.path.join("numscons", "version.py")
     f = open(fname, "w")
-    f.writelines("VERSION = %s\n" % build_verstring())
+    f.writelines("VERSION = '%s'\n" % build_verstring())
     f.writelines("DEV = %s" % DEV)
     f.close()
     

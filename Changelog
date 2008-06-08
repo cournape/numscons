@@ -1,3 +1,8 @@
+Mon, 09 Jun 2008 00:21:52 +0900
+	* Fix stupid bug with version being a non string
+	* Make sure the right numscons is tested in sanity check for dist test
+	* Release 0.7.4
+
 Sun, 08 Jun 2008 22:04:35 +0900
 	* add functions to query numscons version
 	* Release 0.7.3
