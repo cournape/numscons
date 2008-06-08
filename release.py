@@ -1,3 +1,5 @@
+import os
+
 CLASSIFIERS = """\
 Development Status :: 3 - Alpha
 Intended Audience :: Science/Research
@@ -37,3 +39,10 @@ def build_fverstring():
     else:
         return build_verstring()
 
+def write_version():
+    fname = os.path.join("numscons", "version.py")
+    f = open(fname, "w")
+    f.writelines("VERSION = %s\n" % build_verstring())
+    f.writelines("DEV = %s" % DEV)
+    f.close()
+    

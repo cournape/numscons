@@ -73,14 +73,7 @@ class sdist(old_sdist):
 # Main setup method
 import release as R
 
-def write_version():
-    fname = os.path.join("numscons", "version.py")
-    f = open(fname, "w")
-    f.writelines("VERSION = %s\n" % R.build_verstring())
-    f.writelines("DEV = %s" % R.DEV)
-    f.close()
-    
-write_version()
+R.write_version()
 setup(cmdclass = {'install': install, 'install_data': install_data, 'sdist': sdist},
       distclass     = Distribution,
       name          = R.NAME,

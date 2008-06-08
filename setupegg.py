@@ -10,8 +10,10 @@ if os.path.exists('MANIFEST'): os.remove('MANIFEST')
 
 # Main setup method
 import release as R
+
+R.write_version()
 setup(name          = R.NAME,
-      version       = R.VERSION,
+      version       = R.build_fverstring(),
       description   = R.DESCRIPTION,
       author        = R.AUTHOR,
       author_email  = R.AUTHOR_EMAIL,
