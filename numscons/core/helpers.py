@@ -17,7 +17,7 @@ from numscons.core.compiler_config import get_cc_config, get_f77_config, get_cxx
 from numscons.core.custom_builders import NumpySharedLibrary, NumpyCtypes, \
      NumpyPythonExtension, NumpyStaticExtLibrary
 from numscons.core.siteconfig import get_config
-from numscons.core.extension_scons import PythonExtension, built_with_mstools, \
+from numscons.core.extension_scons import built_with_mstools, \
      createStaticExtLibraryBuilder
 from numscons.core.utils import pkg_to_path, partial
 from numscons.core.misc import pyplat2sconsplat, is_cc_suncc, \
@@ -313,15 +313,9 @@ def _get_numpy_env(args):
     # some different behaviour than just Environment instances...
     opts = GetNumpyOptions(args)
 
-    # Get the python extension suffix
-    # XXX this should be defined somewhere else. Is there a way to reliably get
-    # all the necessary informations specific to python extensions (linkflags,
-    # etc...) dynamically ?
-    pyextsuffix = get_config_vars('SO')
-
     # We set tools to an empty list, to be sure that the custom options are
     # given first. We have to
-    env = NumpyEnvironment(options = opts, tools = [], PYEXTSUFFIX = pyextsuffix)
+    env = NumpyEnvironment(options = opts, tools = [])
 
     set_bootstrap(env)
 
@@ -456,7 +450,6 @@ def add_custom_builders(env):
     # XXX: Put them into tools ?
     env['BUILDERS']['NumpySharedLibrary'] = NumpySharedLibrary
     env['BUILDERS']['NumpyCtypes'] = NumpyCtypes
-    env['BUILDERS']['PythonExtension'] = PythonExtension
     env['BUILDERS']['NumpyPythonExtension'] = NumpyPythonExtension
 
     tpl_scanner = Scanner(function = generate_from_template_scanner,
@@ -518,6 +511,9 @@ def customize_tools(env):
         t(env)
         t = Tool("dlltool", toolpath = get_numscons_toolpaths(env))
         t(env)
+
+    t = Tool('pyext', toolpath = get_numscons_toolpaths(env))
+    t(env)
 
     # Add our own, custom tools (f2py, from_template, etc...)
     #t = Tool('f2py', toolpath = get_numscons_toolpaths(env))
