@@ -473,6 +473,7 @@ def add_custom_builders(env):
 
 def customize_tools(env):
     from SCons.Tool import Tool, FindTool, FindAllTools
+    from SCons.Builder import Builder
 
     # List of supplemental paths to take into account
     path_list = []
@@ -514,6 +515,17 @@ def customize_tools(env):
 
     t = Tool('pyext', toolpath = get_numscons_toolpaths(env))
     t(env)
+
+    # Extending pyext to handle fortran source code. 
+    # XXX: This is ugly: I don't see any way to do this cleanly.
+    pyext_obj = t._tool_module().createPythonObjectBuilder(env)
+    from SCons.Tool.FortranCommon import CreateDialectActions, ShFortranEmitter
+
+    compaction, compppaction, shcompaction, shcompppaction = \
+            CreateDialectActions('F77')
+    for suffix in env['F77FILESUFFIXES']:
+        pyext_obj.add_action(suffix, shcompaction)
+        pyext_obj.add_emitter(suffix, ShFortranEmitter)
 
     # Add our own, custom tools (f2py, from_template, etc...)
     #t = Tool('f2py', toolpath = get_numscons_toolpaths(env))
