@@ -120,8 +120,8 @@ def set_basic_vars(env):
         env['PYEXTLINKCOM'] = '${TEMPFILE("$PYEXTLINK $PYEXTLINKFLAGS '\
                               '/OUT:$TARGET.windows $SOURCES.windows")}'
     else:
-        env['PYEXTLINKCOM'] = "$PYEXTLINK -o $TARGET $PYEXTLINKFLAGS $SOURCES "\
-                            "$_LIBDIRFLAGS $_LIBFLAGS"
+        env['PYEXTLINKCOM'] = "$PYEXTLINK -o $TARGET $PYEXTLINKFLAGS "\
+                              "$SOURCES $_LIBDIRFLAGS $_LIBFLAGS"
 
     if sys.platform == 'darwin':
         env['PYEXTLINKCOM'] += ' $_FRAMEWORKPATH $_FRAMEWORKS $FRAMEWORKSFLAGS'
