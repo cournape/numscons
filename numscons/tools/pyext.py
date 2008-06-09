@@ -112,7 +112,8 @@ def set_basic_vars(env):
         env['PYEXTLINKCOM'] = '${TEMPFILE("$PYEXTLINK $PYEXTLINKFLAGS '\
                               '/OUT:$TARGET.windows $SOURCES.windows")}'
     else:
-        env['PYEXTLINKCOM'] = "$PYEXTLINK -o $TARGET $PYEXTLINKFLAGS $SOURCES"
+        env['PYEXTLINKCOM'] = "$PYEXTLINK -o $TARGET $PYEXTLINKFLAGS $SOURCES"\
+                            "$_LIBDIRFLAGS $_LIBFLAGS"
 
 def _set_configuration_nodistutils(env):
     # Set env variables to sensible values when not using distutils
