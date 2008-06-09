@@ -385,6 +385,10 @@ def set_verbosity(env):
         env['CXXCOMSTR']        = "CXX                $SOURCE"
         env['SHCXXCOMSTR']      = "SHCXX              $SOURCE"
 
+        env['PYEXTCCCOMSTR']    = "PYEXTCC            $SOURCE"
+        env['PYEXTCXXCOMSTR']   = "PYEXTCXX           $SOURCE"
+        env['PYEXTLINKCOMSTR']  = "PYEXTLINK          $SOURCE"
+
         env['F77COMSTR']        = "F77                $SOURCE"
         env['SHF77COMSTR']      = "SHF77              $SOURCE"
 
