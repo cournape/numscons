@@ -90,7 +90,7 @@ def createPythonExtensionBuilder(env):
 def set_basic_vars(env):
     # Set construction variables which are independant on whether we are using
     # distutils or not.
-    env['PYEXTCPPPATH'] = SCons.Util.CLVar('$PYEXTINCPATH')
+    env['PYEXTCPPPATH'] = SCons.Util.CLVar('$PYEXTINCPATH $CPPPATH')
 
     env['_PYEXTCPPINCFLAGS'] = '$( ${_concat(INCPREFIX, PYEXTCPPPATH, '\
                                'INCSUFFIX, __env__, RDirs, TARGET, SOURCE)} $)'
