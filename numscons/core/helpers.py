@@ -472,6 +472,39 @@ def add_custom_builders(env):
     createStaticExtLibraryBuilder(env)
     env['BUILDERS']['NumpyStaticExtLibrary'] = NumpyStaticExtLibrary
 
+# No easy way to retrieve this function from scons (because of the + in the
+# module name, cannot be easily imported).
+def iscplusplus(source):
+    import SCons
+
+    # We neeed to copy this too...
+    CXXSuffixes = ['.cpp', '.cc', '.cxx', '.c++', '.C++', '.mm']
+    if SCons.Util.case_sensitive_suffixes('.c', '.C'):
+        CXXSuffixes.append('.C')
+
+    if not source:
+        # Source might be None for unusual cases like SConf.
+        return 0
+    for s in source:
+        if s.sources:
+            ext = os.path.splitext(str(s.sources[0]))[1]
+            if ext in CXXSuffixes:
+                return 1
+    return 0
+
+# Our own smart_link: the one in scons is not that smart.
+def dumb_link(source, target, env, for_signature):
+    import SCons.Errors
+    from SCons.Tool.FortranCommon import isfortran
+
+    has_cplusplus = iscplusplus(source)
+    has_fortran = isfortran(env, source)
+    if has_cplusplus and has_fortran:
+        raise SCons.Errors.InternalError(
+                "Sorry, numscons cannot yet link c++ and fortran code together.")
+    elif has_cplusplus:
+        return '$CXX'
+    return '$CC'
 
 def customize_tools(env):
     from SCons.Tool import Tool, FindTool, FindAllTools
@@ -508,6 +541,10 @@ def customize_tools(env):
 
     for t in FindAllTools(DEF_OTHER_TOOLS, env):
         Tool(t)(env)
+
+    # Use our own stupid link, because we handle this with conf checkers and
+    # link flags.
+    env['SMARTLINK']   = dumb_link
 
     if built_with_mingw(env):
         t = Tool("dllwrap", toolpath = get_numscons_toolpaths(env))
