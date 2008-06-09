@@ -626,6 +626,7 @@ def customize_link_flags(env):
         env['LINKCOM'] = '%s $LINKFLAGSEND' % env['LINKCOM']
         env['SHLINKCOM'] = '%s $SHLINKFLAGSEND' % env['SHLINKCOM']
         env['LDMODULECOM'] = '%s $LDMODULEFLAGSEND' % env['LDMODULECOM']
+        env['PYEXTLINKCOM'] = '%s $PYEXTLINKFLAGSEND' % env['PYEXTLINKCOM']
 
 def distutils_dirs_emitter(target, source, env):
     from SCons.Node.FS import default_fs

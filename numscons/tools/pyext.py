@@ -113,7 +113,7 @@ def set_basic_vars(env):
                              "$PYEXTCXXFLAGS $_PYEXTCPPINCFLAGS $_CCCOMCOM "\
                              "$SOURCES"
                             
-
+    env['PYEXTLINKFLAGSEND'] = SCons.Util.CLVar('$LINKFLAGSEND')
     # XXX: cf comment on PYEXTCCCOM
     if sys.platform == 'win32':
         env['PYEXTLINKCOM'] = '${TEMPFILE("$PYEXTLINK $PYEXTLINKFLAGS '\
