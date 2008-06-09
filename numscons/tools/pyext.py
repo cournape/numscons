@@ -54,7 +54,7 @@ def createPythonObjectBuilder(env):
                                       emitter = {},
                                       prefix = '$PYEXTOBJPREFIX',
                                       suffix = '$PYEXTOBJSUFFIX',
-                                      src_builder = ['CFile'],
+                                      src_builder = ['CFile', 'CXXFile'],
                                       source_scanner = SourceFileScanner,
                                       single_source = 1)
         env['BUILDERS']['PythonObject'] = pyobj
@@ -103,10 +103,15 @@ def set_basic_vars(env):
     if sys.platform == 'win32':
         env['PYEXTCCCOM'] = "$PYEXTCC /Fo$TARGET /c $PYEXTCCSHARED "\
                             "$PYEXTCFLAGS $_PYEXTCPPINCFLAGS $SOURCES"
+        env['PYEXTCXXCOM'] = "$PYEXTCXX /Fo$TARGET /c $PYEXTCSHARED "\
+                             "$PYEXTCXXFLAGS $_PYEXTCPPINCFLAGS $SOURCES"
     else:
         env['PYEXTCCCOM'] = "$PYEXTCC -o $TARGET -c $PYEXTCCSHARED "\
                             "$PYEXTCFLAGS $_PYEXTCPPINCFLAGS $_CCCOMCOM "\
                             "$SOURCES"
+        env['PYEXTCXXCOM'] = "$PYEXTCXX -o $TARGET -c $PYEXTCSHARED "\
+                             "$PYEXTCXXFLAGS $_PYEXTCPPINCFLAGS $_CCCOMCOM "\
+                             "$SOURCES"
                             
 
     # XXX: cf comment on PYEXTCCCOM
@@ -121,6 +126,8 @@ def _set_configuration_nodistutils(env):
     # Set env variables to sensible values when not using distutils
     def_cfg = {'PYEXTCC' : '$SHCC',
                'PYEXTCFLAGS' : '$SHCFLAGS',
+               'PYEXTCXX' : '$SHCXX',
+               'PYEXTCXXFLAGS' : '$SHCXXFLAGS',
                'PYEXTLINK' : '$LDMODULE',
                'PYEXTLINKFLAGS' : '$LDMODULEFLAGS',
                'PYEXTSUFFIX' : '$LDMODULESUFFIX',
@@ -198,6 +205,10 @@ def generate(env):
     action = SCons.Action.Action("$PYEXTCCCOM", "$PYEXTCCCOMSTR")
     pyobj.add_emitter('.c', SCons.Defaults.SharedObjectEmitter)
     pyobj.add_action('.c', action)
+
+    action = SCons.Action.Action("$PYEXTCXXCOM", "$PYEXTCXXCOMSTR")
+    pyobj.add_emitter('$CXXFILESUFFIX', SCons.Defaults.SharedObjectEmitter)
+    pyobj.add_action('$CXXFILESUFFIX', action)
 
     # Create the PythonExtension builder
     createPythonExtensionBuilder(env)

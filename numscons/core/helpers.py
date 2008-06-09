@@ -293,6 +293,8 @@ def initialize_cxx(env, path_list):
             except KeyError:
                 pass
 
+    env['CXXFILESUFFIX'] = '.cxx'
+
 def set_bootstrap(env):
     import __builtin__
     if env['bootstrapping']:
