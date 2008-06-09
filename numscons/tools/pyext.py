@@ -123,6 +123,9 @@ def set_basic_vars(env):
         env['PYEXTLINKCOM'] = "$PYEXTLINK -o $TARGET $PYEXTLINKFLAGS $SOURCES "\
                             "$_LIBDIRFLAGS $_LIBFLAGS"
 
+    if sys.platform == 'darwin':
+        env['PYEXTLINKCOM'] += ' $_FRAMEWORKPATH $_FRAMEWORKS $FRAMEWORKSFLAGS'
+
 def _set_configuration_nodistutils(env):
     # Set env variables to sensible values when not using distutils
     def_cfg = {'PYEXTCC' : '$SHCC',
