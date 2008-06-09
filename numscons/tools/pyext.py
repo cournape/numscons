@@ -130,9 +130,7 @@ def _set_configuration_nodistutils(env):
                'PYEXTCXX' : '$SHCXX',
                'PYEXTCXXFLAGS' : '$SHCXXFLAGS',
                'PYEXTLINK' : '$LDMODULE',
-               'PYEXTLINKFLAGS' : '$LDMODULEFLAGS',
                'PYEXTSUFFIX' : '$LDMODULESUFFIX',
-               'PYEXT_ALLOW_UNDEFINED' : '$ALLOW_UNDEFINED',
                'PYEXTPREFIX' : ''}
 
     if sys.platform == 'darwin':
@@ -141,7 +139,11 @@ def _set_configuration_nodistutils(env):
     for k, v in def_cfg.items():
         ifnotset(env, k, v)
 
-    env.Append(PYEXTLINKFLAGS = env['PYEXT_ALLOW_UNDEFINED'])
+    ifnotset(env, 'PYEXT_ALLOW_UNDEFINED', 
+             SCons.Util.CLVar('$ALLOW_UNDEFINED'))
+    ifnotset(env, 'PYEXTLINKFLAGS', SCons.Util.CLVar('$LDMODULEFLAGS'))
+
+    env.AppendUnique(PYEXTLINKFLAGS = env['PYEXT_ALLOW_UNDEFINED'])
 
 def ifnotset(env, name, value):
     if not env.has_key(name):
