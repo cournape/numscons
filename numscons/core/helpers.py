@@ -9,7 +9,7 @@ import os.path
 from os.path import join as pjoin, dirname as pdirname, basename as pbasename, \
     exists as pexists, abspath as pabspath
 from distutils.sysconfig import get_config_vars
-from copy import deepcopy
+from copy import deepcopy, copy
 
 from numscons.core.default import tool_list
 from numscons.core.compiler_config import get_cc_config, get_f77_config, get_cxx_config, \
@@ -443,7 +443,7 @@ def customize_scons_dirs(env):
 def add_custom_builders(env):
     """Call this to add all our custom builders to the environment."""
     from SCons.Scanner import Scanner
-    from SCons.Builder import Builder
+    from SCons.Builder import Builder, EmitterProxy, ListEmitter, DictEmitter
     from SCons.Action import Action
 
     # Add the file substitution tool
@@ -452,7 +452,6 @@ def add_custom_builders(env):
     # XXX: Put them into tools ?
     env['BUILDERS']['NumpySharedLibrary'] = NumpySharedLibrary
     env['BUILDERS']['NumpyCtypes'] = NumpyCtypes
-    env['BUILDERS']['NumpyPythonExtension'] = NumpyPythonExtension
 
     tpl_scanner = Scanner(function = generate_from_template_scanner,
                           skeys = ['.src'])
@@ -471,6 +470,30 @@ def add_custom_builders(env):
 
     createStaticExtLibraryBuilder(env)
     env['BUILDERS']['NumpyStaticExtLibrary'] = NumpyStaticExtLibrary
+
+    def add_distutils_emitter(emitter):
+        # Order is significant: DictEmitter is a callable...
+        if isinstance(emitter, DictEmitter):
+            for k in emitter.keys():
+                emitter[k] = add_distutils_emitter(emitter[k])
+        elif isinstance(emitter, EmitterProxy) or callable(emitter):
+            nemitter = ListEmitter()
+            nemitter.append(emitter)
+            emitter = nemitter
+
+            emitter.insert(0, distutils_dirs_emitter)
+        else:
+            raise InternalError("This should not happen, yet, it happened")
+
+        return emitter
+
+    for bld_name in ['PythonObject', 'PythonExtension']:
+        bld = copy(env['BUILDERS'][bld_name])
+        bld.emitter = add_distutils_emitter(bld.emitter)
+        env['BUILDERS']['Numpy%s' % bld_name] = bld
+
+    # XXX: Hackish
+    env['BUILDERS']['NumpyPythonExtension'].src_builder = ['NumpyPythonObject']
 
 # No easy way to retrieve this function from scons (because of the + in the
 # module name, cannot be easily imported).
@@ -641,10 +664,17 @@ def customize_link_flags(env):
         env['LDMODULECOM'] = '%s $LDMODULEFLAGSEND' % env['LDMODULECOM']
         env['PYEXTLINKCOM'] = '%s $PYEXTLINKFLAGSEND' % env['PYEXTLINKCOM']
 
-def distutils_dirs_emitter(target, source, env):
+def _distutils_dirs_seq(seq, env):
     from SCons.Node.FS import default_fs
 
-    source = [default_fs.Entry(pjoin(env['build_dir'], str(i))) for i in source]
-    target = [default_fs.Entry(pjoin(env['build_dir'], str(i))) for i in target]
+    sseq = [str(i) for i in seq]
+    newseq = []
+    for i in sseq:
+        if not i.startswith(env['build_dir']):
+            newseq.append(default_fs.Entry(pjoin(env['build_dir'], i)))
+        else:
+            newseq.append(default_fs.Entry(i))
+    return newseq
 
-    return target, source
+def distutils_dirs_emitter(target, source, env):
+    return _distutils_dirs_seq(target, env), _distutils_dirs_seq(source, env)
