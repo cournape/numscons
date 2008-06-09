@@ -117,7 +117,7 @@ def set_basic_vars(env):
 def _set_configuration_nodistutils(env):
     # Set env variables to sensible values when not using distutils
     def_cfg = {'PYEXTCC' : '$SHCC',
-               'PYEXTCFLAGS' : '$SHCCFLAGS',
+               'PYEXTCFLAGS' : '$SHCFLAGS',
                'PYEXTLINK' : '$LDMODULE',
                'PYEXTLINKFLAGS' : '$LDMODULEFLAGS',
                'PYEXTSUFFIX' : '$LDMODULESUFFIX',
