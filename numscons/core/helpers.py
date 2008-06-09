@@ -506,6 +506,15 @@ def dumb_link(source, target, env, for_signature):
         return '$CXX'
     return '$CC'
 
+def initialize_allow_undefined(env):
+    import SCons
+    from allow_undefined import get_darwin_allow_undefined
+
+    if sys.platform == 'darwin':
+        env['ALLOW_UNDEFINED'] = get_darwin_allow_undefined()
+    else:
+        env['ALLOW_UNDEFINED'] = SCons.Util.CLVar('')
+
 def customize_tools(env):
     from SCons.Tool import Tool, FindTool, FindAllTools
     from SCons.Builder import Builder
@@ -541,6 +550,10 @@ def customize_tools(env):
 
     for t in FindAllTools(DEF_OTHER_TOOLS, env):
         Tool(t)(env)
+
+    # Set ALLOW_UNDEFINED link flags to allow undefined symbols in dynamic
+    # libraries
+    initialize_allow_undefined(env)
 
     # Use our own stupid link, because we handle this with conf checkers and
     # link flags.

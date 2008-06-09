@@ -114,6 +114,7 @@ def set_basic_vars(env):
                              "$SOURCES"
                             
     env['PYEXTLINKFLAGSEND'] = SCons.Util.CLVar('$LINKFLAGSEND')
+
     # XXX: cf comment on PYEXTCCCOM
     if sys.platform == 'win32':
         env['PYEXTLINKCOM'] = '${TEMPFILE("$PYEXTLINK $PYEXTLINKFLAGS '\
@@ -131,6 +132,7 @@ def _set_configuration_nodistutils(env):
                'PYEXTLINK' : '$LDMODULE',
                'PYEXTLINKFLAGS' : '$LDMODULEFLAGS',
                'PYEXTSUFFIX' : '$LDMODULESUFFIX',
+               'PYEXT_ALLOW_UNDEFINED' : '$ALLOW_UNDEFINED',
                'PYEXTPREFIX' : ''}
 
     if sys.platform == 'darwin':
@@ -138,13 +140,6 @@ def _set_configuration_nodistutils(env):
 
     for k, v in def_cfg.items():
         ifnotset(env, k, v)
-
-    if not env.has_key("PYEXT_ALLOW_UNDEFINED"):
-        if sys.platform == 'darwin':
-            from allow_undefined import get_darwin_allow_undefined
-            env['PYEXT_ALLOW_UNDEFINED'] = get_darwin_allow_undefined()
-        else:
-            env["PYEXT_ALLOW_UNDEFINED"] = ['']
 
     env.Append(PYEXTLINKFLAGS = env['PYEXT_ALLOW_UNDEFINED'])
 
