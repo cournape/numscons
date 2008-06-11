@@ -33,7 +33,7 @@ from numscons.tools.substinfile import TOOL_SUBST
 from misc import get_scons_build_dir, get_scons_configres_dir,\
                  get_scons_configres_filename, built_with_mingw
 
-__all__ = ['GetNumpyEnvironment', 'distutils_dirs_emitter']
+__all__ = ['GetNumpyEnvironment', 'distutils_dirs_emitter', 'GetInitEnvironment']
 
 DEF_LINKERS, DEF_C_COMPILERS, DEF_CXX_COMPILERS, DEF_ASSEMBLERS, \
 DEF_FORTRAN_COMPILERS, DEF_ARS, DEF_OTHER_TOOLS = tool_list(pyplat2sconsplat())
@@ -300,6 +300,32 @@ def set_bootstrap(env):
 
 def is_bootstrapping(env):
     return env['bootstrapping']
+
+def GetInitEnvironment(args):
+    # This should be refactor, as this logic is in 
+    from numpyenv import NumpyEnvironment
+    from SCons.Defaults import DefaultEnvironment
+    from SCons.Script import BuildDir
+
+    opts = GetNumpyOptions(args)
+    env = NumpyEnvironment(options = opts, tools = [])
+
+    # We explicily set DefaultEnvironment to avoid wasting time on initializing
+    # tools a second time.
+    DefaultEnvironment(tools = [])
+
+    # Setting dirs according to command line options
+    env.AppendUnique(build_dir = pjoin(env['build_prefix'], env['src_dir']))
+    env.AppendUnique(distutils_installdir = pjoin(env['distutils_libdir'],
+                                                  pkg_to_path(env['pkg_name'])))
+
+    # Setting build directory according to command line option
+    if len(env['src_dir']) > 0:
+        BuildDir(env['build_dir'], env['src_dir'])
+    else:
+        BuildDir(env['build_dir'], '.')
+
+    return env
 
 def _get_numpy_env(args):
     """Call this with args = ARGUMENTS."""
