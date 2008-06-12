@@ -588,15 +588,6 @@ def customize_tools(env):
         pyext_obj.add_action(suffix, shcompaction)
         pyext_obj.add_emitter(suffix, ShFortranEmitter)
 
-    # Add our own, custom tools (f2py, from_template, etc...)
-    #t = Tool('f2py', toolpath = get_numscons_toolpaths(env))
-    #if t.exists(env):
-    #    t(env)
-
-    #t = Tool('numpyf2py', toolpath = get_numscons_toolpaths(env))
-    #if t.exists(env):
-    #    t(env)
-
     # XXX: understand how registration of source files work before reenabling
     # those
 
