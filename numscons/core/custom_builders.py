@@ -26,11 +26,9 @@ def NumpyCtypes(env, target, source, *args, **kw):
     used for libraries which will only be used through ctypes.
 
     In particular, it does not install .exp/.lib files on windows. """
-    source = [pjoin(env['build_dir'], i) for i in source]
-
     # XXX: why target is a list ? It is always true ?
     # XXX: handle cases where SHLIBPREFIX is in args
-    lib = env.SharedLibrary("$build_dir/%s" % target[0],
+    lib = env.SharedLibrary(target,
                             source,
                             SHLIBPREFIX = '',
                             *args,
