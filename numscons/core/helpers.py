@@ -154,18 +154,16 @@ def GetNumpyEnvironment(args):
         env.AppendUnique(CFLAGS = env['NUMPY_EXTRA_CFLAGS'] +
                                   env['NUMPY_THREAD_CFLAGS'])
     else:
-        env.AppendUnique(CFLAGS  = env['NUMPY_WARN_CFLAGS'] +\
-                                   env['NUMPY_OPTIM_CFLAGS'] +\
-                                   env['NUMPY_DEBUG_SYMBOL_CFLAGS'] +\
-                                   env['NUMPY_EXTRA_CFLAGS'] +\
+        env.AppendUnique(CFLAGS  = env['NUMPY_WARN_CFLAGS'] +
+                                   env['NUMPY_OPTIM_CFLAGS'] +
+                                   env['NUMPY_DEBUG_SYMBOL_CFLAGS'] +
+                                   env['NUMPY_EXTRA_CFLAGS'] +
                                    env['NUMPY_THREAD_CFLAGS'])
     env.AppendUnique(LINKFLAGS = env['NUMPY_OPTIM_LDFLAGS'])
 
     #--------------------------------
     # F77 compiler last customization
     #--------------------------------
-    # XXX: For now, only handle F77 case, but will have to think about multiple
-    # fortran standard at some points ?
     if env.has_key('F77'):
         if 'FFLAGS' in os.environ:
             env.Append(F77FLAGS = "%s" % os.environ['FFLAGS'])
@@ -249,8 +247,6 @@ def initialize_f77(env, path_list):
             t = Tool(def_fcompiler, toolpath = get_numscons_toolpaths(env))
             t(env)
             customize_f77(t.name, env)
-        else:
-            print "========== NO FORTRAN COMPILER FOUND ==========="
 
 def initialize_cxx(env, path_list):
     """Initialize C++ compiler from distutils info."""
@@ -272,7 +268,6 @@ def initialize_cxx(env, path_list):
             t(env)
             customize_cxx(t.name, env)
         else:
-            print "========== NO CXX COMPILER FOUND ==========="
             # Some scons tools initialize CXX env var even if no CXX available.
             # This is just confusing, so remove the key here since we could not
             # initialize any CXX tool.
@@ -529,11 +524,11 @@ def customize_tools(env):
     # link flags.
     env['SMARTLINK']   = dumb_link
 
-    if built_with_mingw(env):
-        t = Tool("dllwrap", toolpath = get_numscons_toolpaths(env))
-        t(env)
-        t = Tool("dlltool", toolpath = get_numscons_toolpaths(env))
-        t(env)
+    # if built_with_mingw(env):
+    #     t = Tool("dllwrap", toolpath = get_numscons_toolpaths(env))
+    #     t(env)
+    #     t = Tool("dlltool", toolpath = get_numscons_toolpaths(env))
+    #     t(env)
 
     t = Tool('pyext', toolpath = get_numscons_toolpaths(env))
     t(env)
