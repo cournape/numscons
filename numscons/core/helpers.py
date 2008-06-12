@@ -491,9 +491,6 @@ def customize_tools(env):
         # XXX: is this really the right place ?
         env.AppendUnique(CFLAGS = '-mno-cygwin')
 
-    for t in FindAllTools(DEF_OTHER_TOOLS, env):
-        Tool(t)(env)
-
     # Set ALLOW_UNDEFINED link flags to allow undefined symbols in dynamic
     # libraries
     initialize_allow_undefined(env)
