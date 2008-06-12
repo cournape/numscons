@@ -3,7 +3,7 @@ import os.path
 
 def configuration(parent_package='',top_path=None):
     from numpy.distutils.misc_util import Configuration
-    config = Configuration('scons_fake',parent_package,top_path)
+    config = Configuration('examples',parent_package,top_path)
 
     from numscons import get_version
     import numscons
