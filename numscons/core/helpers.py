@@ -9,8 +9,9 @@ import os.path
 from os.path import join as pjoin
 
 from numscons.core.default import tool_list
-from numscons.core.compiler_config import get_cc_config, get_f77_config, get_cxx_config, \
-     NoCompilerConfig, Config, CompilerConfig, F77CompilerConfig, CXXCompilerConfig
+from numscons.core.compiler_config import get_cc_config, \
+     get_f77_config, get_cxx_config, NoCompilerConfig, Config, \
+     CompilerConfig, F77CompilerConfig, CXXCompilerConfig
 from numscons.core.custom_builders import DistutilsSharedLibrary, NumpyCtypes, \
      DistutilsPythonExtension, DistutilsStaticExtLibrary
 from numscons.core.siteconfig import get_config
@@ -289,7 +290,7 @@ def is_bootstrapping(env):
 def _init_environment(args):
     from numpyenv import NumpyEnvironment
     from SCons.Defaults import DefaultEnvironment
-    from SCons.Script import BuildDir, Help
+    from SCons.Script import Help
 
     opts = GetNumpyOptions(args)
     env = NumpyEnvironment(options = opts, tools = [])
@@ -303,8 +304,6 @@ def _init_environment(args):
     env.AppendUnique(distutils_installdir = pjoin(env['distutils_libdir'],
                                                   pkg_to_path(env['pkg_name'])))
 
-    # Generate help (if calling scons directly during debugging, this could be
-    # useful)
     Help(opts.GenerateHelpText(env))
 
     return env
@@ -350,34 +349,34 @@ def set_verbosity(env):
     level = int(env['silent'])
 
     if level > 0:
-        env['F2PYCOMSTR']       = "F2PY               $SOURCE"
+        env['F2PYCOMSTR']           = "F2PY               $SOURCE"
 
-        env['CCCOMSTR']         = "CC                 $SOURCE"
-        env['SHCCCOMSTR']       = "SHCC               $SOURCE"
+        env['CCCOMSTR']             = "CC                 $SOURCE"
+        env['SHCCCOMSTR']           = "SHCC               $SOURCE"
 
-        env['CXXCOMSTR']        = "CXX                $SOURCE"
-        env['SHCXXCOMSTR']      = "SHCXX              $SOURCE"
+        env['CXXCOMSTR']            = "CXX                $SOURCE"
+        env['SHCXXCOMSTR']          = "SHCXX              $SOURCE"
 
-        env['PYEXTCCCOMSTR']    = "PYEXTCC            $SOURCE"
-        env['PYEXTCXXCOMSTR']   = "PYEXTCXX           $SOURCE"
-        env['PYEXTLINKCOMSTR']  = "PYEXTLINK          $SOURCE"
+        env['PYEXTCCCOMSTR']        = "PYEXTCC            $SOURCE"
+        env['PYEXTCXXCOMSTR']       = "PYEXTCXX           $SOURCE"
+        env['PYEXTLINKCOMSTR']      = "PYEXTLINK          $SOURCE"
 
-        env['F77COMSTR']        = "F77                $SOURCE"
-        env['SHF77COMSTR']      = "SHF77              $SOURCE"
+        env['F77COMSTR']            = "F77                $SOURCE"
+        env['SHF77COMSTR']          = "SHF77              $SOURCE"
 
-        env['ARCOMSTR']         = "AR                 $SOURCE"
-        env['RANLIBCOMSTR']     = "RANLIB             $SOURCE"
-        env['LDMODULECOMSTR']   = "LDMODULE           $SOURCE"
+        env['ARCOMSTR']             = "AR                 $SOURCE"
+        env['RANLIBCOMSTR']         = "RANLIB             $SOURCE"
+        env['LDMODULECOMSTR']       = "LDMODULE           $SOURCE"
 
-        env['INSTALLSTR']       = "INSTALL            $SOURCE"
+        env['INSTALLSTR']           = "INSTALL            $SOURCE"
 
-        env['ARRAPIGENCOMSTR']  = "GENERATE ARRAY API $SOURCE"
-        env['UFUNCAPIGENCOMSTR']= "GENERATE UFUNC API $SOURCE"
-        env['TEMPLATECOMSTR']   = "FROM TEMPLATE      $SOURCE"
-        env['UMATHCOMSTR']      = "GENERATE UMATH     $SOURCE"
+        env['ARRAPIGENCOMSTR']      = "GENERATE ARRAY API $SOURCE"
+        env['UFUNCAPIGENCOMSTR']    = "GENERATE UFUNC API $SOURCE"
+        env['TEMPLATECOMSTR']       = "FROM TEMPLATE      $SOURCE"
+        env['UMATHCOMSTR']          = "GENERATE UMATH     $SOURCE"
 
-        env['CTEMPLATECOMSTR']  = "FROM C TEMPLATE    $SOURCE"
-        env['FTEMPLATECOMSTR']  = "FROM F TEMPLATE    $SOURCE"
+        env['CTEMPLATECOMSTR']      = "FROM C TEMPLATE    $SOURCE"
+        env['FTEMPLATECOMSTR']      = "FROM F TEMPLATE    $SOURCE"
 
 def set_site_config(env):
     config = get_config()
@@ -465,8 +464,8 @@ def dumb_link(source, target, env, for_signature):
     has_cplusplus = iscplusplus(source)
     has_fortran = isfortran(env, source)
     if has_cplusplus and has_fortran:
-        raise SCons.Errors.InternalError(
-                "Sorry, numscons cannot yet link c++ and fortran code together.")
+        msg = "Sorry, numscons cannot yet link c++ and fortran code together."
+        raise SCons.Errors.InternalError(msg)
     elif has_cplusplus:
         return '$CXX'
     return '$CC'
@@ -482,7 +481,6 @@ def initialize_allow_undefined(env):
 
 def customize_tools(env):
     from SCons.Tool import Tool, FindTool, FindAllTools
-    from SCons.Builder import Builder
 
     # List of supplemental paths to take into account
     path_list = []
@@ -524,12 +522,6 @@ def customize_tools(env):
     # link flags.
     env['SMARTLINK']   = dumb_link
 
-    # if built_with_mingw(env):
-    #     t = Tool("dllwrap", toolpath = get_numscons_toolpaths(env))
-    #     t(env)
-    #     t = Tool("dlltool", toolpath = get_numscons_toolpaths(env))
-    #     t(env)
-
     t = Tool('pyext', toolpath = get_numscons_toolpaths(env))
     t(env)
 
@@ -538,22 +530,10 @@ def customize_tools(env):
     pyext_obj = t._tool_module().createPythonObjectBuilder(env)
     from SCons.Tool.FortranCommon import CreateDialectActions, ShFortranEmitter
 
-    compaction, compppaction, shcompaction, shcompppaction = \
-            CreateDialectActions('F77')
+    shcompaction = CreateDialectActions('F77')[2]
     for suffix in env['F77FILESUFFIXES']:
         pyext_obj.add_action(suffix, shcompaction)
         pyext_obj.add_emitter(suffix, ShFortranEmitter)
-
-    # XXX: understand how registration of source files work before reenabling
-    # those
-
-    # t = Tool('npyctpl',
-    #          toolpath = )
-    # t(env)
-
-    # t = Tool('npyftpl',
-    #          toolpath = )
-    # t(env)
 
     finalize_env(env)
 
@@ -563,7 +543,6 @@ def customize_tools(env):
     env['ENV']['PATH'] = os.pathsep.join(path_list)
 
 def customize_link_flags(env):
-    from SCons.Action import ListAction, Action
     # We sometimes need to put link flags at the really end of the command
     # line, so we add a construction variable for it
     env['LINKFLAGSEND'] = []
@@ -580,16 +559,25 @@ def customize_link_flags(env):
         # Sanity check: in case scons changes and we are not
         # aware of it
         if not isinstance(env["SHLINKCOM"], list):
-            raise InternalError("Internal consistency check failed for MS compiler. This is bug, please contact the maintainer")
+            msg = "Internal consistency check failed for MS compiler. This " \
+                  "is bug, please contact the maintainer"
+            raise InternalError(msg)
         if not isinstance(env["LDMODULECOM"], list):
-            raise InternalError("Internal consistency check failed for MS compiler. This is bug, please contact the maintainer")
+            msg = "Internal consistency check failed for MS compiler. This " \
+                  "is bug, please contact the maintainer"
+            raise InternalError(msg)
         # We replace the "real" shlib action of mslink by our
         # own, which only differ in the linkdlagsend flags.
-        newshlibaction = Action('${TEMPFILE("$SHLINK $SHLINKFLAGS $_SHLINK_TARGETS $( $_LIBDIRFLAGS $) $_LIBFLAGS $SHLINKFLAGSEND $_PDB $_SHLINK_SOURCES")}')
+        newshlibaction = Action('${TEMPFILE("$SHLINK $SHLINKFLAGS ' \
+                                '$_SHLINK_TARGETS $( $_LIBDIRFLAGS $) ' \
+                                '$_LIBFLAGS $SHLINKFLAGSEND $_PDB' \
+                                '$_SHLINK_SOURCES")}')
         env["SHLINKCOM"][0] = newshlibaction
         env["LDMODULECOM"][0] = newshlibaction
 
-        newlibaction = '${TEMPFILE("$LINK $LINKFLAGS /OUT:$TARGET.windows $( $_LIBDIRFLAGS $) $_LIBFLAGS $LINKFLAGSEND $_PDB $SOURCES.windows")}'
+        newlibaction = '${TEMPFILE("$LINK $LINKFLAGS /OUT:$TARGET.windows ' \
+                       '$( $_LIBDIRFLAGS $) $_LIBFLAGS $LINKFLAGSEND $_PDB ' \
+                       '$SOURCES.windows")}'
         env["LINKCOM"] = newlibaction
     else:
         env['LINKCOM'] = '%s $LINKFLAGSEND' % env['LINKCOM']
