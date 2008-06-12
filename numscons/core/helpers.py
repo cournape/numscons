@@ -6,10 +6,7 @@ customization (python extension builders, build_dir, etc...)."""
 import sys
 import os
 import os.path
-from os.path import join as pjoin, dirname as pdirname, basename as pbasename, \
-    exists as pexists, abspath as pabspath
-from distutils.sysconfig import get_config_vars
-from copy import deepcopy, copy
+from os.path import join as pjoin
 
 from numscons.core.default import tool_list
 from numscons.core.compiler_config import get_cc_config, get_f77_config, get_cxx_config, \
@@ -19,7 +16,7 @@ from numscons.core.custom_builders import DistutilsSharedLibrary, NumpyCtypes, \
 from numscons.core.siteconfig import get_config
 from numscons.core.extension_scons import built_with_mstools, \
      createStaticExtLibraryBuilder
-from numscons.core.utils import pkg_to_path, partial
+from numscons.core.utils import pkg_to_path
 from numscons.core.misc import pyplat2sconsplat, is_cc_suncc, \
      get_numscons_toolpaths, \
      is_f77_gnu, get_vs_version
@@ -29,7 +26,7 @@ from numscons.core.template_generators import generate_from_c_template, \
 
 from numscons.tools.substinfile import TOOL_SUBST
 
-from misc import get_scons_build_dir, get_scons_configres_dir,\
+from misc import get_scons_build_dir, \
                  get_scons_configres_filename, built_with_mingw
 
 __all__ = ['GetNumpyEnvironment', 'GetInitEnvironment']
@@ -385,7 +382,6 @@ def _get_numpy_env(args):
     # useful)
     Help(opts.GenerateHelpText(env))
 
-    import sys
     if sys.platform == "win32":
         env["ENV"]["PATH"] = os.environ["PATH"]
     return env
@@ -455,7 +451,7 @@ def customize_scons_dirs(env):
 def add_custom_builders(env):
     """Call this to add all our custom builders to the environment."""
     from SCons.Scanner import Scanner
-    from SCons.Builder import Builder, EmitterProxy, ListEmitter, DictEmitter
+    from SCons.Builder import Builder
     from SCons.Action import Action
 
     # Add the file substitution tool
