@@ -1,3 +1,6 @@
+Thu, 12 Jun 2008 21:52:58 +0900
+	* Release 0.8.0
+
 Thu, 12 Jun 2008 20:45:21 +0900
 	* Python Extension builders are now 'real' builders.
 	* Build directories are handled differently; instead of messing with
