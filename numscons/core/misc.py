@@ -166,3 +166,24 @@ def isf2py(env, source):
             if ext in fsuffixes:
                 return 1
     return 0
+
+# No easy way to retrieve this function from scons (because of the + in the
+# module name, cannot be easily imported).
+def iscplusplus(source):
+    import SCons
+
+    # We neeed to copy this too...
+    CXXSuffixes = ['.cpp', '.cc', '.cxx', '.c++', '.C++', '.mm']
+    if SCons.Util.case_sensitive_suffixes('.c', '.C'):
+        CXXSuffixes.append('.C')
+
+    if not source:
+        # Source might be None for unusual cases like SConf.
+        return 0
+    for s in source:
+        if s.sources:
+            ext = os.path.splitext(str(s.sources[0]))[1]
+            if ext in CXXSuffixes:
+                return 1
+    return 0
+
