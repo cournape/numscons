@@ -437,8 +437,7 @@ def set_site_config(env):
 
     # This will be used to keep configuration information on a per package basis
     env['NUMPY_PKG_CONFIG'] = {'PERFLIB' : {}, 'LIB' : {}}
-    env['NUMPY_PKG_CONFIG_FILE'] = pjoin(env['src_dir'],
-                                         get_scons_configres_filename())
+    env['NUMPY_PKG_CONFIG_FILE'] = pjoin(get_scons_configres_filename())
 
 def customize_scons_dirs(env):
     # Keep NumpyConfigure for backward compatibility...
