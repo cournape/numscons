@@ -7,8 +7,8 @@ from os.path import basename, join as pjoin, dirname
 from copy import deepcopy
 
 from numscons.core.utils import popen_wrapper
-from numscons.core.extension_scons import built_with_mstools, \
-    built_with_mingw, built_with_gnu_f77
+from numscons.core.misc import built_with_mstools, built_with_mingw, \
+			       built_with_gnu_f77
 from fortran import parse_f77link, check_link_verbose, gnu_to_scons_flags
 
 __all__ = ['CheckF77Clib', 'CheckF77Mangling']

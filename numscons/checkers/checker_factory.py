@@ -8,7 +8,7 @@ import os
 import sys
 from copy import copy, deepcopy
 
-from numscons.core.extension_scons import built_with_mstools
+from numscons.core.misc import built_with_mstools
 from numscons.core.siteconfig import get_config_from_section, get_config
 
 from numscons.checkers.perflib_info import add_lib_info, MetalibInfo

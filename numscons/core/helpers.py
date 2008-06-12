@@ -15,12 +15,11 @@ from numscons.core.compiler_config import get_cc_config, \
 from numscons.core.custom_builders import DistutilsSharedLibrary, NumpyCtypes, \
      DistutilsPythonExtension, DistutilsStaticExtLibrary
 from numscons.core.siteconfig import get_config
-from numscons.core.extension_scons import built_with_mstools, \
-     createStaticExtLibraryBuilder
+from numscons.core.extension_scons import createStaticExtLibraryBuilder
 from numscons.core.utils import pkg_to_path
 from numscons.core.misc import pyplat2sconsplat, is_cc_suncc, \
-     get_numscons_toolpaths, \
-     is_f77_gnu, get_vs_version
+     get_numscons_toolpaths, iscplusplus, \
+     is_f77_gnu, get_vs_version, built_with_mstools
 from numscons.core.template_generators import generate_from_c_template, \
      generate_from_f_template, generate_from_template_emitter, \
      generate_from_template_scanner
