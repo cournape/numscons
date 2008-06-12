@@ -9,7 +9,7 @@ import os.path
 from os.path import join as pjoin, dirname as pdirname, basename as pbasename, \
     exists as pexists, abspath as pabspath
 from distutils.sysconfig import get_config_vars
-from copy import deepcopy
+from copy import deepcopy, copy
 
 from numscons.core.default import tool_list
 from numscons.core.compiler_config import get_cc_config, get_f77_config, get_cxx_config, \
@@ -17,7 +17,7 @@ from numscons.core.compiler_config import get_cc_config, get_f77_config, get_cxx
 from numscons.core.custom_builders import DistutilsSharedLibrary, NumpyCtypes, \
      DistutilsPythonExtension, DistutilsStaticExtLibrary
 from numscons.core.siteconfig import get_config
-from numscons.core.extension_scons import PythonExtension, built_with_mstools, \
+from numscons.core.extension_scons import built_with_mstools, \
      createStaticExtLibraryBuilder
 from numscons.core.utils import pkg_to_path, partial
 from numscons.core.misc import pyplat2sconsplat, is_cc_suncc, \
@@ -284,6 +284,8 @@ def initialize_cxx(env, path_list):
             except KeyError:
                 pass
 
+    env['CXXFILESUFFIX'] = '.cxx'
+
 def set_bootstrap(env):
     import __builtin__
     if env['bootstrapping']:
@@ -330,15 +332,9 @@ def _get_numpy_env(args):
     # some different behaviour than just Environment instances...
     opts = GetNumpyOptions(args)
 
-    # Get the python extension suffix
-    # XXX this should be defined somewhere else. Is there a way to reliably get
-    # all the necessary informations specific to python extensions (linkflags,
-    # etc...) dynamically ?
-    pyextsuffix = get_config_vars('SO')
-
     # We set tools to an empty list, to be sure that the custom options are
     # given first. We have to
-    env = NumpyEnvironment(options = opts, tools = [], PYEXTSUFFIX = pyextsuffix)
+    env = NumpyEnvironment(options = opts, tools = [])
 
     set_bootstrap(env)
 
@@ -406,6 +402,10 @@ def set_verbosity(env):
         env['CXXCOMSTR']        = "CXX                $SOURCE"
         env['SHCXXCOMSTR']      = "SHCXX              $SOURCE"
 
+        env['PYEXTCCCOMSTR']    = "PYEXTCC            $SOURCE"
+        env['PYEXTCXXCOMSTR']   = "PYEXTCXX           $SOURCE"
+        env['PYEXTLINKCOMSTR']  = "PYEXTLINK          $SOURCE"
+
         env['F77COMSTR']        = "F77                $SOURCE"
         env['SHF77COMSTR']      = "SHF77              $SOURCE"
 
@@ -455,7 +455,7 @@ def customize_scons_dirs(env):
 def add_custom_builders(env):
     """Call this to add all our custom builders to the environment."""
     from SCons.Scanner import Scanner
-    from SCons.Builder import Builder
+    from SCons.Builder import Builder, EmitterProxy, ListEmitter, DictEmitter
     from SCons.Action import Action
 
     # Add the file substitution tool
@@ -464,7 +464,6 @@ def add_custom_builders(env):
     # XXX: Put them into tools ?
     env['BUILDERS']['DistutilsSharedLibrary'] = DistutilsSharedLibrary
     env['BUILDERS']['NumpyCtypes'] = NumpyCtypes
-    env['BUILDERS']['PythonExtension'] = PythonExtension
     env['BUILDERS']['DistutilsPythonExtension'] = DistutilsPythonExtension
 
     tpl_scanner = Scanner(function = generate_from_template_scanner,
@@ -482,9 +481,52 @@ def add_custom_builders(env):
     createStaticExtLibraryBuilder(env)
     env['BUILDERS']['DistutilsStaticExtLibrary'] = DistutilsStaticExtLibrary
 
+# No easy way to retrieve this function from scons (because of the + in the
+# module name, cannot be easily imported).
+def iscplusplus(source):
+    import SCons
+
+    # We neeed to copy this too...
+    CXXSuffixes = ['.cpp', '.cc', '.cxx', '.c++', '.C++', '.mm']
+    if SCons.Util.case_sensitive_suffixes('.c', '.C'):
+        CXXSuffixes.append('.C')
+
+    if not source:
+        # Source might be None for unusual cases like SConf.
+        return 0
+    for s in source:
+        if s.sources:
+            ext = os.path.splitext(str(s.sources[0]))[1]
+            if ext in CXXSuffixes:
+                return 1
+    return 0
+
+# Our own smart_link: the one in scons is not that smart.
+def dumb_link(source, target, env, for_signature):
+    import SCons.Errors
+    from SCons.Tool.FortranCommon import isfortran
+
+    has_cplusplus = iscplusplus(source)
+    has_fortran = isfortran(env, source)
+    if has_cplusplus and has_fortran:
+        raise SCons.Errors.InternalError(
+                "Sorry, numscons cannot yet link c++ and fortran code together.")
+    elif has_cplusplus:
+        return '$CXX'
+    return '$CC'
+
+def initialize_allow_undefined(env):
+    import SCons
+    from allow_undefined import get_darwin_allow_undefined
+
+    if sys.platform == 'darwin':
+        env['ALLOW_UNDEFINED'] = get_darwin_allow_undefined()
+    else:
+        env['ALLOW_UNDEFINED'] = SCons.Util.CLVar('')
 
 def customize_tools(env):
     from SCons.Tool import Tool, FindTool, FindAllTools
+    from SCons.Builder import Builder
 
     # List of supplemental paths to take into account
     path_list = []
@@ -518,11 +560,33 @@ def customize_tools(env):
     for t in FindAllTools(DEF_OTHER_TOOLS, env):
         Tool(t)(env)
 
+    # Set ALLOW_UNDEFINED link flags to allow undefined symbols in dynamic
+    # libraries
+    initialize_allow_undefined(env)
+
+    # Use our own stupid link, because we handle this with conf checkers and
+    # link flags.
+    env['SMARTLINK']   = dumb_link
+
     if built_with_mingw(env):
         t = Tool("dllwrap", toolpath = get_numscons_toolpaths(env))
         t(env)
         t = Tool("dlltool", toolpath = get_numscons_toolpaths(env))
         t(env)
+
+    t = Tool('pyext', toolpath = get_numscons_toolpaths(env))
+    t(env)
+
+    # Extending pyext to handle fortran source code. 
+    # XXX: This is ugly: I don't see any way to do this cleanly.
+    pyext_obj = t._tool_module().createPythonObjectBuilder(env)
+    from SCons.Tool.FortranCommon import CreateDialectActions, ShFortranEmitter
+
+    compaction, compppaction, shcompaction, shcompppaction = \
+            CreateDialectActions('F77')
+    for suffix in env['F77FILESUFFIXES']:
+        pyext_obj.add_action(suffix, shcompaction)
+        pyext_obj.add_emitter(suffix, ShFortranEmitter)
 
     # Add our own, custom tools (f2py, from_template, etc...)
     #t = Tool('f2py', toolpath = get_numscons_toolpaths(env))
@@ -584,3 +648,4 @@ def customize_link_flags(env):
         env['LINKCOM'] = '%s $LINKFLAGSEND' % env['LINKCOM']
         env['SHLINKCOM'] = '%s $SHLINKFLAGSEND' % env['SHLINKCOM']
         env['LDMODULECOM'] = '%s $LDMODULEFLAGSEND' % env['LDMODULECOM']
+        env['PYEXTLINKCOM'] = '%s $PYEXTLINKFLAGSEND' % env['PYEXTLINKCOM']
