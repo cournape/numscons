@@ -31,4 +31,9 @@ class NumpyEnvironment(Environment):
     def DistutilsSConscript(self, name):
         """This sets up build directory correctly to play nice with
         distutils."""
-        Environment.SConscript(self, pjoin('$build_dir', '$src_dir', name))
+        if self['src_dir']:
+            sname = pjoin('$src_dir', name)
+        else:
+            sname = name
+        Environment.SConscript(self, sname,
+                               build_dir = '$build_dir', src_dir = '$src_dir')
