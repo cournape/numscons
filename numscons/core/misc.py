@@ -95,7 +95,10 @@ def get_local_toolpaths():
 
 def get_custom_toolpaths(env):
     """Returns the list of user-customized pathnames for scons tools."""
-    return env['scons_tool_path'].split(os.pathsep)
+    if env['scons_tool_path']:
+        return env['scons_tool_path'].split(os.pathsep)
+    else:
+        return []
 
 def get_numscons_toolpaths(env):
     """Returns the full list of pathnames where to look for scons tools."""
