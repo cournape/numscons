@@ -529,13 +529,7 @@ def customize_link_flags(env):
     env['SHLINKFLAGSEND'] = ['$LINKFLAGSEND']
     env['LDMODULEFLAGSEND'] = []
 
-    if built_with_mingw(env) and not built_with_mstools(env):
-        # For mingw tools, we do it in our custom mingw
-        # scons tool XXX: this should be done at the tool
-        # level, that's the only way to avoid screwing
-        # things up....
-        pass
-    elif built_with_mstools(env):
+    if built_with_mstools(env):
         # Sanity check: in case scons changes and we are not
         # aware of it
         if not isinstance(env["SHLINKCOM"], list):
