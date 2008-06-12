@@ -1,5 +1,5 @@
 #! /usr/bin/env python
-# Last Change: Sat Jan 26 06:00 PM 2008 J
+# Last Change: Thu Jun 12 04:00 PM 2008 J
 
 """This module implements the functionality to:
     - add/retrieve info about checked meta-lib for show_config functionality.
@@ -36,9 +36,6 @@ def get_cached_perflib_info(env, name):
     return cached
 
 def write_info(env):
-    cfgdir = os.path.dirname(env['NUMPY_PKG_CONFIG_FILE'])
-    if not os.path.exists(cfgdir):
-        os.makedirs(cfgdir)
     cfg = env['NUMPY_PKG_CONFIG']['LIB']
     config_str = {}
     for k, i in cfg.items():

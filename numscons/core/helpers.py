@@ -14,8 +14,8 @@ from copy import deepcopy
 from numscons.core.default import tool_list
 from numscons.core.compiler_config import get_cc_config, get_f77_config, get_cxx_config, \
      NoCompilerConfig, Config, CompilerConfig, F77CompilerConfig, CXXCompilerConfig
-from numscons.core.custom_builders import NumpySharedLibrary, NumpyCtypes, \
-     NumpyPythonExtension, NumpyStaticExtLibrary
+from numscons.core.custom_builders import DistutilsSharedLibrary, NumpyCtypes, \
+     DistutilsPythonExtension, DistutilsStaticExtLibrary
 from numscons.core.siteconfig import get_config
 from numscons.core.extension_scons import PythonExtension, built_with_mstools, \
      createStaticExtLibraryBuilder
@@ -26,25 +26,16 @@ from numscons.core.misc import pyplat2sconsplat, is_cc_suncc, \
 from numscons.core.template_generators import generate_from_c_template, \
      generate_from_f_template, generate_from_template_emitter, \
      generate_from_template_scanner
-from numscons.core.custom_builders import NumpyFromCTemplate, NumpyFromFTemplate
 
 from numscons.tools.substinfile import TOOL_SUBST
 
 from misc import get_scons_build_dir, get_scons_configres_dir,\
                  get_scons_configres_filename, built_with_mingw
 
-__all__ = ['GetNumpyEnvironment', 'distutils_dirs_emitter']
+__all__ = ['GetNumpyEnvironment', 'GetInitEnvironment']
 
 DEF_LINKERS, DEF_C_COMPILERS, DEF_CXX_COMPILERS, DEF_ASSEMBLERS, \
 DEF_FORTRAN_COMPILERS, DEF_ARS, DEF_OTHER_TOOLS = tool_list(pyplat2sconsplat())
-
-def _glob(env, path):
-    """glob function to handle src_dir issues."""
-    #import glob
-    #files = glob.glob(pjoin(env['src_dir'], path))
-    files = env.Glob(pjoin(env['src_dir'], path), strings = True)
-    rdir = pdirname(path)
-    return [pjoin(rdir, pbasename(f)) for f in files]
 
 def GetNumpyOptions(args):
     """Call this with args=ARGUMENTS to take into account command line args."""
@@ -301,6 +292,32 @@ def set_bootstrap(env):
 def is_bootstrapping(env):
     return env['bootstrapping']
 
+def GetInitEnvironment(args):
+    # This should be refactor, as this logic is in 
+    from numpyenv import NumpyEnvironment
+    from SCons.Defaults import DefaultEnvironment
+    from SCons.Script import BuildDir
+
+    opts = GetNumpyOptions(args)
+    env = NumpyEnvironment(options = opts, tools = [])
+
+    # We explicily set DefaultEnvironment to avoid wasting time on initializing
+    # tools a second time.
+    DefaultEnvironment(tools = [])
+
+    # Setting dirs according to command line options
+    env.AppendUnique(build_dir = pjoin(env['build_prefix'], env['src_dir']))
+    env.AppendUnique(distutils_installdir = pjoin(env['distutils_libdir'],
+                                                  pkg_to_path(env['pkg_name'])))
+
+    # Setting build directory according to command line option
+    if len(env['src_dir']) > 0:
+        BuildDir(env['build_dir'], env['src_dir'])
+    else:
+        BuildDir(env['build_dir'], '.')
+
+    return env
+
 def _get_numpy_env(args):
     """Call this with args = ARGUMENTS."""
     from SCons.Script import BuildDir, Help
@@ -412,9 +429,7 @@ def set_site_config(env):
 
     # This will be used to keep configuration information on a per package basis
     env['NUMPY_PKG_CONFIG'] = {'PERFLIB' : {}, 'LIB' : {}}
-    env['NUMPY_PKG_CONFIG_FILE'] = pjoin(get_scons_configres_dir(),
-                                         env['src_dir'],
-                                         get_scons_configres_filename())
+    env['NUMPY_PKG_CONFIG_FILE'] = pjoin(get_scons_configres_filename())
 
 def customize_scons_dirs(env):
     # Keep NumpyConfigure for backward compatibility...
@@ -434,15 +449,8 @@ def customize_scons_dirs(env):
 
     sconsign = pjoin(get_build_relative_src(env['src_dir'],
                                             env['build_dir']),
-                     '.sconsign.dblite')
-    asconsign = pabspath(env['build_dir'])
-    if not pexists(asconsign):
-        os.makedirs(asconsign)
+                     'sconsign.dblite')
     env.SConsignFile(sconsign)
-
-    # Change Glob to take into account our particular need wrt build
-    # directories, etc...
-    env.NumpyGlob = partial(_glob, env)
 
 def add_custom_builders(env):
     """Call this to add all our custom builders to the environment."""
@@ -454,10 +462,10 @@ def add_custom_builders(env):
     TOOL_SUBST(env)
 
     # XXX: Put them into tools ?
-    env['BUILDERS']['NumpySharedLibrary'] = NumpySharedLibrary
+    env['BUILDERS']['DistutilsSharedLibrary'] = DistutilsSharedLibrary
     env['BUILDERS']['NumpyCtypes'] = NumpyCtypes
     env['BUILDERS']['PythonExtension'] = PythonExtension
-    env['BUILDERS']['NumpyPythonExtension'] = NumpyPythonExtension
+    env['BUILDERS']['DistutilsPythonExtension'] = DistutilsPythonExtension
 
     tpl_scanner = Scanner(function = generate_from_template_scanner,
                           skeys = ['.src'])
@@ -471,11 +479,8 @@ def add_custom_builders(env):
                 emitter = generate_from_template_emitter,
                 source_scanner = tpl_scanner)
 
-    env['BUILDERS']['NumpyFromCTemplate'] = NumpyFromCTemplate
-    env['BUILDERS']['NumpyFromFTemplate'] = NumpyFromFTemplate
-
     createStaticExtLibraryBuilder(env)
-    env['BUILDERS']['NumpyStaticExtLibrary'] = NumpyStaticExtLibrary
+    env['BUILDERS']['DistutilsStaticExtLibrary'] = DistutilsStaticExtLibrary
 
 
 def customize_tools(env):
@@ -579,11 +584,3 @@ def customize_link_flags(env):
         env['LINKCOM'] = '%s $LINKFLAGSEND' % env['LINKCOM']
         env['SHLINKCOM'] = '%s $SHLINKFLAGSEND' % env['SHLINKCOM']
         env['LDMODULECOM'] = '%s $LDMODULEFLAGSEND' % env['LDMODULECOM']
-
-def distutils_dirs_emitter(target, source, env):
-    from SCons.Node.FS import default_fs
-
-    source = [default_fs.Entry(pjoin(env['build_dir'], str(i))) for i in source]
-    target = [default_fs.Entry(pjoin(env['build_dir'], str(i))) for i in target]
-
-    return target, source

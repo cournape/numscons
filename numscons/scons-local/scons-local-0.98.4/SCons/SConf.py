@@ -612,7 +612,7 @@ class SConfBase:
             prog = self.lastTarget
             pname = str(prog)
             output = SConfFS.File(pname+'.out')
-            node = self.env.Command(output, prog, [ [ pname, ">", "${TARGET}"] ])
+            node = self.env.Command(output, prog, [ [os.path.join(os.getcwd(), pname), ">", "${TARGET}"] ])
             ok = self.BuildNodes(node)
             if ok:
                 outputStr = output.get_contents()

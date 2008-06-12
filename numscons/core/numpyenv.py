@@ -16,8 +16,8 @@ class NumpyEnvironment(Environment):
             # XXX handle this gracefully
             assert 0 == 1
         else:
-            kw['conf_dir'] = pjoin(self['build_dir'], '.sconf')
-            kw['log_file'] = pjoin(self['build_dir'], 'config.log')
+            kw['conf_dir'] = 'sconf'
+            kw['log_file'] = 'config.log'
         return Environment.Configure(self, *args, **kw)
 
     def Tool(self, toolname, path = None):
@@ -27,3 +27,13 @@ class NumpyEnvironment(Environment):
                     path + get_numscons_toolpaths(self))
         else:
             return Environment.Tool(self, toolname, get_numscons_toolpaths(self))
+
+    def DistutilsSConscript(self, name):
+        """This sets up build directory correctly to play nice with
+        distutils."""
+        if self['src_dir']:
+            sname = pjoin('$src_dir', name)
+        else:
+            sname = name
+        Environment.SConscript(self, sname,
+                               build_dir = '$build_dir', src_dir = '$src_dir')
