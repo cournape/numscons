@@ -14,8 +14,8 @@ from copy import deepcopy
 from numscons.core.default import tool_list
 from numscons.core.compiler_config import get_cc_config, get_f77_config, get_cxx_config, \
      NoCompilerConfig, Config, CompilerConfig, F77CompilerConfig, CXXCompilerConfig
-from numscons.core.custom_builders import NumpySharedLibrary, NumpyCtypes, \
-     NumpyPythonExtension, NumpyStaticExtLibrary
+from numscons.core.custom_builders import DistutilsSharedLibrary, NumpyCtypes, \
+     DistutilsPythonExtension, DistutilsStaticExtLibrary
 from numscons.core.siteconfig import get_config
 from numscons.core.extension_scons import PythonExtension, built_with_mstools, \
      createStaticExtLibraryBuilder
@@ -26,7 +26,6 @@ from numscons.core.misc import pyplat2sconsplat, is_cc_suncc, \
 from numscons.core.template_generators import generate_from_c_template, \
      generate_from_f_template, generate_from_template_emitter, \
      generate_from_template_scanner
-from numscons.core.custom_builders import NumpyFromCTemplate, NumpyFromFTemplate
 
 from numscons.tools.substinfile import TOOL_SUBST
 
@@ -480,10 +479,10 @@ def add_custom_builders(env):
     TOOL_SUBST(env)
 
     # XXX: Put them into tools ?
-    env['BUILDERS']['NumpySharedLibrary'] = NumpySharedLibrary
+    env['BUILDERS']['DistutilsSharedLibrary'] = DistutilsSharedLibrary
     env['BUILDERS']['NumpyCtypes'] = NumpyCtypes
     env['BUILDERS']['PythonExtension'] = PythonExtension
-    env['BUILDERS']['NumpyPythonExtension'] = NumpyPythonExtension
+    env['BUILDERS']['DistutilsPythonExtension'] = DistutilsPythonExtension
 
     tpl_scanner = Scanner(function = generate_from_template_scanner,
                           skeys = ['.src'])
@@ -497,11 +496,8 @@ def add_custom_builders(env):
                 emitter = generate_from_template_emitter,
                 source_scanner = tpl_scanner)
 
-    env['BUILDERS']['NumpyFromCTemplate'] = NumpyFromCTemplate
-    env['BUILDERS']['NumpyFromFTemplate'] = NumpyFromFTemplate
-
     createStaticExtLibraryBuilder(env)
-    env['BUILDERS']['NumpyStaticExtLibrary'] = NumpyStaticExtLibrary
+    env['BUILDERS']['DistutilsStaticExtLibrary'] = DistutilsStaticExtLibrary
 
 
 def customize_tools(env):
