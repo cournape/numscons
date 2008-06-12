@@ -458,10 +458,7 @@ def customize_scons_dirs(env):
 
     sconsign = pjoin(get_build_relative_src(env['src_dir'],
                                             env['build_dir']),
-                     '.sconsign.dblite')
-    asconsign = pabspath(env['build_dir'])
-    if not pexists(asconsign):
-        os.makedirs(asconsign)
+                     'sconsign.dblite')
     env.SConsignFile(sconsign)
 
     # Change Glob to take into account our particular need wrt build
