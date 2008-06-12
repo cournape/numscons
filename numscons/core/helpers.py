@@ -291,11 +291,10 @@ def set_bootstrap(env):
 def is_bootstrapping(env):
     return env['bootstrapping']
 
-def GetInitEnvironment(args):
-    # This should be refactor, as this logic is in 
+def _init_environment(args):
     from numpyenv import NumpyEnvironment
     from SCons.Defaults import DefaultEnvironment
-    from SCons.Script import BuildDir
+    from SCons.Script import BuildDir, Help
 
     opts = GetNumpyOptions(args)
     env = NumpyEnvironment(options = opts, tools = [])
@@ -309,43 +308,18 @@ def GetInitEnvironment(args):
     env.AppendUnique(distutils_installdir = pjoin(env['distutils_libdir'],
                                                   pkg_to_path(env['pkg_name'])))
 
-    # Setting build directory according to command line option
-    if len(env['src_dir']) > 0:
-        BuildDir(env['build_dir'], env['src_dir'])
-    else:
-        BuildDir(env['build_dir'], '.')
+    # Generate help (if calling scons directly during debugging, this could be
+    # useful)
+    Help(opts.GenerateHelpText(env))
 
     return env
 
+def GetInitEnvironment(args):
+    return _init_environment(args)
+
 def _get_numpy_env(args):
     """Call this with args = ARGUMENTS."""
-    from SCons.Script import BuildDir, Help
-    from SCons.Defaults import DefaultEnvironment
-    from numpyenv import NumpyEnvironment
-
-    # XXX: this function is too long and clumsy...
-
-    # XXX: I would prefer subclassing Environment, because we really expect
-    # some different behaviour than just Environment instances...
-    opts = GetNumpyOptions(args)
-
-    # We set tools to an empty list, to be sure that the custom options are
-    # given first. We have to
-    env = NumpyEnvironment(options = opts, tools = [])
-
-    set_bootstrap(env)
-
-    # XXX: should we allow default environment at all ? It certainly won't work
-    # as it is.
-
-    # We explicily set DefaultEnvironment to avoid wasting time on initializing
-    # tools a second time.
-    DefaultEnvironment(tools = [])
-
-    # Setting dirs according to command line options
-    env.AppendUnique(build_dir = pjoin(env['build_prefix'], env['src_dir']))
-    env.AppendUnique(distutils_installdir = pjoin(env['distutils_libdir'],
-                                                  pkg_to_path(env['pkg_name'])))
+    env = _init_environment(args)
 
     #------------------------------------------------
     # Setting tools according to command line options
@@ -365,25 +339,16 @@ def _get_numpy_env(args):
     # Getting the config options from *.cfg files
     set_site_config(env)
 
-    # Setting build directory according to command line option
-    if len(env['src_dir']) > 0:
-        BuildDir(env['build_dir'], env['src_dir'])
-    else:
-        BuildDir(env['build_dir'], '.')
-
     # Add HOME in the environment: some tools seem to require it (Intel
     # compiler, for licenses stuff)
     if os.environ.has_key('HOME'):
         env['ENV']['HOME'] = os.environ['HOME']
 
-    set_verbosity(env)
-
-    # Generate help (if calling scons directly during debugging, this could be
-    # useful)
-    Help(opts.GenerateHelpText(env))
-
     if sys.platform == "win32":
         env["ENV"]["PATH"] = os.environ["PATH"]
+
+    set_verbosity(env)
+
     return env
 
 def set_verbosity(env):
