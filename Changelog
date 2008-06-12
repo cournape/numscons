@@ -1,3 +1,9 @@
+Thu, 12 Jun 2008 20:45:21 +0900
+	* Python Extension builders are now 'real' builders.
+	* Build directories are handled differently; instead of messing with
+	emitters, we handle it the usual scons way, with two scons scripts
+	files.
+
 Mon, 09 Jun 2008 00:21:52 +0900
 	* Fix stupid bug with version being a non string
 	* Make sure the right numscons is tested in sanity check for dist test
