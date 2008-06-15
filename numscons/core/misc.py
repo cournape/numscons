@@ -39,11 +39,8 @@ def built_with_mstools(env):
     return env['cc_opt'] == 'msvc'
 
 def built_with_mingw(env):
-    """Return true if built with mingw compiler."""
-    return env['cc_opt'] == 'mingw' or \
-           (sys.platform == 'win32'
-            and (env['f77_opt'] == 'g77' or
-                 env['f77_opt'] == 'gfortran'))
+    """Return true if C code built with mingw compiler."""
+    return env['cc_opt'] == 'mingw'
 
 def built_with_gnu_f77(env):
     """Return true if f77 compiler is gnu (g77, gfortran, etc...)."""
