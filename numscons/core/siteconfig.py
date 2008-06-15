@@ -1,5 +1,5 @@
 #! /usr/bin/env python
-# Last Change: Sun Jun 15 03:00 PM 2008 J
+# Last Change: Sun Jun 15 04:00 PM 2008 J
 
 """This module has helper functions to get basic information from site.cfg-like
 files."""
@@ -66,6 +66,8 @@ def get_config(src_dir = None):
     extend_srcdir('.numpy-site.cfg')
     files.extend(get_standard_file('site.cfg'))
     extend_srcdir('site.cfg')
+
+    cp.read(files)
 
     return cp, files
 
