@@ -527,10 +527,14 @@ def customize_pyext(env):
     # We don't do this in pyext because scons has no infrastructure to know
     # whether we are using mingw or ms
     if sys.platform == 'win32':
+	env.PrependUnique(LIBPATH = get_pythonlib_dir())
 	if built_with_mingw(env):
-	    pass
-   	else:
-	    env.PrependUnique(LIBPATH = get_pythonlib_dir())
+	    # We are overrind pyext coms here. 
+	    # XXX: This is ugly
+	    pycc, pycxx, pylink = t._tool_module().pyext_coms('posix')
+	    env['PYEXTCCCOM'] = pycc
+	    env['PYEXTCXXCOM'] = pycxx
+	    env['PYEXTLINKCOM'] = pylink
 
 def customize_link_flags(env):
     # We sometimes need to put link flags at the really end of the command
