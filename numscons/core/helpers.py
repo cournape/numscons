@@ -498,6 +498,18 @@ def customize_tools(env):
     # link flags.
     env['SMARTLINK']   = dumb_link
 
+    customize_pyext(env)
+
+    finalize_env(env)
+
+    # Add the tool paths in the environment
+    if env['ENV'].has_key('PATH'):
+        path_list += env['ENV']['PATH'].split(os.pathsep)
+    env['ENV']['PATH'] = os.pathsep.join(path_list)
+
+def customize_pyext(env):
+    from SCons.Tool import Tool
+
     t = Tool('pyext', toolpath = get_numscons_toolpaths(env))
     t(env)
 
@@ -510,13 +522,6 @@ def customize_tools(env):
     for suffix in env['F77FILESUFFIXES']:
         pyext_obj.add_action(suffix, shcompaction)
         pyext_obj.add_emitter(suffix, ShFortranEmitter)
-
-    finalize_env(env)
-
-    # Add the tool paths in the environment
-    if env['ENV'].has_key('PATH'):
-        path_list += env['ENV']['PATH'].split(os.pathsep)
-    env['ENV']['PATH'] = os.pathsep.join(path_list)
 
 def customize_link_flags(env):
     # We sometimes need to put link flags at the really end of the command
