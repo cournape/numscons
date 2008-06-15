@@ -539,6 +539,13 @@ def customize_pyext(env):
     # whether we are using mingw or ms
     if sys.platform == 'win32':
 	env.PrependUnique(LIBPATH = get_pythonlib_dir())
+	def dummy(target, source, env):
+	    return target, source
+
+	# We override the default emitter here because SHLIB emitter
+	# does a lot of checks we don&t care about and are wrong
+	# anyway for python extensions.
+	env["BUILDERS"]["PythonExtension"].emitter = dummy
 	if built_with_mingw(env):
 	    # We are overrind pyext coms here. 
 	    # XXX: This is ugly
