@@ -95,7 +95,7 @@ def customize_cc(name, env):
     try:
         cfg = get_cc_config(name)
     except NoCompilerConfig, e:
-        print "compiler %s has no customization available" % name
+        print e
         cfg = CompilerConfig(Config())
     env.AppendUnique(**cfg.get_flags_dict())
 
@@ -108,7 +108,7 @@ def customize_f77(name, env):
     try:
         cfg = get_f77_config(name)
     except NoCompilerConfig, e:
-        print "compiler %s has no customization available" % name
+        print e
         cfg = F77CompilerConfig(Config())
     env.AppendUnique(**cfg.get_flags_dict())
 
@@ -117,7 +117,7 @@ def customize_cxx(name, env):
     try:
         cfg = get_cxx_config(name)
     except NoCompilerConfig, e:
-        print "compiler %s has no customization available" % name
+        print e
         cfg = CXXCompilerConfig(Config())
     env.AppendUnique(**cfg.get_flags_dict())
 

@@ -111,8 +111,7 @@ def get_config(name, language):
     if len(st) < 1:
         raise IOError("config file %s not found" % cfgfname)
     if not config.has_section(name):
-	print cfgfname
-        raise NoCompilerConfig("compiler %s has no configuration in %s" % (name, cfgfname))
+        raise NoCompilerConfig("compiler %s (lang %s) has no configuration in %s" % (name, language, cfgfname))
 
     cfg = Config()
 
