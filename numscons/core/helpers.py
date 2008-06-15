@@ -232,6 +232,9 @@ def initialize_cc(env, path_list):
         t(env)
         customize_cc(t.name, env)
 
+def has_f77(env):
+    return len(env['f77_opt']) > 0
+
 def initialize_f77(env, path_list):
     """Initialize F77 compiler from distutils info."""
     from SCons.Tool import Tool, FindTool
@@ -526,10 +529,11 @@ def customize_pyext(env):
     pyext_obj = t._tool_module().createPythonObjectBuilder(env)
     from SCons.Tool.FortranCommon import CreateDialectActions, ShFortranEmitter
 
-    shcompaction = CreateDialectActions('F77')[2]
-    for suffix in env['F77FILESUFFIXES']:
-        pyext_obj.add_action(suffix, shcompaction)
-        pyext_obj.add_emitter(suffix, ShFortranEmitter)
+    if has_f77(env):
+        shcompaction = CreateDialectActions('F77')[2]
+        for suffix in env['F77FILESUFFIXES']:
+            pyext_obj.add_action(suffix, shcompaction)
+            pyext_obj.add_emitter(suffix, ShFortranEmitter)
 
     # We don't do this in pyext because scons has no infrastructure to know
     # whether we are using mingw or ms
