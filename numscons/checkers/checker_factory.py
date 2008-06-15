@@ -9,7 +9,7 @@ import sys
 from copy import copy, deepcopy
 
 from numscons.core.misc import built_with_mstools
-from numscons.core.siteconfig import get_config_from_section, get_config
+from numscons.core.siteconfig import get_config_from_section
 
 from numscons.checkers.perflib_info import add_lib_info, MetalibInfo
 from numscons.checkers.perflib import CONFIG, get_perflib_info
@@ -73,7 +73,7 @@ def _check(perflibs, context, libname, check_version, msg_template, test_src,
 
 def _get_customization(context, section, libname, test_src, autoadd, language = 'C'):
     """Check whether customization is available through config files."""
-    siteconfig = get_config()[0]
+    siteconfig = context.env['NUMPY_SITE_CONFIG'][0]
     cfgopts, found = get_config_from_section(siteconfig, section)
     if found:
         ncfgopts = BuildConfig()
