@@ -219,8 +219,7 @@ def initialize_cc(env, path_list):
                          toolpath = get_numscons_toolpaths(env))
                 t(env)
                 # We need msvs tool too (before customization !)
-                t = Tool('msvs')
-                t(env)
+                Tool('msvs')(env)
                 customize_cc(t.name, env)
                 path_list.append(env['cc_opt_path'])
 
