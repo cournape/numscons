@@ -19,13 +19,15 @@ from numscons.core.extension_scons import createStaticExtLibraryBuilder
 from numscons.core.extension import get_pythonlib_dir
 from numscons.core.utils import pkg_to_path
 from numscons.core.misc import pyplat2sconsplat, is_cc_suncc, \
-     get_numscons_toolpaths, iscplusplus, \
+     get_numscons_toolpaths, iscplusplus, get_pythonlib_name, \
      is_f77_gnu, get_vs_version, built_with_mstools
 from numscons.core.template_generators import generate_from_c_template, \
      generate_from_f_template, generate_from_template_emitter, \
      generate_from_template_scanner
 
 from numscons.tools.substinfile import TOOL_SUBST
+
+from numscons.numdist import msvc_runtime_library
 
 from misc import get_scons_build_dir, \
                  get_scons_configres_filename, built_with_mingw
@@ -535,6 +537,8 @@ def customize_pyext(env):
 	    env['PYEXTCCCOM'] = pycc
 	    env['PYEXTCXXCOM'] = pycxx
 	    env['PYEXTLINKCOM'] = pylink
+
+	    env.PrependUnique(LIBS = get_pythonlib_name())
 
 def customize_link_flags(env):
     # We sometimes need to put link flags at the really end of the command
