@@ -209,6 +209,16 @@ def initialize_cc(env, path_list):
                          topdir = os.path.split(env['cc_opt_path'])[0])
                 t(env)
                 customize_cc(t.name, env)
+	    elif built_with_mstools(env):
+                t = Tool(env['cc_opt'],
+                         toolpath = get_numscons_toolpaths(env))
+                t(env)
+                # We need msvs tool too (before customization !)
+                t = Tool('msvs')
+                t(env)
+                customize_cc(t.name, env)
+                path_list.append(env['cc_opt_path'])
+
             else:
                 if is_cc_suncc(pjoin(env['cc_opt_path'], env['cc_opt'])):
                     env['cc_opt'] = 'suncc'
