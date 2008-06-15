@@ -105,7 +105,7 @@ def CheckF77Clib(context):
             from fortran import get_g2c_libs
             rtdir, msrtlibs = get_g2c_libs(env, final_flags)
 	    # XXX: this is ugly, we interpolate by hand.
-	    libdirflags = ["/LIBPATH:%s" % rtdir]
+	    libdirflags = ["/LIBPATH:%s" % os.path.join(env['build_dir'], rtdir)]
 	    libflags    = ["%s" % l for l in msrtlibs]
             env["F77_LDFLAGS"] = libdirflags + libflags
         else:
