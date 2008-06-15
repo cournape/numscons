@@ -102,9 +102,11 @@ def set_basic_vars(env):
     # This is difficult with the current way tools work in scons.
     if sys.platform == 'win32':
         env['PYEXTCCCOM'] = "$PYEXTCC /Fo$TARGET /c $PYEXTCCSHARED "\
-                            "$PYEXTCFLAGS $_PYEXTCPPINCFLAGS $SOURCES"
+                            "$PYEXTCFLAGS $_PYEXTCPPINCFLAGS $_CCCOMCOM "\
+                            "$SOURCES"
         env['PYEXTCXXCOM'] = "$PYEXTCXX /Fo$TARGET /c $PYEXTCSHARED "\
-                             "$PYEXTCXXFLAGS $_PYEXTCPPINCFLAGS $SOURCES"
+                             "$PYEXTCXXFLAGS $_PYEXTCPPINCFLAGS $_CCCOMCOM "\
+                             "$SOURCES"
     else:
         env['PYEXTCCCOM'] = "$PYEXTCC -o $TARGET -c $PYEXTCCSHARED "\
                             "$PYEXTCFLAGS $_PYEXTCPPINCFLAGS $_CCCOMCOM "\
@@ -186,11 +188,6 @@ def set_configuration(env, use_distutils):
 def generate(env):
     """Add Builders and construction variables for python extensions to an
     Environment."""
-
-    if sys.platform == 'win32':
-        raise NotImplementedError(
-                "Sorry: building python extensions "\
-                "on windows is not supported yet")
 
     if not env.has_key('PYEXT_USE_DISTUTILS'):
         env['PYEXT_USE_DISTUTILS'] = False
