@@ -568,7 +568,7 @@ def customize_pyext(env):
 	    env['PYEXTCXXCOM'] = pycxx
 	    env['PYEXTLINKCOM'] = pylink
 
-	    env.PrependUnique(LIBS = get_pythonlib_name())
+	    env.PrependUnique(LIBS = [get_pythonlib_name()])
 
 def customize_link_flags(env):
     # We sometimes need to put link flags at the really end of the command
