@@ -526,6 +526,7 @@ def customize_link_flags(env):
     env['LDMODULEFLAGSEND'] = []
 
     if built_with_mstools(env):
+	from SCons.Action import Action
         # Sanity check: in case scons changes and we are not
         # aware of it
         if not isinstance(env["SHLINKCOM"], list):
