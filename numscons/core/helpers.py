@@ -16,6 +16,7 @@ from numscons.core.custom_builders import DistutilsSharedLibrary, NumpyCtypes, \
      DistutilsPythonExtension, DistutilsStaticExtLibrary
 from numscons.core.siteconfig import get_config
 from numscons.core.extension_scons import createStaticExtLibraryBuilder
+from numscons.core.extension import get_pythonlib_dir
 from numscons.core.utils import pkg_to_path
 from numscons.core.misc import pyplat2sconsplat, is_cc_suncc, \
      get_numscons_toolpaths, iscplusplus, \
@@ -522,6 +523,14 @@ def customize_pyext(env):
     for suffix in env['F77FILESUFFIXES']:
         pyext_obj.add_action(suffix, shcompaction)
         pyext_obj.add_emitter(suffix, ShFortranEmitter)
+
+    # We don't do this in pyext because scons has no infrastructure to know
+    # whether we are using mingw or ms
+    if sys.platform == 'win32':
+	if built_with_mingw(env):
+	    pass
+   	else:
+	    env.PrependUnique(LIBPATH = get_pythonlib_dir())
 
 def customize_link_flags(env):
     # We sometimes need to put link flags at the really end of the command
