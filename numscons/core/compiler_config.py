@@ -42,7 +42,7 @@ class CompilerConfig:
              'NUMPY_OPTIM_LDFLAGS' : self._cfg['link_optim'],
              'NUMPY_WARN_CFLAGS' : self._cfg['warn'],
              'NUMPY_THREAD_CFLAGS' : self._cfg['thread'],
-             'NUMPY_EXTRA_CFLAGS' : self._cfg['debug'],
+             'NUMPY_EXTRA_CFLAGS' : self._cfg['extra'],
              'NUMPY_DEBUG_CFLAGS' : self._cfg['debug'],
              'NUMPY_DEBUG_SYMBOL_CFLAGS' : self._cfg['debug_sym']}
         for k, v in d.items():
@@ -111,7 +111,8 @@ def get_config(name, language):
     if len(st) < 1:
         raise IOError("config file %s not found" % cfgfname)
     if not config.has_section(name):
-        raise NoCompilerConfig("compiler %s has no configuration" % name)
+	print cfgfname
+        raise NoCompilerConfig("compiler %s has no configuration in %s" % (name, cfgfname))
 
     cfg = Config()
 
