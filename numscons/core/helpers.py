@@ -513,6 +513,11 @@ def customize_tools(env):
 def customize_pyext(env):
     from SCons.Tool import Tool
 
+    from distutils.sysconfig import get_config_var
+
+    ext = get_config_var('SO')
+    env['PYEXTSUFFIX'] = ext
+
     t = Tool('pyext', toolpath = get_numscons_toolpaths(env))
     t(env)
 
