@@ -1,11 +1,11 @@
 #! /usr/bin/env python
-# Last Change: Wed Mar 05 06:00 PM 2008 J
+# Last Change: Sun Jun 15 04:00 PM 2008 J
 
 """Module for support to look for external code (replacement of
 numpy.distutils.system_info). scons dependant code."""
 import os
 
-from numscons.core.siteconfig import get_config_from_section, get_config, \
+from numscons.core.siteconfig import get_config_from_section, \
                                      get_paths, parse_config_param
 
 from numscons.checkers.support import save_and_set, \
@@ -52,7 +52,7 @@ def NumpyCheckLibAndHeader(context, libs, symbols = None, headers = None,
         name = libs[0]
 
     # Get site.cfg customization if any
-    siteconfig, cfgfiles = get_config()
+    siteconfig = context.env['NUMPY_SITE_CONFIG'][0]
     opts, found = get_config_from_section(siteconfig, section)
     if found:
         # XXX: fix this

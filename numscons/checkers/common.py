@@ -10,13 +10,12 @@ customization using site.cfg, as well being disabled from the user environment
 import os
 from copy import copy
 
-from numscons.core.siteconfig import get_config_from_section, get_config
+from numscons.core.siteconfig import get_config_from_section
 from numscons.checkers.perflib_info import PerflibInfo
 from numscons.checkers.support import save_and_set, restore, check_symbol
 
-def _get_site_cfg_customization(section, defopts_factory):
+def _get_site_cfg_customization(siteconfig, section, defopts_factory):
     """defopts_factory should be an instance of BuildConfigFactory."""
-    siteconfig = get_config()[0]
     opts, found = get_config_from_section(siteconfig, section)
     defopts_factory.merge(opts)
 
@@ -95,7 +94,8 @@ def check_code(context, name, section, opts_factory, headers_to_check,
         return None
 
     # Get site.cfg customization if any
-    found = _get_site_cfg_customization(section, opts_factory)
+    found = _get_site_cfg_customization(context.env['NUMPY_SITE_CONFIG'][0],
+                                        section, opts_factory)
     opts = opts_factory.core_config()
     if rpath_is_libpath:
         opts['rpath'] = copy(opts['library_dirs'])
