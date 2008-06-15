@@ -20,7 +20,7 @@ from numscons.core.extension import get_pythonlib_dir
 from numscons.core.utils import pkg_to_path
 from numscons.core.misc import pyplat2sconsplat, is_cc_suncc, \
      get_numscons_toolpaths, iscplusplus, get_pythonlib_name, \
-     is_f77_gnu, get_vs_version, built_with_mstools
+     is_f77_gnu, get_vs_version, built_with_mstools, cc_version
 from numscons.core.template_generators import generate_from_c_template, \
      generate_from_f_template, generate_from_template_emitter, \
      generate_from_template_scanner
@@ -87,6 +87,11 @@ def GetNumpyOptions(args):
 
 def customize_cc(name, env):
     """Customize env options related to the given tool (C compiler)."""
+    # XXX: this should be handled differently. Compilation customization API is
+    # brain-damaged as it is.
+    ver = cc_version(env)
+    if ver:
+	name = '%s%1.0f' % (name, ver)
     try:
         cfg = get_cc_config(name)
     except NoCompilerConfig, e:

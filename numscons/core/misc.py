@@ -129,6 +129,15 @@ def get_vs_version(env):
     except KeyError:
         raise RuntimeError("Could not get VS version !")
 
+def cc_version(env):
+    """Return version number as a float of the C compiler, if available, None
+    otherwise."""
+    if built_with_mstools(env):
+	ma, mi = get_vs_version(env)
+	return ma + 0.1 * mi
+
+    return None
+
 def isfortran(env, source):
     """Return 1 if any of code in source has fortran files in it, 0
     otherwise."""
