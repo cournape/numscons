@@ -378,7 +378,7 @@ def set_verbosity(env):
         env['FTEMPLATECOMSTR']      = "FROM F TEMPLATE    $SOURCE"
 
 def set_site_config(env):
-    config = get_config()
+    config = get_config(str(env.fs.Top))
     env['NUMPY_SITE_CONFIG'] = config
 
     # This will be used to keep configuration information on a per package basis

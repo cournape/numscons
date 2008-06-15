@@ -1,5 +1,5 @@
 #! /usr/bin/env python
-# Last Change: Sat Jun 07 07:00 PM 2008 J
+# Last Change: Sun Jun 15 03:00 PM 2008 J
 
 """This module has helper functions to get basic information from site.cfg-like
 files."""
@@ -31,7 +31,7 @@ class ConfigOpts(DefaultDict):
         return '\n'.join(msg)
 
 # Think about a cache mechanism, to avoid reparsing the config file everytime.
-def get_config():
+def get_config(src_dir = None):
     """ This tries to read .cfg files in several locations, and merge its
     information into a ConfigParser object for the first found file.
 
@@ -54,9 +54,18 @@ def get_config():
     defaults['include_dirs'] = os.pathsep.join(default_include_dirs)
     defaults['src_dirs'] = os.pathsep.join(default_src_dirs)
     cp = ConfigParser.ConfigParser(defaults)
+
     files = []
+    def extend_srcdir(fname):
+        if src_dir:
+            fid = os.path.join(src_dir, fname)
+            if os.path.isfile(fid):
+                files.append(fid)
+
     files.extend(get_standard_file('.numpy-site.cfg'))
+    extend_srcdir('.numpy-site.cfg')
     files.extend(get_standard_file('site.cfg'))
+    extend_srcdir('site.cfg')
 
     return cp, files
 
