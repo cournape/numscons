@@ -93,3 +93,20 @@ def msvc_runtime_library():
     else:
         lib = None
     return lib
+
+def get_mathlibs(path):
+    """Return the MATHLIB line from numpyconfig.h
+    """
+    #if path is None:
+    #   #path = os.path.join(get_numpy_include_dirs()[0], 'numpy')
+    config_file = os.path.join(path,'numpyconfig.h')
+    fid = open(config_file)
+    mathlibs = []
+    s = '#define MATHLIB'
+    for line in fid.readlines():
+        if line.startswith(s):
+            value = line[len(s):].strip()
+            if value:
+                mathlibs.extend(value.split(','))
+    fid.close()
+    return mathlibs
