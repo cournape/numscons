@@ -97,8 +97,11 @@ def msvc_runtime_library():
 def get_mathlibs(path):
     """Return the MATHLIB line from numpyconfig.h
     """
-    #if path is None:
-    #   #path = os.path.join(get_numpy_include_dirs()[0], 'numpy')
+    # XXX: fix this bootstrapping issue for real at some point instead of
+    # relying on numpy.distutils
+    if path is None:
+       from numpy.distutils.misc_util import get_numpy_include_dirs
+       path = os.path.join(get_numpy_include_dirs()[0], 'numpy')
     config_file = os.path.join(path,'numpyconfig.h')
     fid = open(config_file)
     mathlibs = []
