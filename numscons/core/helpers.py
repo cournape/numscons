@@ -16,15 +16,18 @@ from numscons.core.custom_builders import DistutilsSharedLibrary, NumpyCtypes, \
      DistutilsPythonExtension, DistutilsStaticExtLibrary
 from numscons.core.siteconfig import get_config
 from numscons.core.extension_scons import createStaticExtLibraryBuilder
+from numscons.core.extension import get_pythonlib_dir
 from numscons.core.utils import pkg_to_path
 from numscons.core.misc import pyplat2sconsplat, is_cc_suncc, \
-     get_numscons_toolpaths, iscplusplus, \
-     is_f77_gnu, get_vs_version, built_with_mstools
+     get_numscons_toolpaths, iscplusplus, get_pythonlib_name, \
+     is_f77_gnu, get_vs_version, built_with_mstools, cc_version
 from numscons.core.template_generators import generate_from_c_template, \
      generate_from_f_template, generate_from_template_emitter, \
      generate_from_template_scanner
 
 from numscons.tools.substinfile import TOOL_SUBST
+
+from numscons.numdist import msvc_runtime_library
 
 from misc import get_scons_build_dir, \
                  get_scons_configres_filename, built_with_mingw
@@ -84,10 +87,15 @@ def GetNumpyOptions(args):
 
 def customize_cc(name, env):
     """Customize env options related to the given tool (C compiler)."""
+    # XXX: this should be handled differently. Compilation customization API is
+    # brain-damaged as it is.
+    ver = cc_version(env)
+    if ver:
+	name = '%s%1.0f' % (name, ver)
     try:
         cfg = get_cc_config(name)
     except NoCompilerConfig, e:
-        print "compiler %s has no customization available" % name
+        print e
         cfg = CompilerConfig(Config())
     env.AppendUnique(**cfg.get_flags_dict())
 
@@ -100,7 +108,7 @@ def customize_f77(name, env):
     try:
         cfg = get_f77_config(name)
     except NoCompilerConfig, e:
-        print "compiler %s has no customization available" % name
+        print e
         cfg = F77CompilerConfig(Config())
     env.AppendUnique(**cfg.get_flags_dict())
 
@@ -109,7 +117,7 @@ def customize_cxx(name, env):
     try:
         cfg = get_cxx_config(name)
     except NoCompilerConfig, e:
-        print "compiler %s has no customization available" % name
+        print e
         cfg = CXXCompilerConfig(Config())
     env.AppendUnique(**cfg.get_flags_dict())
 
@@ -206,6 +214,15 @@ def initialize_cc(env, path_list):
                          topdir = os.path.split(env['cc_opt_path'])[0])
                 t(env)
                 customize_cc(t.name, env)
+	    elif built_with_mstools(env):
+                t = Tool(env['cc_opt'],
+                         toolpath = get_numscons_toolpaths(env))
+                t(env)
+                # We need msvs tool too (before customization !)
+                Tool('msvs')(env)
+                customize_cc(t.name, env)
+                path_list.append(env['cc_opt_path'])
+
             else:
                 if is_cc_suncc(pjoin(env['cc_opt_path'], env['cc_opt'])):
                     env['cc_opt'] = 'suncc'
@@ -228,6 +245,9 @@ def initialize_cc(env, path_list):
                  toolpath = get_numscons_toolpaths(env))
         t(env)
         customize_cc(t.name, env)
+
+def has_f77(env):
+    return len(env['f77_opt']) > 0
 
 def initialize_f77(env, path_list):
     """Initialize F77 compiler from distutils info."""
@@ -498,6 +518,23 @@ def customize_tools(env):
     # link flags.
     env['SMARTLINK']   = dumb_link
 
+    customize_pyext(env)
+
+    finalize_env(env)
+
+    # Add the tool paths in the environment
+    if env['ENV'].has_key('PATH'):
+        path_list += env['ENV']['PATH'].split(os.pathsep)
+    env['ENV']['PATH'] = os.pathsep.join(path_list)
+
+def customize_pyext(env):
+    from SCons.Tool import Tool
+
+    from distutils.sysconfig import get_config_var
+
+    ext = get_config_var('SO')
+    env['PYEXTSUFFIX'] = ext
+
     t = Tool('pyext', toolpath = get_numscons_toolpaths(env))
     t(env)
 
@@ -506,17 +543,32 @@ def customize_tools(env):
     pyext_obj = t._tool_module().createPythonObjectBuilder(env)
     from SCons.Tool.FortranCommon import CreateDialectActions, ShFortranEmitter
 
-    shcompaction = CreateDialectActions('F77')[2]
-    for suffix in env['F77FILESUFFIXES']:
-        pyext_obj.add_action(suffix, shcompaction)
-        pyext_obj.add_emitter(suffix, ShFortranEmitter)
+    if has_f77(env):
+        shcompaction = CreateDialectActions('F77')[2]
+        for suffix in env['F77FILESUFFIXES']:
+            pyext_obj.add_action(suffix, shcompaction)
+            pyext_obj.add_emitter(suffix, ShFortranEmitter)
 
-    finalize_env(env)
+    # We don't do this in pyext because scons has no infrastructure to know
+    # whether we are using mingw or ms
+    if sys.platform == 'win32':
+	env.PrependUnique(LIBPATH = get_pythonlib_dir())
+	def dummy(target, source, env):
+	    return target, source
 
-    # Add the tool paths in the environment
-    if env['ENV'].has_key('PATH'):
-        path_list += env['ENV']['PATH'].split(os.pathsep)
-    env['ENV']['PATH'] = os.pathsep.join(path_list)
+	# We override the default emitter here because SHLIB emitter
+	# does a lot of checks we don&t care about and are wrong
+	# anyway for python extensions.
+	env["BUILDERS"]["PythonExtension"].emitter = dummy
+	if built_with_mingw(env):
+	    # We are overrind pyext coms here. 
+	    # XXX: This is ugly
+	    pycc, pycxx, pylink = t._tool_module().pyext_coms('posix')
+	    env['PYEXTCCCOM'] = pycc
+	    env['PYEXTCXXCOM'] = pycxx
+	    env['PYEXTLINKCOM'] = pylink
+
+	    env.PrependUnique(LIBS = [get_pythonlib_name()])
 
 def customize_link_flags(env):
     # We sometimes need to put link flags at the really end of the command
@@ -526,6 +578,7 @@ def customize_link_flags(env):
     env['LDMODULEFLAGSEND'] = []
 
     if built_with_mstools(env):
+	from SCons.Action import Action
         # Sanity check: in case scons changes and we are not
         # aware of it
         if not isinstance(env["SHLINKCOM"], list):
@@ -549,6 +602,7 @@ def customize_link_flags(env):
                        '$( $_LIBDIRFLAGS $) $_LIBFLAGS $LINKFLAGSEND $_PDB ' \
                        '$SOURCES.windows")}'
         env["LINKCOM"] = newlibaction
+        env['PYEXTLINKCOM'] = '%s $PYEXTLINKFLAGSEND' % env['PYEXTLINKCOM']
     else:
         env['LINKCOM'] = '%s $LINKFLAGSEND' % env['LINKCOM']
         env['SHLINKCOM'] = '%s $SHLINKFLAGSEND' % env['SHLINKCOM']

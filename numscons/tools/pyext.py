@@ -87,6 +87,34 @@ def createPythonExtensionBuilder(env):
 
     return pyext
 
+def pyext_coms(platform):
+    """Return PYEXTCCCOM, PYEXTCXXCOM and PYEXTLINKCOM for the given
+    platform."""
+    if platform == 'win32':
+        pyext_cccom = "$PYEXTCC /Fo$TARGET /c $PYEXTCCSHARED "\
+                      "$PYEXTCFLAGS $_PYEXTCPPINCFLAGS $_CCCOMCOM "\
+                      "$SOURCES"
+        pyext_cxxcom = "$PYEXTCXX /Fo$TARGET /c $PYEXTCSHARED "\
+                       "$PYEXTCXXFLAGS $_PYEXTCPPINCFLAGS $_CCCOMCOM "\
+                       "$SOURCES"
+        pyext_linkcom = '${TEMPFILE("$PYEXTLINK $PYEXTLINKFLAGS '\
+                        '/OUT:$TARGET.windows $( $_LIBDIRFLAGS $) '\
+                        '$_LIBFLAGS $SOURCES.windows")}'
+    else:
+        pyext_cccom = "$PYEXTCC -o $TARGET -c $PYEXTCCSHARED "\
+                      "$PYEXTCFLAGS $_PYEXTCPPINCFLAGS $_CCCOMCOM "\
+                      "$SOURCES"
+        pyext_cxxcom = "$PYEXTCXX -o $TARGET -c $PYEXTCSHARED "\
+                       "$PYEXTCXXFLAGS $_PYEXTCPPINCFLAGS $_CCCOMCOM "\
+                       "$SOURCES"
+        pyext_linkcom = "$PYEXTLINK -o $TARGET $PYEXTLINKFLAGS "\
+                        "$SOURCES $_LIBDIRFLAGS $_LIBFLAGS"
+
+    if platform == 'darwin':
+        pyext_linkcom += ' $_FRAMEWORKPATH $_FRAMEWORKS $FRAMEWORKSFLAGS'
+
+    return pyext_cccom, pyext_cxxcom, pyext_linkcom
+
 def set_basic_vars(env):
     # Set construction variables which are independant on whether we are using
     # distutils or not.
@@ -100,31 +128,13 @@ def set_basic_vars(env):
     # XXX: This won't work in all cases (using mingw, for example). To make
     # this work, we need to know whether PYEXTCC accepts /c and /Fo or -c -o.
     # This is difficult with the current way tools work in scons.
-    if sys.platform == 'win32':
-        env['PYEXTCCCOM'] = "$PYEXTCC /Fo$TARGET /c $PYEXTCCSHARED "\
-                            "$PYEXTCFLAGS $_PYEXTCPPINCFLAGS $SOURCES"
-        env['PYEXTCXXCOM'] = "$PYEXTCXX /Fo$TARGET /c $PYEXTCSHARED "\
-                             "$PYEXTCXXFLAGS $_PYEXTCPPINCFLAGS $SOURCES"
-    else:
-        env['PYEXTCCCOM'] = "$PYEXTCC -o $TARGET -c $PYEXTCCSHARED "\
-                            "$PYEXTCFLAGS $_PYEXTCPPINCFLAGS $_CCCOMCOM "\
-                            "$SOURCES"
-        env['PYEXTCXXCOM'] = "$PYEXTCXX -o $TARGET -c $PYEXTCSHARED "\
-                             "$PYEXTCXXFLAGS $_PYEXTCPPINCFLAGS $_CCCOMCOM "\
-                             "$SOURCES"
+    pycc, pycxx, pylink = pyext_coms(sys.platform)
                             
     env['PYEXTLINKFLAGSEND'] = SCons.Util.CLVar('$LINKFLAGSEND')
 
-    # XXX: cf comment on PYEXTCCCOM
-    if sys.platform == 'win32':
-        env['PYEXTLINKCOM'] = '${TEMPFILE("$PYEXTLINK $PYEXTLINKFLAGS '\
-                              '/OUT:$TARGET.windows $SOURCES.windows")}'
-    else:
-        env['PYEXTLINKCOM'] = "$PYEXTLINK -o $TARGET $PYEXTLINKFLAGS "\
-                              "$SOURCES $_LIBDIRFLAGS $_LIBFLAGS"
-
-    if sys.platform == 'darwin':
-        env['PYEXTLINKCOM'] += ' $_FRAMEWORKPATH $_FRAMEWORKS $FRAMEWORKSFLAGS'
+    env['PYEXTCCCOM'] = pycc
+    env['PYEXTCXXCOM'] = pycxx
+    env['PYEXTLINKCOM'] = pylink
 
 def _set_configuration_nodistutils(env):
     # Set env variables to sensible values when not using distutils
@@ -186,11 +196,6 @@ def set_configuration(env, use_distutils):
 def generate(env):
     """Add Builders and construction variables for python extensions to an
     Environment."""
-
-    if sys.platform == 'win32':
-        raise NotImplementedError(
-                "Sorry: building python extensions "\
-                "on windows is not supported yet")
 
     if not env.has_key('PYEXT_USE_DISTUTILS'):
         env['PYEXT_USE_DISTUTILS'] = False

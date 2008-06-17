@@ -42,7 +42,7 @@ def scons_get_paths(paths):
     return paths.split(os.pathsep)
 
 def scons_get_mathlib(env):
-    from numpy.distutils.misc_util import get_mathlibs
+    from numscons.numdist import get_mathlibs
     path_list = scons_get_paths(env['include_bootstrap']) + [None]
     for i in path_list:
         try:

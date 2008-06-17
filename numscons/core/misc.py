@@ -39,11 +39,8 @@ def built_with_mstools(env):
     return env['cc_opt'] == 'msvc'
 
 def built_with_mingw(env):
-    """Return true if built with mingw compiler."""
-    return env['cc_opt'] == 'mingw' or \
-           (sys.platform == 'win32'
-            and (env['f77_opt'] == 'g77' or
-                 env['f77_opt'] == 'gfortran'))
+    """Return true if C code built with mingw compiler."""
+    return env['cc_opt'] == 'mingw'
 
 def built_with_gnu_f77(env):
     """Return true if f77 compiler is gnu (g77, gfortran, etc...)."""
@@ -131,6 +128,15 @@ def get_vs_version(env):
             raise RuntimeError("FIXME: failed to parse VS version")
     except KeyError:
         raise RuntimeError("Could not get VS version !")
+
+def cc_version(env):
+    """Return version number as a float of the C compiler, if available, None
+    otherwise."""
+    if built_with_mstools(env):
+	ma, mi = get_vs_version(env)
+	return ma + 0.1 * mi
+
+    return None
 
 def isfortran(env, source):
     """Return 1 if any of code in source has fortran files in it, 0
