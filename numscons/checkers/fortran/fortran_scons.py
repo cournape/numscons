@@ -88,7 +88,7 @@ def CheckF77Clib(context):
     config = context.sconf
     context.Message('Checking %s C compatibility runtime ...' % env[fcompiler])
     # XXX: check how to get verbose output
-    verbose = '-v'
+    verbose = ['-v']
 
     # Convention old* variables MUST be restored in ANY CONDITION.
     oldLINKFLAGS = env.has_key(fflags) and deepcopy(env[fflags]) or []
