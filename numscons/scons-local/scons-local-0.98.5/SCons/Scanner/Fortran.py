@@ -27,7 +27,7 @@ This module implements the dependency scanner for Fortran code.
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #
 
-__revision__ = "src/engine/SCons/Scanner/Fortran.py 2949 2008/05/17 23:07:00 knight"
+__revision__ = "src/engine/SCons/Scanner/Fortran.py 3057 2008/06/09 22:21:00 knight"
 
 import re
 import string

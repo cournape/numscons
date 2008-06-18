@@ -27,7 +27,7 @@ This file implements the warnings framework for SCons.
 
 """
 
-__revision__ = "src/engine/SCons/Warnings.py 2949 2008/05/17 23:07:00 knight"
+__revision__ = "src/engine/SCons/Warnings.py 3057 2008/06/09 22:21:00 knight"
 
 import string
 import sys
@@ -64,6 +64,9 @@ class DeprecatedTargetSignaturesWarning(DeprecatedWarning):
 class DuplicateEnvironmentWarning(Warning):
     pass
 
+class LinkWarning(Warning):
+    pass
+
 class MisleadingKeywordsWarning(Warning):
     pass
 
@@ -89,6 +92,9 @@ class ReservedVariableWarning(Warning):
     pass
 
 class StackSizeWarning(Warning):
+    pass
+
+class FortranCxxMixWarning(LinkWarning):
     pass
 
 _warningAsException = 0

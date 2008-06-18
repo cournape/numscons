@@ -26,7 +26,7 @@ SCons Packaging Tool.
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #
 
-__revision__ = "src/engine/SCons/Tool/packaging/__init__.py 2949 2008/05/17 23:07:00 knight"
+__revision__ = "src/engine/SCons/Tool/packaging/__init__.py 3057 2008/06/09 22:21:00 knight"
 
 import SCons.Environment
 from SCons.Variables import *

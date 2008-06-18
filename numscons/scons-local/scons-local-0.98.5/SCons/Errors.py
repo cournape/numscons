@@ -28,7 +28,7 @@ and user errors in SCons.
 
 """
 
-__revision__ = "src/engine/SCons/Errors.py 2949 2008/05/17 23:07:00 knight"
+__revision__ = "src/engine/SCons/Errors.py 3057 2008/06/09 22:21:00 knight"
 
 
 

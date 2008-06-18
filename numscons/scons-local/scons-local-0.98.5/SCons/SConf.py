@@ -26,7 +26,7 @@ Autoconf-like configuration support.
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #
 
-__revision__ = "src/engine/SCons/SConf.py 2949 2008/05/17 23:07:00 knight"
+__revision__ = "src/engine/SCons/SConf.py 3057 2008/06/09 22:21:00 knight"
 
 import SCons.compat
 
@@ -612,7 +612,7 @@ class SConfBase:
             prog = self.lastTarget
             pname = str(prog)
             output = SConfFS.File(pname+'.out')
-            node = self.env.Command(output, prog, [ [os.path.join(os.getcwd(), pname), ">", "${TARGET}"] ])
+            node = self.env.Command(output, prog, [ [ pname, ">", "${TARGET}"] ])
             ok = self.BuildNodes(node)
             if ok:
                 outputStr = output.get_contents()

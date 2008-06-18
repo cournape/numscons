@@ -64,7 +64,7 @@ function defined below loads the module as the "real" name (without the
 rest of our code will find our pre-loaded compatibility module.
 """
 
-__revision__ = "src/engine/SCons/compat/__init__.py 2949 2008/05/17 23:07:00 knight"
+__revision__ = "src/engine/SCons/compat/__init__.py 3057 2008/06/09 22:21:00 knight"
 
 def import_as(module, name):
     """
