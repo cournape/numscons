@@ -533,6 +533,7 @@ def customize_pyext(env):
 
     from distutils.sysconfig import get_config_var
     from SCons.Node.FS import default_fs
+    from SCons.Action import Action
 
     ext = get_config_var('SO')
     env['PYEXTSUFFIX'] = ext
@@ -562,11 +563,12 @@ def customize_pyext(env):
             # Action to handle msvc runtime problem with fortran/mingw: normally,
             # when we link a python extension with mingw, we need to add the msvc
             # runtime. BUT, if the extensions uses fortran, we should not.
+            # XXX: Is action the right way to do that ?
             snodes = [default_fs.Entry(s) for s in source]
             if isfortran(env, snodes) or isf2py(env, snodes):
                 env.PrependUnique(LIBS = [get_pythonlib_name()])
             else:
-                env.PrependUnique(LIBS = [get_pythonlib_name(), msvc_runtime()])
+                env.PrependUnique(LIBS = [get_pythonlib_name(), msvc_runtime_library()])
             return 0
 
         # We override the default emitter here because SHLIB emitter
@@ -581,7 +583,9 @@ def customize_pyext(env):
             env['PYEXTCXXCOM'] = pycxx
             env['PYEXTLINKCOM'] = pylink
 
-            env.PrependUnique(LIBS = [get_pythonlib_name(), msvc_runtime_library()])
+            pyext_runtime_action = Action(pyext_runtime, '')
+            old_action = env['BUILDERS']['PythonExtension'].action
+            env['BUILDERS']['PythonExtension'].action = Action([pyext_runtime_action, old_action])
 
 def customize_link_flags(env):
     # We sometimes need to put link flags at the really end of the command
