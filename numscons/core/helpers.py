@@ -561,9 +561,10 @@ def customize_pyext(env):
             # XXX: Is action the right way to do that ?
             snodes = [default_fs.Entry(s) for s in source]
             if isfortran(env, snodes) or isf2py(env, snodes):
-                env.PrependUnique(LIBS = [get_pythonlib_name()])
+                env["PYEXTRUNTIME"] = [get_pythonlib_name()]
             else:
-                env.PrependUnique(LIBS = [get_pythonlib_name(), msvc_runtime_library()])
+                env["PYEXTRUNTIME"] = [get_pythonlib_name(), msvc_runtime_library()]
+	    print env['PYEXTRUNTIME']
             return 0
 
         # We override the default emitter here because SHLIB emitter
