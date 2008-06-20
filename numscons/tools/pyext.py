@@ -99,7 +99,7 @@ def pyext_coms(platform):
                        "$SOURCES"
         pyext_linkcom = '${TEMPFILE("$PYEXTLINK $PYEXTLINKFLAGS '\
                         '/OUT:$TARGET.windows $( $_LIBDIRFLAGS $) '\
-                        '$_LIBFLAGS $SOURCES.windows")}'
+                        '$_LIBFLAGS $_PYEXTRUNTIME $SOURCES.windows")}'
     else:
         pyext_cccom = "$PYEXTCC -o $TARGET -c $PYEXTCCSHARED "\
                       "$PYEXTCFLAGS $_PYEXTCPPINCFLAGS $_CCCOMCOM "\
@@ -108,7 +108,7 @@ def pyext_coms(platform):
                        "$PYEXTCXXFLAGS $_PYEXTCPPINCFLAGS $_CCCOMCOM "\
                        "$SOURCES"
         pyext_linkcom = "$PYEXTLINK -o $TARGET $PYEXTLINKFLAGS "\
-                        "$SOURCES $_LIBDIRFLAGS $_LIBFLAGS"
+                        "$SOURCES $_LIBDIRFLAGS $_LIBFLAGS $_PYEXTRUNTIME"
 
     if platform == 'darwin':
         pyext_linkcom += ' $_FRAMEWORKPATH $_FRAMEWORKS $FRAMEWORKSFLAGS'
@@ -125,6 +125,10 @@ def set_basic_vars(env):
     env['PYEXTOBJSUFFIX'] = '$SHOBJSUFFIX'
     env['PYEXTOBJPREFIX'] = '$SHOBJPREFIX'
 
+    env['PYEXTRUNTIME']   = SCons.Util.CLVar("")
+    # XXX: this should be handled with different flags
+    env['_PYEXTRUNTIME']  = '$( ${_concat(LIBLINKPREFIX, PYEXTRUNTIME, '\
+                          'LIBLINKSUFFIX, __env__)} $)'
     # XXX: This won't work in all cases (using mingw, for example). To make
     # this work, we need to know whether PYEXTCC accepts /c and /Fo or -c -o.
     # This is difficult with the current way tools work in scons.
