@@ -20,7 +20,9 @@ from numscons.core.extension import get_pythonlib_dir
 from numscons.core.utils import pkg_to_path
 from numscons.core.misc import pyplat2sconsplat, is_cc_suncc, \
      get_numscons_toolpaths, iscplusplus, get_pythonlib_name, \
-     is_f77_gnu, get_vs_version, built_with_mstools, cc_version
+     is_f77_gnu, get_vs_version, built_with_mstools, cc_version, \
+     isfortran, isf2py
+
 from numscons.core.template_generators import generate_from_c_template, \
      generate_from_f_template, generate_from_template_emitter, \
      generate_from_template_scanner
@@ -530,6 +532,7 @@ def customize_pyext(env):
     from SCons.Tool import Tool
 
     from distutils.sysconfig import get_config_var
+    from SCons.Node.FS import default_fs
 
     ext = get_config_var('SO')
     env['PYEXTSUFFIX'] = ext
@@ -554,6 +557,17 @@ def customize_pyext(env):
         env.PrependUnique(LIBPATH = get_pythonlib_dir())
         def dummy(target, source, env):
             return target, source
+
+        def pyext_runtime(target = None, source = None, env = None):
+            # Action to handle msvc runtime problem with fortran/mingw: normally,
+            # when we link a python extension with mingw, we need to add the msvc
+            # runtime. BUT, if the extensions uses fortran, we should not.
+            snodes = [default_fs.Entry(s) for s in source]
+            if isfortran(env, snodes) or isf2py(env, snodes):
+                env.PrependUnique(LIBS = [get_pythonlib_name()])
+            else:
+                env.PrependUnique(LIBS = [get_pythonlib_name(), msvc_runtime()])
+            return 0
 
         # We override the default emitter here because SHLIB emitter
         # does a lot of checks we don&t care about and are wrong
