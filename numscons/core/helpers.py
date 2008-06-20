@@ -91,7 +91,7 @@ def customize_cc(name, env):
     # brain-damaged as it is.
     ver = cc_version(env)
     if ver:
-	name = '%s%1.0f' % (name, ver)
+        name = '%s%1.0f' % (name, ver)
     try:
         cfg = get_cc_config(name)
     except NoCompilerConfig, e:
@@ -214,15 +214,14 @@ def initialize_cc(env, path_list):
                          topdir = os.path.split(env['cc_opt_path'])[0])
                 t(env)
                 customize_cc(t.name, env)
-	    elif built_with_mstools(env):
-                t = Tool(env['cc_opt'],
-                         toolpath = get_numscons_toolpaths(env))
-                t(env)
-                # We need msvs tool too (before customization !)
-                Tool('msvs')(env)
-                customize_cc(t.name, env)
-                path_list.append(env['cc_opt_path'])
-
+            elif built_with_mstools(env):
+                 t = Tool(env['cc_opt'],
+                          toolpath = get_numscons_toolpaths(env))
+                 t(env)
+                 # We need msvs tool too (before customization !)
+                 Tool('msvs')(env)
+                 customize_cc(t.name, env)
+                 path_list.append(env['cc_opt_path'])
             else:
                 if is_cc_suncc(pjoin(env['cc_opt_path'], env['cc_opt'])):
                     env['cc_opt'] = 'suncc'
@@ -552,23 +551,23 @@ def customize_pyext(env):
     # We don't do this in pyext because scons has no infrastructure to know
     # whether we are using mingw or ms
     if sys.platform == 'win32':
-	env.PrependUnique(LIBPATH = get_pythonlib_dir())
-	def dummy(target, source, env):
-	    return target, source
-
-	# We override the default emitter here because SHLIB emitter
-	# does a lot of checks we don&t care about and are wrong
-	# anyway for python extensions.
-	env["BUILDERS"]["PythonExtension"].emitter = dummy
-	if built_with_mingw(env):
-	    # We are overrind pyext coms here. 
-	    # XXX: This is ugly
-	    pycc, pycxx, pylink = t._tool_module().pyext_coms('posix')
-	    env['PYEXTCCCOM'] = pycc
-	    env['PYEXTCXXCOM'] = pycxx
-	    env['PYEXTLINKCOM'] = pylink
-
-	    env.PrependUnique(LIBS = [get_pythonlib_name(), msvc_runtime_library()])
+        env.PrependUnique(LIBPATH = get_pythonlib_dir())
+        def dummy(target, source, env):
+            return target, source
+    
+        # We override the default emitter here because SHLIB emitter
+        # does a lot of checks we don&t care about and are wrong
+        # anyway for python extensions.
+        env["BUILDERS"]["PythonExtension"].emitter = dummy
+        if built_with_mingw(env):
+            # We are overrind pyext coms here. 
+            # XXX: This is ugly
+            pycc, pycxx, pylink = t._tool_module().pyext_coms('posix')
+            env['PYEXTCCCOM'] = pycc
+            env['PYEXTCXXCOM'] = pycxx
+            env['PYEXTLINKCOM'] = pylink
+    
+            env.PrependUnique(LIBS = [get_pythonlib_name(), msvc_runtime_library()])
 
 def customize_link_flags(env):
     # We sometimes need to put link flags at the really end of the command
@@ -578,7 +577,7 @@ def customize_link_flags(env):
     env['LDMODULEFLAGSEND'] = []
 
     if built_with_mstools(env):
-	from SCons.Action import Action
+        from SCons.Action import Action
         # Sanity check: in case scons changes and we are not
         # aware of it
         if not isinstance(env["SHLINKCOM"], list):
