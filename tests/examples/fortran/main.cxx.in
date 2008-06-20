@@ -1,0 +1,7 @@
+extern "C" void @HELLO@();
+
+int main()
+{
+        @HELLO@();
+        return 0;
+}

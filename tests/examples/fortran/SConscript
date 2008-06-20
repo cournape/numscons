@@ -4,11 +4,15 @@ from numscons import CheckF77Mangling, CheckF77Clib
 
 env = GetNumpyEnvironment(ARGUMENTS)
 
-config = env.NumpyConfigure(custom_tests = {'CheckF77Clib' : CheckF77Clib})
+config = env.NumpyConfigure(custom_tests = {'CheckF77Clib' : CheckF77Clib,
+                            'CheckF77Mangling': CheckF77Mangling})
 
 config.CheckF77Clib()
+config.CheckF77Mangling()
 
 config.Finish()
 
+env['SUBST_DICT'] = {'@HELLO@' : env['F77_NAME_MANGLER']('hello')}
 env.Append(LINKFLAGSEND = env['F77_LDFLAGS'])
+env.SubstInFile('main.cxx.in')
 env.Program(["main.cxx", "hello.f"])
