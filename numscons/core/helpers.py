@@ -458,15 +458,10 @@ def add_custom_builders(env):
 
 # Our own smart_link: the one in scons is not that smart.
 def dumb_link(source, target, env, for_signature):
-    import SCons.Errors
-    from SCons.Tool.FortranCommon import isfortran
-
     has_cplusplus = iscplusplus(source)
-    has_fortran = isfortran(env, source)
-    if has_cplusplus and has_fortran:
-        msg = "Sorry, numscons cannot yet link c++ and fortran code together."
-        raise SCons.Errors.InternalError(msg)
-    elif has_cplusplus:
+    # XXX: it would be nice to raise a warning if F77_LDFLAGS is not found in
+    # env and we link some fortran code.
+    if has_cplusplus:
         return '$CXX'
     return '$CC'
 
