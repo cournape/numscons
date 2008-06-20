@@ -537,7 +537,7 @@ def customize_pyext(env):
     t = Tool('pyext', toolpath = get_numscons_toolpaths(env))
     t(env)
 
-    # Extending pyext to handle fortran source code. 
+    # Extending pyext to handle fortran source code.
     # XXX: This is ugly: I don't see any way to do this cleanly.
     pyext_obj = t._tool_module().createPythonObjectBuilder(env)
     from SCons.Tool.FortranCommon import CreateDialectActions, ShFortranEmitter
@@ -554,19 +554,19 @@ def customize_pyext(env):
         env.PrependUnique(LIBPATH = get_pythonlib_dir())
         def dummy(target, source, env):
             return target, source
-    
+
         # We override the default emitter here because SHLIB emitter
         # does a lot of checks we don&t care about and are wrong
         # anyway for python extensions.
         env["BUILDERS"]["PythonExtension"].emitter = dummy
         if built_with_mingw(env):
-            # We are overrind pyext coms here. 
+            # We are overrind pyext coms here.
             # XXX: This is ugly
             pycc, pycxx, pylink = t._tool_module().pyext_coms('posix')
             env['PYEXTCCCOM'] = pycc
             env['PYEXTCXXCOM'] = pycxx
             env['PYEXTLINKCOM'] = pylink
-    
+
             env.PrependUnique(LIBS = [get_pythonlib_name(), msvc_runtime_library()])
 
 def customize_link_flags(env):
