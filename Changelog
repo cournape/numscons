@@ -1,3 +1,8 @@
+Sun, 22 Jun 2008 17:43:51 +0900
+	* pyext tool now handle correctly msvc runtime problems; msvc build
+	should work again (build tested on python2.6 with VS 2008)
+	* scons updated to 0.98.5, to solve issues with sun compilers.
+
 Thu, 12 Jun 2008 21:52:58 +0900
 	* Release 0.8.0
 
