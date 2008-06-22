@@ -9,7 +9,7 @@ were when scons was inside numpy repository):
       done through tools), rename functions, and set the order right (0.7*
       serie).
     - CXX optimizations flags + Control cxxflags from env
-    - Add CPPPDEFINES in perflib checkers 
+    - Add CPPPDEFINES in perflib checkers
     - handle inplace
     - doc
     - CLAPACK: check old atlas
@@ -18,14 +18,10 @@ were when scons was inside numpy repository):
     - handle numpy headers, too
 
 Meta Goals:
-    - 0.7: upstream Fortran changes in scons, handle fortran dialects.
-    - 0.8: Python Extension builder, make clear difference between Numpy and
-      Distutils builders, automatically handle libpath, cpppath for numpy
-      header, etc...
     - 0.9: clean up core and checkers code. Remove duplicated code, clean-up
       numpyenv, etc\.\.\. Handles setuptools integration (inplace, etc...) +
       sdist problems. Put documentation in shape.
-    
+
 Cleaning checkers modules:
     - Refactor site config custom: remove duplicate between core.libinfo and
       checkers.perflib_info
@@ -33,8 +29,6 @@ Cleaning checkers modules:
     - remove duplicate between check_code and check_include_and_run.
 
 Things to implement in scons (upstream):
-    - Make 'real' python extension builders
-    - automatic handling of python header and python lib for python extensions.
     - remove code for building empty programs: replace it by proper sconf (see
       below)
 
@@ -49,8 +43,6 @@ Fortran:
 Not so important things:
     - improve BrokenMathlib and Mathlib in core, and make them available to
       everyone
-    - Generic Api builders (with dep tracking)
-    - Generic FromTemplate builder (with dep tracking)
 
 Upstream scons changes needed:
 ==============================
@@ -62,20 +54,19 @@ Builder
 
 New builders we can add to scons (and needed by numscons):
 
-    - a PythonExtension builder independant of distutils
-    - a CtypesExtension builder
-    - pyrex builder ?
+    - a proper CtypesExtension builder
+    - pyrex/cython/swig builders ?
 
 Fortran code
 ------------
 
-Finish work on refactored scons: fortran revamp work integrated in scons 0.98.2
+Work on sconf for fortran: integrate upstream.
 
 Misc
 ----
 
 We need the following:
-        
+
     - Being able to run a builder and capture its output (both stdout and
       stderr)
     - building blocks for checkers
