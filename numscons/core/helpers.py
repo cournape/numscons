@@ -9,9 +9,8 @@ import os.path
 from os.path import join as pjoin
 
 from numscons.core.default import tool_list
-from numscons.core.compiler_config import get_cc_config, \
-     get_f77_config, get_cxx_config, NoCompilerConfig, Config, \
-     CompilerConfig, F77CompilerConfig, CXXCompilerConfig
+from numscons.core.compiler_config import get_config as get_compiler_config, \
+     NoCompilerConfig, CompilerConfig
 from numscons.core.custom_builders import DistutilsSharedLibrary, NumpyCtypes, \
      DistutilsPythonExtension, DistutilsStaticExtLibrary
 from numscons.core.siteconfig import get_config
@@ -95,11 +94,11 @@ def customize_cc(name, env):
     if ver:
         name = '%s%1.0f' % (name, ver)
     try:
-        cfg = get_cc_config(name)
+        cfg = get_compiler_config(name, 'C')
     except NoCompilerConfig, e:
         print e
-        cfg = CompilerConfig(Config())
-    env.AppendUnique(**cfg.get_flags_dict())
+        cfg = CompilerConfig()
+    env["NUMPY_CUSTOMIZATION"]["C"] = cfg
 
 def customize_f77(name, env):
     """Customize env options related to the given tool (F77 compiler)."""
@@ -108,20 +107,20 @@ def customize_f77(name, env):
         name = "%s_mingw" % name
 
     try:
-        cfg = get_f77_config(name)
+        cfg = get_compiler_config(name, 'F77')
     except NoCompilerConfig, e:
         print e
-        cfg = F77CompilerConfig(Config())
-    env.AppendUnique(**cfg.get_flags_dict())
+        cfg = CompilerCompiler()
+    env["NUMPY_CUSTOMIZATION"]["F77"] = cfg
 
 def customize_cxx(name, env):
     """Customize env options related to the given tool (CXX compiler)."""
     try:
-        cfg = get_cxx_config(name)
+        cfg = get_compiler_config(name, 'CXX')
     except NoCompilerConfig, e:
         print e
-        cfg = CXXCompilerConfig(Config())
-    env.AppendUnique(**cfg.get_flags_dict())
+        cfg = CompilerConfig()
+    env["NUMPY_CUSTOMIZATION"]["CXX"] = cfg
 
 def finalize_env(env):
     """Call this at the really end of the numpy environment initialization."""
@@ -159,46 +158,38 @@ def GetNumpyEnvironment(args):
     # C compiler last customization
     #------------------------------
     # Apply optim and warn flags considering context
+    custom = env['NUMPY_CUSTOMIZATION']['C']
     if 'CFLAGS' in os.environ:
         env.Append(CFLAGS = "%s" % os.environ['CFLAGS'])
-        env.AppendUnique(CFLAGS = env['NUMPY_EXTRA_CFLAGS'] +
-                                  env['NUMPY_THREAD_CFLAGS'])
+        env.AppendUnique(CFLAGS = custom['extra'] + custom['thread'])
     else:
-        env.AppendUnique(CFLAGS  = env['NUMPY_WARN_CFLAGS'] +
-                                   env['NUMPY_OPTIM_CFLAGS'] +
-                                   env['NUMPY_DEBUG_SYMBOL_CFLAGS'] +
-                                   env['NUMPY_EXTRA_CFLAGS'] +
-                                   env['NUMPY_THREAD_CFLAGS'])
-    env.AppendUnique(LINKFLAGS = env['NUMPY_OPTIM_LDFLAGS'])
+        env.AppendUnique(CFLAGS  = custom.values())
+
+    # XXX: what to do about linkflags ?
+    #env.AppendUnique(LINKFLAGS = env['NUMPY_OPTIM_LDFLAGS'])
 
     #--------------------------------
     # F77 compiler last customization
     #--------------------------------
+    custom = env['NUMPY_CUSTOMIZATION']['F77']
     if env.has_key('F77'):
         if 'FFLAGS' in os.environ:
             env.Append(F77FLAGS = "%s" % os.environ['FFLAGS'])
-            env.AppendUnique(F77FLAGS = env['NUMPY_EXTRA_FFLAGS'] +
-                                        env['NUMPY_THREAD_FFLAGS'])
+            env.AppendUnique(F77FLAGS = custom['extra'] + custom['thread'])
         else:
-            env.AppendUnique(F77FLAGS  = env['NUMPY_WARN_FFLAGS'] +
-                                         env['NUMPY_OPTIM_FFLAGS'] +
-                                         env['NUMPY_DEBUG_SYMBOL_FFLAGS'] +
-                                         env['NUMPY_EXTRA_FFLAGS'] +
-                                         env['NUMPY_THREAD_FFLAGS'])
+            env.AppendUnique(F77FLAGS  = custom.values())
+
     #--------------------------------
     # CXX compiler last customization
     #--------------------------------
+    custom = env['NUMPY_CUSTOMIZATION']['CXX']
     if env.has_key('CXX'):
         if 'CXXFLAGS' in os.environ:
             env.Append(CXXFLAGS = "%s" % os.environ['CXXFLAGS'])
-            env.AppendUnique(CXXFLAGS = env['NUMPY_EXTRA_CXXFLAGS'] +
-                                        env['NUMPY_THREAD_CXXFLAGS'])
+            env.AppendUnique(CXXFLAGS = custom['extra'] + custom['thread'])
         else:
-            env.AppendUnique(CXXFLAGS  = env['NUMPY_WARN_CXXFLAGS'] +
-                                         env['NUMPY_OPTIM_CXXFLAGS'] +
-                                         env['NUMPY_DEBUG_SYMBOL_CXXFLAGS'] +
-                                         env['NUMPY_EXTRA_CXXFLAGS'] +
-                                         env['NUMPY_THREAD_CXXFLAGS'])
+            env.AppendUnique(CXXFLAGS  = custom.values())
+
     return env
 
 def initialize_cc(env, path_list):
@@ -323,6 +314,10 @@ def _init_environment(args):
     env.AppendUnique(build_dir = pjoin(env['build_prefix'], env['src_dir']))
     env.AppendUnique(distutils_installdir = pjoin(env['distutils_libdir'],
                                                   pkg_to_path(env['pkg_name'])))
+
+    # This will keep our compiler dependent customization (optimization,
+    # warning, etc...)
+    env['NUMPY_CUSTOMIZATION'] = {}
 
     Help(opts.GenerateHelpText(env))
 
