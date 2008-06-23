@@ -1,14 +1,14 @@
-from ConfigParser import SafeConfigParser, ConfigParser
-from os.path import join as pjoin, dirname as pdirname
-
-from numscons.core.utils import partial
-
 """Module to handle compiler configuration.
 
 Configurations are set into config files, and are obtained from get_*_config
 functions. The object returned by those functions have a method get_flags_dict
 which returns a dictionary which can be copied into scons environments objects
 as construction variables."""
+
+from ConfigParser import SafeConfigParser, ConfigParser
+from os.path import join as pjoin, dirname as pdirname
+
+from numscons.core.utils import partial
 
 # XXX: customization from site.cfg or other ?
 # XXX: how to cache this between different scons calls
