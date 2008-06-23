@@ -86,41 +86,21 @@ def GetNumpyOptions(args):
 
     return opts
 
-def customize_cc(name, env):
-    """Customize env options related to the given tool (C compiler)."""
-    # XXX: this should be handled differently. Compilation customization API is
-    # brain-damaged as it is.
-    ver = cc_version(env)
-    if ver:
-        name = '%s%1.0f' % (name, ver)
+def customize_compiler(name, env, lang):
+    """Customize env options related to the given tool and language."""
+    # XXX: we have to fix how to detect compilers/version instead of hack after
+    # hack...
+    if lang == "C":
+        ver = cc_version(env)
+        if ver:
+            name = '%s%1.0f' % (name, ver)
+
     try:
-        cfg = get_compiler_config(name, 'C')
+        cfg = get_compiler_config(name, lang)
     except NoCompilerConfig, e:
         print e
         cfg = CompilerConfig()
-    env["NUMPY_CUSTOMIZATION"]["C"] = cfg
-
-def customize_f77(name, env):
-    """Customize env options related to the given tool (F77 compiler)."""
-    # XXX: this should be handled somewhere else...
-    if sys.platform == "win32" and is_f77_gnu(env):
-        name = "%s_mingw" % name
-
-    try:
-        cfg = get_compiler_config(name, 'F77')
-    except NoCompilerConfig, e:
-        print e
-        cfg = CompilerCompiler()
-    env["NUMPY_CUSTOMIZATION"]["F77"] = cfg
-
-def customize_cxx(name, env):
-    """Customize env options related to the given tool (CXX compiler)."""
-    try:
-        cfg = get_compiler_config(name, 'CXX')
-    except NoCompilerConfig, e:
-        print e
-        cfg = CompilerConfig()
-    env["NUMPY_CUSTOMIZATION"]["CXX"] = cfg
+    env["NUMPY_CUSTOMIZATION"][lang] = cfg
 
 def finalize_env(env):
     """Call this at the really end of the numpy environment initialization."""
@@ -206,14 +186,12 @@ def initialize_cc(env, path_list):
                          toolpath = get_numscons_toolpaths(env),
                          topdir = os.path.split(env['cc_opt_path'])[0])
                 t(env)
-                customize_cc(t.name, env)
             elif built_with_mstools(env):
                  t = Tool(env['cc_opt'],
                           toolpath = get_numscons_toolpaths(env))
                  t(env)
                  # We need msvs tool too (before customization !)
                  Tool('msvs')(env)
-                 customize_cc(t.name, env)
                  path_list.append(env['cc_opt_path'])
             else:
                 if is_cc_suncc(pjoin(env['cc_opt_path'], env['cc_opt'])):
@@ -221,22 +199,23 @@ def initialize_cc(env, path_list):
                 t = Tool(env['cc_opt'],
                          toolpath = get_numscons_toolpaths(env))
                 t(env)
-                customize_cc(t.name, env)
                 path_list.append(env['cc_opt_path'])
         else:
             # Do not care about PATH info because none given from scons
             # distutils command
             t = Tool(env['cc_opt'], toolpath = get_numscons_toolpaths(env))
             t(env)
-            customize_cc(t.name, env)
+
+        return t
 
     if len(env['cc_opt']) > 0:
-        set_cc_from_distutils()
+        t = set_cc_from_distutils()
     else:
         t = Tool(FindTool(DEF_C_COMPILERS, env),
                  toolpath = get_numscons_toolpaths(env))
         t(env)
-        customize_cc(t.name, env)
+    
+    customize_compiler(t.name, env, "C")
 
 def has_f77(env):
     return len(env['f77_opt']) > 0
@@ -252,13 +231,13 @@ def initialize_f77(env, path_list):
                      toolpath = get_numscons_toolpaths(env))
             t(env)
             path_list.append(env['f77_opt_path'])
-            customize_f77(t.name, env)
     else:
         def_fcompiler =  FindTool(DEF_FORTRAN_COMPILERS, env)
         if def_fcompiler:
             t = Tool(def_fcompiler, toolpath = get_numscons_toolpaths(env))
             t(env)
-            customize_f77(t.name, env)
+
+    customize_compiler(t.name, env, "F77")
 
 def initialize_cxx(env, path_list):
     """Initialize C++ compiler from distutils info."""
@@ -272,13 +251,11 @@ def initialize_cxx(env, path_list):
                      toolpath = get_numscons_toolpaths(env))
             t(env)
             path_list.append(env['cxx_opt_path'])
-            customize_cxx(t.name, env)
     else:
         def_cxxcompiler =  FindTool(DEF_CXX_COMPILERS, env)
         if def_cxxcompiler:
             t = Tool(def_cxxcompiler, toolpath = get_numscons_toolpaths(env))
             t(env)
-            customize_cxx(t.name, env)
         else:
             # Some scons tools initialize CXX env var even if no CXX available.
             # This is just confusing, so remove the key here since we could not
@@ -288,6 +265,7 @@ def initialize_cxx(env, path_list):
             except KeyError:
                 pass
 
+    customize_compiler(t.name, env, "CXX")
     env['CXXFILESUFFIX'] = '.cxx'
 
 def set_bootstrap(env):
