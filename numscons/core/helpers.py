@@ -124,16 +124,8 @@ def finalize_env(env):
     if is_f77_gnu(env):
         env.AppendUnique(F77FLAGS = ['-fno-second-underscore'])
 
-def GetNumpyEnvironment(args):
-    """Returns a correctly initialized scons environment.
-
-    This environment contains builders for python extensions, ctypes
-    extensions, fortran builders, etc... Generally, call it with args =
-    ARGUMENTS, which contain the arguments given to the scons process."""
-    env = _get_numpy_env(args)
-
-    # XXX: this is messy, refactor that crap
-
+def apply_compilers_customization(env):
+    """Apply customization for compilers' flags to the environment."""
     #------------------------------
     # C compiler last customization
     #------------------------------
@@ -169,6 +161,19 @@ def GetNumpyEnvironment(args):
             env.AppendUnique(CXXFLAGS = custom['extra'] + custom['thread'])
         else:
             env.AppendUnique(CXXFLAGS  = custom.values())
+
+
+def GetNumpyEnvironment(args):
+    """Returns a correctly initialized scons environment.
+
+    This environment contains builders for python extensions, ctypes
+    extensions, fortran builders, etc... Generally, call it with args =
+    ARGUMENTS, which contain the arguments given to the scons process.
+    
+    This method returns an environment with fully customized flags."""
+    env = _get_numpy_env(args)
+
+    apply_compilers_customization(env)
 
     return env
 
