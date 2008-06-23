@@ -316,7 +316,7 @@ def _get_numpy_env(args):
     #------------------------------------------------
     # Setting tools according to command line options
     #------------------------------------------------
-    customize_tools(env)
+    initialize_tools(env)
 
     #---------------
     #     Misc
@@ -452,7 +452,7 @@ def initialize_allow_undefined(env):
     else:
         env['ALLOW_UNDEFINED'] = SCons.Util.CLVar('')
 
-def customize_tools(env):
+def initialize_tools(env):
     from SCons.Tool import Tool, FindTool, FindAllTools
 
     # List of supplemental paths to take into account
