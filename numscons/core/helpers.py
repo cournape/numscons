@@ -9,9 +9,8 @@ import os.path
 from os.path import join as pjoin
 
 from numscons.core.default import tool_list
-from numscons.core.compiler_config import get_cc_config, \
-     get_f77_config, get_cxx_config, NoCompilerConfig, Config, \
-     CompilerConfig, F77CompilerConfig, CXXCompilerConfig
+from numscons.core.compiler_config import get_config as get_compiler_config, \
+     NoCompilerConfig, CompilerConfig
 from numscons.core.custom_builders import DistutilsSharedLibrary, NumpyCtypes, \
      DistutilsPythonExtension, DistutilsStaticExtLibrary
 from numscons.core.siteconfig import get_config
@@ -87,41 +86,21 @@ def GetNumpyOptions(args):
 
     return opts
 
-def customize_cc(name, env):
-    """Customize env options related to the given tool (C compiler)."""
-    # XXX: this should be handled differently. Compilation customization API is
-    # brain-damaged as it is.
-    ver = cc_version(env)
-    if ver:
-        name = '%s%1.0f' % (name, ver)
-    try:
-        cfg = get_cc_config(name)
-    except NoCompilerConfig, e:
-        print e
-        cfg = CompilerConfig(Config())
-    env.AppendUnique(**cfg.get_flags_dict())
-
-def customize_f77(name, env):
-    """Customize env options related to the given tool (F77 compiler)."""
-    # XXX: this should be handled somewhere else...
-    if sys.platform == "win32" and is_f77_gnu(env):
-        name = "%s_mingw" % name
+def customize_compiler(name, env, lang):
+    """Customize env options related to the given tool and language."""
+    # XXX: we have to fix how to detect compilers/version instead of hack after
+    # hack...
+    if lang == "C":
+        ver = cc_version(env)
+        if ver:
+            name = '%s%1.0f' % (name, ver)
 
     try:
-        cfg = get_f77_config(name)
+        cfg = get_compiler_config(name, lang)
     except NoCompilerConfig, e:
         print e
-        cfg = F77CompilerConfig(Config())
-    env.AppendUnique(**cfg.get_flags_dict())
-
-def customize_cxx(name, env):
-    """Customize env options related to the given tool (CXX compiler)."""
-    try:
-        cfg = get_cxx_config(name)
-    except NoCompilerConfig, e:
-        print e
-        cfg = CXXCompilerConfig(Config())
-    env.AppendUnique(**cfg.get_flags_dict())
+        cfg = CompilerConfig()
+    env["NUMPY_CUSTOMIZATION"][lang] = cfg
 
 def finalize_env(env):
     """Call this at the really end of the numpy environment initialization."""
@@ -145,60 +124,57 @@ def finalize_env(env):
     if is_f77_gnu(env):
         env.AppendUnique(F77FLAGS = ['-fno-second-underscore'])
 
+def apply_compilers_customization(env):
+    """Apply customization for compilers' flags to the environment."""
+    #------------------------------
+    # C compiler last customization
+    #------------------------------
+    # Apply optim and warn flags considering context
+    custom = env['NUMPY_CUSTOMIZATION']['C']
+    if 'CFLAGS' in os.environ:
+        env.Append(CFLAGS = "%s" % os.environ['CFLAGS'])
+        env.AppendUnique(CFLAGS = custom['extra'] + custom['thread'])
+    else:
+        env.AppendUnique(CFLAGS  = custom.values())
+
+    # XXX: what to do about linkflags ?
+    #env.AppendUnique(LINKFLAGS = env['NUMPY_OPTIM_LDFLAGS'])
+
+    #--------------------------------
+    # F77 compiler last customization
+    #--------------------------------
+    custom = env['NUMPY_CUSTOMIZATION']['F77']
+    if env.has_key('F77'):
+        if 'FFLAGS' in os.environ:
+            env.Append(F77FLAGS = "%s" % os.environ['FFLAGS'])
+            env.AppendUnique(F77FLAGS = custom['extra'] + custom['thread'])
+        else:
+            env.AppendUnique(F77FLAGS  = custom.values())
+
+    #--------------------------------
+    # CXX compiler last customization
+    #--------------------------------
+    custom = env['NUMPY_CUSTOMIZATION']['CXX']
+    if env.has_key('CXX'):
+        if 'CXXFLAGS' in os.environ:
+            env.Append(CXXFLAGS = "%s" % os.environ['CXXFLAGS'])
+            env.AppendUnique(CXXFLAGS = custom['extra'] + custom['thread'])
+        else:
+            env.AppendUnique(CXXFLAGS  = custom.values())
+
+
 def GetNumpyEnvironment(args):
     """Returns a correctly initialized scons environment.
 
     This environment contains builders for python extensions, ctypes
     extensions, fortran builders, etc... Generally, call it with args =
-    ARGUMENTS, which contain the arguments given to the scons process."""
+    ARGUMENTS, which contain the arguments given to the scons process.
+    
+    This method returns an environment with fully customized flags."""
     env = _get_numpy_env(args)
 
-    # XXX: this is messy, refactor that crap
+    apply_compilers_customization(env)
 
-    #------------------------------
-    # C compiler last customization
-    #------------------------------
-    # Apply optim and warn flags considering context
-    if 'CFLAGS' in os.environ:
-        env.Append(CFLAGS = "%s" % os.environ['CFLAGS'])
-        env.AppendUnique(CFLAGS = env['NUMPY_EXTRA_CFLAGS'] +
-                                  env['NUMPY_THREAD_CFLAGS'])
-    else:
-        env.AppendUnique(CFLAGS  = env['NUMPY_WARN_CFLAGS'] +
-                                   env['NUMPY_OPTIM_CFLAGS'] +
-                                   env['NUMPY_DEBUG_SYMBOL_CFLAGS'] +
-                                   env['NUMPY_EXTRA_CFLAGS'] +
-                                   env['NUMPY_THREAD_CFLAGS'])
-    env.AppendUnique(LINKFLAGS = env['NUMPY_OPTIM_LDFLAGS'])
-
-    #--------------------------------
-    # F77 compiler last customization
-    #--------------------------------
-    if env.has_key('F77'):
-        if 'FFLAGS' in os.environ:
-            env.Append(F77FLAGS = "%s" % os.environ['FFLAGS'])
-            env.AppendUnique(F77FLAGS = env['NUMPY_EXTRA_FFLAGS'] +
-                                        env['NUMPY_THREAD_FFLAGS'])
-        else:
-            env.AppendUnique(F77FLAGS  = env['NUMPY_WARN_FFLAGS'] +
-                                         env['NUMPY_OPTIM_FFLAGS'] +
-                                         env['NUMPY_DEBUG_SYMBOL_FFLAGS'] +
-                                         env['NUMPY_EXTRA_FFLAGS'] +
-                                         env['NUMPY_THREAD_FFLAGS'])
-    #--------------------------------
-    # CXX compiler last customization
-    #--------------------------------
-    if env.has_key('CXX'):
-        if 'CXXFLAGS' in os.environ:
-            env.Append(CXXFLAGS = "%s" % os.environ['CXXFLAGS'])
-            env.AppendUnique(CXXFLAGS = env['NUMPY_EXTRA_CXXFLAGS'] +
-                                        env['NUMPY_THREAD_CXXFLAGS'])
-        else:
-            env.AppendUnique(CXXFLAGS  = env['NUMPY_WARN_CXXFLAGS'] +
-                                         env['NUMPY_OPTIM_CXXFLAGS'] +
-                                         env['NUMPY_DEBUG_SYMBOL_CXXFLAGS'] +
-                                         env['NUMPY_EXTRA_CXXFLAGS'] +
-                                         env['NUMPY_THREAD_CXXFLAGS'])
     return env
 
 def initialize_cc(env, path_list):
@@ -215,14 +191,12 @@ def initialize_cc(env, path_list):
                          toolpath = get_numscons_toolpaths(env),
                          topdir = os.path.split(env['cc_opt_path'])[0])
                 t(env)
-                customize_cc(t.name, env)
             elif built_with_mstools(env):
                  t = Tool(env['cc_opt'],
                           toolpath = get_numscons_toolpaths(env))
                  t(env)
                  # We need msvs tool too (before customization !)
                  Tool('msvs')(env)
-                 customize_cc(t.name, env)
                  path_list.append(env['cc_opt_path'])
             else:
                 if is_cc_suncc(pjoin(env['cc_opt_path'], env['cc_opt'])):
@@ -230,22 +204,23 @@ def initialize_cc(env, path_list):
                 t = Tool(env['cc_opt'],
                          toolpath = get_numscons_toolpaths(env))
                 t(env)
-                customize_cc(t.name, env)
                 path_list.append(env['cc_opt_path'])
         else:
             # Do not care about PATH info because none given from scons
             # distutils command
             t = Tool(env['cc_opt'], toolpath = get_numscons_toolpaths(env))
             t(env)
-            customize_cc(t.name, env)
+
+        return t
 
     if len(env['cc_opt']) > 0:
-        set_cc_from_distutils()
+        t = set_cc_from_distutils()
     else:
         t = Tool(FindTool(DEF_C_COMPILERS, env),
                  toolpath = get_numscons_toolpaths(env))
         t(env)
-        customize_cc(t.name, env)
+    
+    customize_compiler(t.name, env, "C")
 
 def has_f77(env):
     return len(env['f77_opt']) > 0
@@ -261,13 +236,13 @@ def initialize_f77(env, path_list):
                      toolpath = get_numscons_toolpaths(env))
             t(env)
             path_list.append(env['f77_opt_path'])
-            customize_f77(t.name, env)
     else:
         def_fcompiler =  FindTool(DEF_FORTRAN_COMPILERS, env)
         if def_fcompiler:
             t = Tool(def_fcompiler, toolpath = get_numscons_toolpaths(env))
             t(env)
-            customize_f77(t.name, env)
+
+    customize_compiler(t.name, env, "F77")
 
 def initialize_cxx(env, path_list):
     """Initialize C++ compiler from distutils info."""
@@ -281,13 +256,11 @@ def initialize_cxx(env, path_list):
                      toolpath = get_numscons_toolpaths(env))
             t(env)
             path_list.append(env['cxx_opt_path'])
-            customize_cxx(t.name, env)
     else:
         def_cxxcompiler =  FindTool(DEF_CXX_COMPILERS, env)
         if def_cxxcompiler:
             t = Tool(def_cxxcompiler, toolpath = get_numscons_toolpaths(env))
             t(env)
-            customize_cxx(t.name, env)
         else:
             # Some scons tools initialize CXX env var even if no CXX available.
             # This is just confusing, so remove the key here since we could not
@@ -297,6 +270,7 @@ def initialize_cxx(env, path_list):
             except KeyError:
                 pass
 
+    customize_compiler(t.name, env, "CXX")
     env['CXXFILESUFFIX'] = '.cxx'
 
 def set_bootstrap(env):
@@ -324,6 +298,10 @@ def _init_environment(args):
     env.AppendUnique(distutils_installdir = pjoin(env['distutils_libdir'],
                                                   pkg_to_path(env['pkg_name'])))
 
+    # This will keep our compiler dependent customization (optimization,
+    # warning, etc...)
+    env['NUMPY_CUSTOMIZATION'] = {}
+
     Help(opts.GenerateHelpText(env))
 
     return env
@@ -338,7 +316,7 @@ def _get_numpy_env(args):
     #------------------------------------------------
     # Setting tools according to command line options
     #------------------------------------------------
-    customize_tools(env)
+    initialize_tools(env)
 
     #---------------
     #     Misc
@@ -474,7 +452,7 @@ def initialize_allow_undefined(env):
     else:
         env['ALLOW_UNDEFINED'] = SCons.Util.CLVar('')
 
-def customize_tools(env):
+def initialize_tools(env):
     from SCons.Tool import Tool, FindTool, FindAllTools
 
     # List of supplemental paths to take into account
