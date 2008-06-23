@@ -30,11 +30,11 @@ class CompilerConfig(DefaultDict):
 def get_config(name, language):
     # XXX name should be a list
     config = ConfigParser()
-    if language == 'c':
+    if language == 'C':
         cfgfname = pjoin(pdirname(__file__), "compiler.cfg")
-    elif language == 'f77':
+    elif language == 'F77':
         cfgfname = pjoin(pdirname(__file__), "fcompiler.cfg")
-    elif language == 'cxx':
+    elif language == 'CXX':
         cfgfname = pjoin(pdirname(__file__), "cxxcompiler.cfg")
     else:
         raise NoCompilerConfig("language %s not recognized !" % language)
@@ -55,6 +55,6 @@ def get_config(name, language):
     return cfg
 
 if __name__ == '__main__':
-    print get_config('gcc', 'c').items()
-    print get_config('g77', 'f77').items()
-    print get_config('g77', 'f77').items()
+    print get_config('gcc', 'C').items()
+    print get_config('g77', 'F77').items()
+    print get_config('g++', 'CXX').items()
