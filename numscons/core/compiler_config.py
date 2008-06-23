@@ -54,13 +54,7 @@ def get_config(name, language):
 
     return cfg
 
-get_cc_config = partial(get_config, language = 'c')
-get_f77_config = partial(get_config, language = 'f77')
-get_cxx_config = partial(get_config, language = 'cxx')
-
 if __name__ == '__main__':
-    cfg = get_cc_config('gcc')
-    print cfg.items()
-
-    cfg = get_f77_config('g77')
-    print cfg.items()
+    print get_config('gcc', 'c').items()
+    print get_config('g77', 'f77').items()
+    print get_config('g77', 'f77').items()
