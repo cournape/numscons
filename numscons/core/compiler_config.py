@@ -126,9 +126,7 @@ get_cxx_config = partial(get_config, language = 'cxx')
 
 if __name__ == '__main__':
     cfg = get_cc_config('gcc')
-    cc = CompilerConfig(cfg)
-    print cc.get_flags_dict()
+    print cfg.get_flags_dict()
 
     cfg = get_f77_config('g77')
-    cc = CompilerConfig(cfg)
-    print cc.get_flags_dict()
+    print cfg.get_flags_dict()
