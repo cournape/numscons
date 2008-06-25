@@ -16,7 +16,7 @@ from numscons.core.custom_builders import DistutilsSharedLibrary, NumpyCtypes, \
 from numscons.core.siteconfig import get_config
 from numscons.core.extension_scons import createStaticExtLibraryBuilder
 from numscons.core.extension import get_pythonlib_dir
-from numscons.core.utils import pkg_to_path
+from numscons.core.utils import pkg_to_path, flatten
 from numscons.core.misc import pyplat2sconsplat, is_cc_suncc, \
      get_numscons_toolpaths, iscplusplus, get_pythonlib_name, \
      is_f77_gnu, get_vs_version, built_with_mstools, cc_version, \
@@ -135,7 +135,7 @@ def apply_compilers_customization(env):
         env.Append(CFLAGS = "%s" % os.environ['CFLAGS'])
         env.AppendUnique(CFLAGS = custom['extra'] + custom['thread'])
     else:
-        env.AppendUnique(CFLAGS  = custom.values())
+        env.AppendUnique(CFLAGS  = flatten(custom.values()))
 
     # XXX: what to do about linkflags ?
     #env.AppendUnique(LINKFLAGS = env['NUMPY_OPTIM_LDFLAGS'])
@@ -149,7 +149,7 @@ def apply_compilers_customization(env):
             env.Append(F77FLAGS = "%s" % os.environ['FFLAGS'])
             env.AppendUnique(F77FLAGS = custom['extra'] + custom['thread'])
         else:
-            env.AppendUnique(F77FLAGS  = custom.values())
+            env.AppendUnique(F77FLAGS  = flatten(custom.values()))
 
     #--------------------------------
     # CXX compiler last customization
@@ -160,7 +160,7 @@ def apply_compilers_customization(env):
             env.Append(CXXFLAGS = "%s" % os.environ['CXXFLAGS'])
             env.AppendUnique(CXXFLAGS = custom['extra'] + custom['thread'])
         else:
-            env.AppendUnique(CXXFLAGS  = custom.values())
+            env.AppendUnique(CXXFLAGS  = flatten(custom.values()))
 
 
 def GetNumpyEnvironment(args):
