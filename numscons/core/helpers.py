@@ -557,7 +557,6 @@ def customize_pyext(env):
                 env["PYEXTRUNTIME"] = [get_pythonlib_name()]
             else:
                 env["PYEXTRUNTIME"] = [get_pythonlib_name(), msvc_runtime_library()]
-	    print env['PYEXTRUNTIME']
             return 0
 
         # We override the default emitter here because SHLIB emitter
