@@ -91,6 +91,14 @@ class DefaultDict(dict):
             cpy[k] = copy(self[k])
         return cpy
 
+def flatten(l):
+    """Flatten a list."""
+    # XXX: needs testing
+    if isinstance(l,list):
+        return sum(map(flatten,l), [])
+    else:
+        return [l]
+
 def rsplit(s, sep, maxsplit = -1):
     """Equivalent of rsplit, but works on 2.3."""
     try:

@@ -6,7 +6,7 @@ customization (python extension builders, build_dir, etc...)."""
 import sys
 import os
 import os.path
-from os.path import join as pjoin
+from os.path import join as pjoin, basename
 
 from numscons.core.default import tool_list
 from numscons.core.compiler_config import get_config as get_compiler_config, \
@@ -16,11 +16,11 @@ from numscons.core.custom_builders import DistutilsSharedLibrary, NumpyCtypes, \
 from numscons.core.siteconfig import get_config
 from numscons.core.extension_scons import createStaticExtLibraryBuilder
 from numscons.core.extension import get_pythonlib_dir
-from numscons.core.utils import pkg_to_path
+from numscons.core.utils import pkg_to_path, flatten
 from numscons.core.misc import pyplat2sconsplat, is_cc_suncc, \
      get_numscons_toolpaths, iscplusplus, get_pythonlib_name, \
      is_f77_gnu, get_vs_version, built_with_mstools, cc_version, \
-     isfortran, isf2py
+     isfortran, isf2py, is_cxx_suncc, is_cc_gnu
 
 from numscons.core.template_generators import generate_from_c_template, \
      generate_from_f_template, generate_from_template_emitter, \
@@ -135,7 +135,7 @@ def apply_compilers_customization(env):
         env.Append(CFLAGS = "%s" % os.environ['CFLAGS'])
         env.AppendUnique(CFLAGS = custom['extra'] + custom['thread'])
     else:
-        env.AppendUnique(CFLAGS  = custom.values())
+        env.AppendUnique(CFLAGS  = flatten(custom.values()))
 
     # XXX: what to do about linkflags ?
     #env.AppendUnique(LINKFLAGS = env['NUMPY_OPTIM_LDFLAGS'])
@@ -149,7 +149,7 @@ def apply_compilers_customization(env):
             env.Append(F77FLAGS = "%s" % os.environ['FFLAGS'])
             env.AppendUnique(F77FLAGS = custom['extra'] + custom['thread'])
         else:
-            env.AppendUnique(F77FLAGS  = custom.values())
+            env.AppendUnique(F77FLAGS  = flatten(custom.values()))
 
     #--------------------------------
     # CXX compiler last customization
@@ -160,7 +160,7 @@ def apply_compilers_customization(env):
             env.Append(CXXFLAGS = "%s" % os.environ['CXXFLAGS'])
             env.AppendUnique(CXXFLAGS = custom['extra'] + custom['thread'])
         else:
-            env.AppendUnique(CXXFLAGS  = custom.values())
+            env.AppendUnique(CXXFLAGS  = flatten(custom.values()))
 
 
 def GetNumpyEnvironment(args):
@@ -199,8 +199,13 @@ def initialize_cc(env, path_list):
                  Tool('msvs')(env)
                  path_list.append(env['cc_opt_path'])
             else:
+                # XXX: hack to handle pyCC/pycc wrapper in open solaris.
+                # Solving this in a nice and efficient way is not
+                # trivial.
                 if is_cc_suncc(pjoin(env['cc_opt_path'], env['cc_opt'])):
                     env['cc_opt'] = 'suncc'
+                elif is_cc_gnu(pjoin(env['cc_opt_path'], env['cc_opt'])):
+                    env['cc_opt'] = 'gcc'
                 t = Tool(env['cc_opt'],
                          toolpath = get_numscons_toolpaths(env))
                 t(env)
@@ -250,11 +255,21 @@ def initialize_cxx(env, path_list):
 
     if len(env['cxx_opt']) > 0:
         if len(env['cxx_opt_path']) > 0:
-            if is_cc_suncc(pjoin(env['cxx_opt_path'], env['cxx_opt'])):
-                env['cxx_opt'] = 'sunc++'
-            t = Tool(env['cxx_opt'],
+            # XXX: hack to handle pyCC/pycc wrapper in open solaris.
+            # Solving this in a nice and efficient way is not
+            # trivial.
+            toolname = env['cxx_opt']
+            if is_cxx_suncc(pjoin(env['cxx_opt_path'], env['cxx_opt'])):
+                toolname = 'sunc++'
+            elif is_cc_gnu(pjoin(env['cxx_opt_path'], env['cxx_opt'])):
+                toolname = 'g++'
+            t = Tool(toolname,
                      toolpath = get_numscons_toolpaths(env))
             t(env)
+        # XXX: this is an hack around scons sunc++ which does not work on
+        # open solaris
+        if not env['CXX']:
+            env['CXX'] = basename(env['cxx_opt'])
             path_list.append(env['cxx_opt_path'])
     else:
         def_cxxcompiler =  FindTool(DEF_CXX_COMPILERS, env)
@@ -542,7 +557,6 @@ def customize_pyext(env):
                 env["PYEXTRUNTIME"] = [get_pythonlib_name()]
             else:
                 env["PYEXTRUNTIME"] = [get_pythonlib_name(), msvc_runtime_library()]
-	    print env['PYEXTRUNTIME']
             return 0
 
         # We override the default emitter here because SHLIB emitter
