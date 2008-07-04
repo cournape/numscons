@@ -8,6 +8,7 @@ from os.path import join as pjoin, dirname as pdirname, \
                     basename as pbasename, splitext
 
 import numscons
+from numscons.core.utils import popen_wrapper
 
 def get_scons_path():
     """Returns the name of the directory where our local scons is."""
@@ -72,42 +73,22 @@ def pyplat2sconsplat():
 def is_cc_gnu(fullpath):
     """Return True if the compiler is gcc."""
     gnucc = re.compile('gcc version')
-    # Redirect stderr to stdout
-    cmd = fullpath + ' -v 2>&1'
-    out = os.popen(cmd)
-    cnt = out.read()
-    #st = out.close()
-    out.close()
-
-    return gnucc.search(cnt)
+    cmd = [fullpath, ' -v']
+    st, cnt = popen_wrapper(cmd, merge = True)
+    return st == 0 and gnucc.search(cnt)
 
 def is_cxx_suncc(fullpath):
     """Return true if the compiler is suncc."""
     suncc = re.compile('CC: Sun')
-    # Redirect stderr to stdout
-    cmd = fullpath + ' -V 2>&1'
-    out = os.popen(cmd)
-    cnt = out.read()
-    #st = out.close()
-    out.close()
-
+    cmd = [fullpath, ' -V']
+    st, cnt = popen_wrapper(cmd, merge = True)
     return suncc.search(cnt)
 
 def is_cc_suncc(fullpath):
     """Return true if the compiler is suncc."""
-    # I wish there was a better way: we launch suncc -V, read the output, and
-    # returns true if Sun is found in the output. We cannot check the status
-    # code, because the compiler does not seem to have a way to do nothing
-    # while returning success (0).
-
     suncc = re.compile('Sun C')
-    # Redirect stderr to stdout
-    cmd = fullpath + ' -V 2>&1'
-    out = os.popen(cmd)
-    cnt = out.read()
-    #st = out.close()
-    out.close()
-
+    cmd = [fullpath, ' -V']
+    st, cnt = popen_wrapper(cmd, merge = True)
     return suncc.search(cnt)
 
 def get_local_toolpaths():

@@ -14,6 +14,7 @@ _START_WITH_MINUS = re.compile('^\s*-')
 
 def popen_wrapper(cmd, merge = False):
     """This works like popen, but it returns both the status and the output.
+    expects a list for input.
 
     If merge is True, then output contains both stdout and stderr.
 
@@ -24,7 +25,7 @@ def popen_wrapper(cmd, merge = False):
         - it tries to be robust to find non existing command. For example, is
           cmd starts with a minus, a nonzero status is returned, and no junk is
           displayed on the interpreter stdout."""
-    if _START_WITH_MINUS.match(cmd):
+    if _START_WITH_MINUS.match(' '.join(cmd)):
         return 1, ''
 
     if merge:
