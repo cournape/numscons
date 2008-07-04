@@ -5,7 +5,6 @@ customization (python extension builders, build_dir, etc...)."""
 
 import sys
 import os
-import os.path
 from os.path import join as pjoin, basename
 
 from numscons.core.default import tool_list
@@ -470,7 +469,7 @@ def initialize_allow_undefined(env):
         env['ALLOW_UNDEFINED'] = SCons.Util.CLVar('')
 
 def initialize_tools(env):
-    from SCons.Tool import Tool, FindTool, FindAllTools
+    from SCons.Tool import Tool, FindTool
 
     # List of supplemental paths to take into account
     path_list = []
