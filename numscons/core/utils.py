@@ -1,5 +1,5 @@
 #! /usr/bin/env python
-# Last Change: Sun Jan 06 09:00 PM 2008 J
+# Last Change: Fri Jul 04 02:00 PM 2008 J
 
 """This module defines various utilities used throughout the scons support
 library."""
@@ -8,6 +8,7 @@ import os
 import re
 
 from copy import deepcopy, copy
+from subprocess import Popen, PIPE, STDOUT
 
 _START_WITH_MINUS = re.compile('^\s*-')
 
@@ -23,22 +24,19 @@ def popen_wrapper(cmd, merge = False):
         - it tries to be robust to find non existing command. For example, is
           cmd starts with a minus, a nonzero status is returned, and no junk is
           displayed on the interpreter stdout."""
-    # XXX: look at subprocess + scons emulation for it instead of this crap
     if _START_WITH_MINUS.match(cmd):
         return 1, ''
-    if merge:
-        # XXX: I have a bad feeling about this. Does it really work reliably on
-        # all supported platforms ?
-        cmd += ' 2>& 1 '
-    output = os.popen(cmd)
-    out = output.read()
-    st = output.close()
-    if st:
-        status = st
-    else:
-        status = 0
 
-    return status, out
+    if merge:
+        stderr = STDOUT
+    else:
+        stderr = NONE
+
+    p = Popen(cmd, stdout = PIPE, stderr = stderr, shell = True, 
+              close_fds = True)
+    st = p.wait()
+    out = ''.join(p.stdout)
+    return st, out
 
 def pkg_to_path(pkg_name):
     """Given a python package name, returns its path from the root.
