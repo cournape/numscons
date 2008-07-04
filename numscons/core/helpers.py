@@ -206,6 +206,8 @@ def initialize_cc(env, path_list):
                     env['cc_opt'] = 'suncc'
                 elif is_cc_gnu(pjoin(env['cc_opt_path'], env['cc_opt'])):
                     env['cc_opt'] = 'gcc'
+                elif env['cc_opt'] == 'icc':
+                    env['cc_opt'] = 'intelc'
                 t = Tool(env['cc_opt'],
                          toolpath = get_numscons_toolpaths(env))
                 t(env)
