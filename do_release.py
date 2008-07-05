@@ -1,19 +1,22 @@
+import sys
+import getopt
+
 from subprocess import Popen, PIPE
 import os
 
 from release import build_verstring, build_fverstring
 import release
 
-if release.DEV:
-    raise Exception("Dev version ?")
-
 def nofailexec(cmd, cwd = None):
     p = Popen(cmd, cwd = cwd, shell = True)
     p.wait()
     assert p.returncode == 0
 
-def make_tarballs():
-    cmd = "python setup.py sdist --formats=bztar,zip"
+def make_tarballs(fast = False):
+    if fast:
+        cmd = "python setup.py sdist --formats=zip"
+    else:
+        cmd = "python setup.py sdist --formats=bztar,zip"
     nofailexec(cmd)
 
 def test_sanity():
@@ -30,7 +33,7 @@ def make_eggs():
     # Build eggs for 2.4 and 2.5
     cmd = "python setupegg.py bdist_egg"
     nofailexec([cmd])
-    
+
     cmd = "python2.4 setupegg.py bdist_egg"
     nofailexec([cmd])
 
@@ -45,8 +48,46 @@ def register():
     cmd = "python2.4 setupegg.py register bdist_egg upload"
     nofailexec([cmd])
 
-make_tarballs()
-test_sanity()
+def process(arg):
+    if arg == 'test':
+        make_tarballs()
+        test_sanity()
+    elif arg == 'release':
+        if release.DEV:
+            raise Exception("Dev version ?")
+        make_tarballs()
+        test_sanity()
 
-make_eggs()
-register()
+        make_eggs()
+        register()
+    else:
+        raise ValueError("Unknown option %s" % arg)
+
+
+
+USAGE = """Small program to automatize tasks for a numscons release.
+
+Usage:
+    - %s test: basic sanity checks (numscons import, unit tests)
+    - %s release: do the release""" % (__file__, __file__)
+
+def main():
+    # parse command line options
+    try:
+        opts, args = getopt.getopt(sys.argv[1:], "h", ["help"])
+    except getopt.error, msg:
+        print msg
+        print "for help use --help"
+        sys.exit(2)
+    # process options
+    for o, a in opts:
+        if o in ("-h", "--help"):
+            print USAGE
+            sys.exit(0)
+    # process arguments
+    for arg in args:
+        process(arg) # process() is defined elsewhere
+
+
+if __name__ == '__main__':
+    main()
