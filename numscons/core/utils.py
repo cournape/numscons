@@ -33,7 +33,7 @@ def popen_wrapper(cmd, merge = False):
     else:
         stderr = None
 
-    p = Popen(cmd, stdout = PIPE, stderr = stderr, shell = True, 
+    p = Popen(cmd, stdout = PIPE, stderr = stderr, shell = True,
               close_fds = True)
     st = p.wait()
     out = ''.join(p.stdout)
