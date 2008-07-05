@@ -5,7 +5,7 @@ functions. The object returned by those functions have a method get_flags_dict
 which returns a dictionary which can be copied into scons environments objects
 as construction variables."""
 
-from ConfigParser import SConfigParser
+from ConfigParser import ConfigParser
 from os.path import join as pjoin, dirname as pdirname
 
 from numscons.core.utils import DefaultDict
