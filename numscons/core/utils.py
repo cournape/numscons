@@ -1,5 +1,5 @@
 #! /usr/bin/env python
-# Last Change: Fri Jul 04 02:00 PM 2008 J
+# Last Change: Sat Jul 05 04:00 PM 2008 J
 
 """This module defines various utilities used throughout the scons support
 library."""
@@ -31,7 +31,7 @@ def popen_wrapper(cmd, merge = False):
     if merge:
         stderr = STDOUT
     else:
-        stderr = NONE
+        stderr = None
 
     p = Popen(cmd, stdout = PIPE, stderr = stderr, shell = True, 
               close_fds = True)

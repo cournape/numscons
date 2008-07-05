@@ -4,8 +4,7 @@ import sys
 import os
 import re
 
-from os.path import join as pjoin, dirname as pdirname, \
-                    basename as pbasename, splitext
+from os.path import join as pjoin, dirname as pdirname, basename as pbasename
 
 import numscons
 from numscons.core.utils import popen_wrapper

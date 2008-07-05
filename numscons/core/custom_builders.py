@@ -1,5 +1,3 @@
-from os.path import join as pjoin
-
 def DistutilsSharedLibrary(env, *args, **kw):
     """This builder is the same as SharedLibrary, except for the fact that
     it put the target into where distutils expects it."""

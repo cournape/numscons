@@ -1,9 +1,7 @@
 #! /usr/bin/env python
-# Last Change: Wed Dec 26 09:00 PM 2007 J
+# Last Change: Sat Jul 05 04:00 PM 2008 J
 """This module defines the default tools for each platform, as well as the
 default compiler configurations."""
-import sys
-import distutils.sysconfig
 
 # This is a copy of scons/Tools/__init__.py, because scons does not offer any
 # public api for this
