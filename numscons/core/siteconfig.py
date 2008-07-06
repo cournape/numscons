@@ -1,5 +1,5 @@
 #! /usr/bin/env python
-# Last Change: Sun Jun 15 04:00 PM 2008 J
+# Last Change: Sun Jul 06 02:00 PM 2008 J
 
 """This module has helper functions to get basic information from site.cfg-like
 files."""
@@ -37,23 +37,7 @@ def get_config(src_dir = None):
 
     Returns the ConfigParser instance. This copies the logic in system_info
     from numpy.distutils."""
-    # Below is the feature we are copying from numpy.distutils:
-    #
-    # The file 'site.cfg' is looked for in
-
-    # 1) Directory of main setup.py file being run.
-    # 2) Home directory of user running the setup.py file as ~/.numpy-site.cfg
-    # 3) System wide directory (location of this file...)
-
-    # The first one found is used to get system configuration options The
-    # format is that used by ConfigParser (i.e., Windows .INI style). 
-
-    defaults = {}
-    defaults['libraries'] = ''
-    defaults['library_dirs'] = os.pathsep.join(default_lib_dirs)
-    defaults['include_dirs'] = os.pathsep.join(default_include_dirs)
-    defaults['src_dirs'] = os.pathsep.join(default_src_dirs)
-    cp = ConfigParser.ConfigParser(defaults)
+    cp = ConfigParser.ConfigParser()
 
     files = []
     def extend_srcdir(fname):
