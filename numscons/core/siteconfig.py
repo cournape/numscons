@@ -6,8 +6,7 @@ files."""
 import os
 import ConfigParser
 
-from numscons.numdist import default_lib_dirs, default_include_dirs, \
-                             default_src_dirs, get_standard_file
+from numscons.numdist import get_standard_file
 from numscons.core.utils import DefaultDict
 
 # List of options that ConfigOpts can keep. If later additional variables
