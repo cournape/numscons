@@ -187,6 +187,10 @@ def generate(env):
     env['F2PYOPTIONS']      = SCons.Util.CLVar('--quiet')
     env['F2PYBUILDDIR']     = ''
     env['F2PYINCLUDEDIR']   = pjoin(d, 'src')
+
+    if not (env.has_key("F2PY_NOT_ADD_INCLUDEDIR") and env["F2PY_NOT_ADD_INCLUDEDIR"]):
+        env.Prepend(CPPPATH = env["F2PYINCLUDEDIR"])
+
     if not env.has_key('F2PYCOMSTR'):
         env['F2PYCOMSTR']       = "f2py: generating $TARGET from $SOURCE"
 
