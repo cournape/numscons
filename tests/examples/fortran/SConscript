@@ -13,6 +13,5 @@ config.CheckF77Mangling()
 config.Finish()
 
 env['SUBST_DICT'] = {'@HELLO@' : env['F77_NAME_MANGLER']('hello')}
-env.Append(LINKFLAGSEND = env['F77_LDFLAGS'])
 env.SubstInFile('main.cxx.in')
 env.Program(["main.cxx", "hello.f"])

@@ -13,6 +13,7 @@ def configuration(parent_package='',top_path=None):
     config.add_subpackage('checkers')
     config.add_subpackage('checklib')
     config.add_subpackage('ctypesext')
+    config.add_subpackage('fortran')
     config.add_subpackage('hook')
     #config.add_subpackage('gnu2ms')
     config.add_subpackage('pyext')

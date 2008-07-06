@@ -1,6 +1,6 @@
 recursive-include numscons/scons-local *.py
 recursive-include doc *
-recursive-include tests *.py *.f *.c SConstruct SConscript
+recursive-include tests *.py *.f *.c *.in SConstruct SConscript
 recursive-include tools *.py configure configure.ac empty.f
 include setupegg.py
 include setup.py
