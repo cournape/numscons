@@ -1,5 +1,5 @@
 #! /usr/bin/env python
-# Last Change: Fri Mar 07 09:00 PM 2008 J
+# Last Change: Sun Jul 06 02:00 PM 2008 J
 """This module contains the infrastructure to get all the necessary options for
 perflib checkers from the perflib configuration file."""
 
@@ -52,13 +52,9 @@ class _PerflibConfig:
 # Perflib specific configuration and helpers
 #-------------------------------------------
 def build_config():
-    from numscons.numdist.numdist_copy import default_lib_dirs
     # list_opts contain a list of all available options available in
     # perflib.cfg which can be a list.
     list_opts = build_config_factory_flags()
-
-    #defint = {'atlas_libpath' :
-    #          ','.join([pjoin(i, 'atlas') for i in default_lib_dirs])}
 
     cfg = SafeConfigParser()
 

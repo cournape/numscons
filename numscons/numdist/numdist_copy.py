@@ -1,50 +1,10 @@
-# Last Change: Fri Mar 07 07:00 PM 2008 J
+# Last Change: Sun Jul 06 02:00 PM 2008 J
 
 """This module contains all the duplicate functions we need from
 numpy.distutils and cannot use because of bootstrapping problems."""
 import sys
 import os.path
 import distutils.sysconfig
-
-if sys.platform == 'win32':
-    default_lib_dirs = ['C:\\',
-                        os.path.join(distutils.sysconfig.EXEC_PREFIX,
-                                     'libs')]
-    default_include_dirs = []
-    default_src_dirs = ['.']
-    default_x11_lib_dirs = []
-    default_x11_include_dirs = []
-else:
-    #default_lib_dirs = ['/usr/local/lib', '/opt/lib', '/usr/lib',
-    #                    '/opt/local/lib', '/sw/lib']
-    default_lib_dirs = []
-    default_include_dirs = ['/usr/local/include',
-                            '/opt/include', '/usr/include',
-                            '/opt/local/include', '/sw/include']
-    default_src_dirs = ['.','/usr/local/src', '/opt/src','/sw/src']
-
-    try:
-        platform = os.uname()
-        bit64 = platform[-1].endswith('64')
-    except:
-        bit64 = False
-
-    if bit64:
-        default_x11_lib_dirs = ['/usr/lib64']
-    else:
-        default_x11_lib_dirs = ['/usr/X11R6/lib','/usr/X11/lib','/usr/lib']
-
-    default_x11_include_dirs = ['/usr/X11R6/include','/usr/X11/include',
-                                '/usr/include']
-
-#if os.path.join(sys.prefix, 'lib') not in default_lib_dirs:
-#    default_lib_dirs.insert(0,os.path.join(sys.prefix, 'lib'))
-#    default_include_dirs.append(os.path.join(sys.prefix, 'include'))
-#    default_src_dirs.append(os.path.join(sys.prefix, 'src'))
-
-default_lib_dirs = filter(os.path.isdir, default_lib_dirs)
-default_include_dirs = filter(os.path.isdir, default_include_dirs)
-default_src_dirs = filter(os.path.isdir, default_src_dirs)
 
 def get_standard_file(fname):
     """Returns a list of files named 'fname' from
