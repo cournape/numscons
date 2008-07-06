@@ -305,6 +305,7 @@ def _init_environment(args):
     opts = GetNumpyOptions(args)
     env = NumpyEnvironment(options = opts, tools = [])
 
+    set_bootstrap(env)
     # We explicily set DefaultEnvironment to avoid wasting time on initializing
     # tools a second time.
     DefaultEnvironment(tools = [])

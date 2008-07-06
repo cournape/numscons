@@ -1,12 +1,11 @@
 #! /usr/bin/env python
-# Last Change: Sun Jul 06 02:00 PM 2008 J
+# Last Change: Sun Jul 06 03:00 PM 2008 J
 
 """This module has helper functions to get basic information from site.cfg-like
 files."""
 import os
 import ConfigParser
 
-from numscons.numdist import get_standard_file
 from numscons.core.utils import DefaultDict
 
 # List of options that ConfigOpts can keep. If later additional variables
@@ -29,6 +28,10 @@ class ConfigOpts(DefaultDict):
         msg = [r'%s : %s' % (k, i) for k, i in self.items() if len(i) > 0]
         return '\n'.join(msg)
 
+def _get_standard_file(fname):
+    from numpy.distutils.system_info import get_standard_file
+    return get_standard_file(fname)
+
 # Think about a cache mechanism, to avoid reparsing the config file everytime.
 def get_config(src_dir = None):
     """ This tries to read .cfg files in several locations, and merge its
@@ -45,9 +48,9 @@ def get_config(src_dir = None):
             if os.path.isfile(fid):
                 files.append(fid)
 
-    files.extend(get_standard_file('.numpy-site.cfg'))
+    files.extend(_get_standard_file('.numpy-site.cfg'))
     extend_srcdir('.numpy-site.cfg')
-    files.extend(get_standard_file('site.cfg'))
+    files.extend(_get_standard_file('site.cfg'))
     extend_srcdir('site.cfg')
 
     cp.read(files)

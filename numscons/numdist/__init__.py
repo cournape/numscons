@@ -1,4 +1,3 @@
-from numdist_copy import get_standard_file
 from numdist_copy import msvc_runtime_library
 from numdist_copy import get_mathlibs
 
