@@ -1,5 +1,5 @@
 #! /usr/bin/env python
-# Last Change: Fri Mar 07 04:00 PM 2008 J
+# Last Change: Sun Jul 06 03:00 PM 2008 J
 
 """This module defines some helper functions, to be used by high level
 checkers."""
@@ -28,6 +28,10 @@ def save_and_set(env, opts, keys = None):
                         []
     kw = zip([_arg2env[k] for k in keys], [opts[k] for k in keys])
     kw = dict(kw)
+    if kw.has_key('LINKFLAGSEND'):
+        env.AppendUnique(**{'LINKFLAGSEND' : kw['LINKFLAGSEND']})
+        del kw['LINKFLAGSEND']
+
     env.Append(**kw)
     return saved_keys
 

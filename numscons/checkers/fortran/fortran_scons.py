@@ -75,7 +75,7 @@ def CheckF90DryRun(context):
     return _CheckFDryRun(context, 'F90')
 
 # Getting fortran support runtime
-def CheckF77Clib(context):
+def CheckF77Clib(context, autoadd = 1):
     """This tries to get Fortran runtime facilities necessary at link stage,
     and put the relevant flags in env['F77_LDFLAGS']."""
     fcompiler = 'F77'
@@ -111,6 +111,8 @@ def CheckF77Clib(context):
         else:
             env['F77_LDFLAGS'] = final_flags
         context.Result(' '.join(env['F77_LDFLAGS']))
+        if autoadd:
+            env.AppendUnique(LINKFLAGSEND =  env['F77_LDFLAGS'])
     else:
         context.Result('Failed !')
 
