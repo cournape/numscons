@@ -142,8 +142,8 @@ def apply_compilers_customization(env):
     #--------------------------------
     # F77 compiler last customization
     #--------------------------------
-    custom = env['NUMPY_CUSTOMIZATION']['F77']
     if env.has_key('F77'):
+        custom = env['NUMPY_CUSTOMIZATION']['F77']
         if 'FFLAGS' in os.environ:
             env.Append(F77FLAGS = "%s" % os.environ['FFLAGS'])
             env.AppendUnique(F77FLAGS = custom['extra'] + custom['thread'])
@@ -153,8 +153,8 @@ def apply_compilers_customization(env):
     #--------------------------------
     # CXX compiler last customization
     #--------------------------------
-    custom = env['NUMPY_CUSTOMIZATION']['CXX']
     if env.has_key('CXX'):
+        custom = env['NUMPY_CUSTOMIZATION']['CXX']
         if 'CXXFLAGS' in os.environ:
             env.Append(CXXFLAGS = "%s" % os.environ['CXXFLAGS'])
             env.AppendUnique(CXXFLAGS = custom['extra'] + custom['thread'])
