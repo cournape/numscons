@@ -1,4 +1,4 @@
-# Last Change: Sat Jan 26 04:00 PM 2008 J
+# Last Change: Sun Jul 06 03:00 PM 2008 J
 import os
 import sys
 import string
@@ -8,7 +8,7 @@ from copy import deepcopy
 
 from numscons.core.utils import popen_wrapper
 from numscons.core.misc import built_with_mstools, built_with_mingw, \
-			       built_with_gnu_f77
+                   built_with_gnu_f77
 from fortran import parse_f77link, check_link_verbose, gnu_to_scons_flags
 
 __all__ = ['CheckF77Clib', 'CheckF77Mangling']
@@ -25,7 +25,7 @@ def _CheckFVerbose(context, fcomp):
             return 1, flag
 
     return 0, ''
-        
+
 def CheckF77Verbose(context):
     context.Message('Checking F77 %s verbose flag ... ' % context.env['F77'] )
 
@@ -37,7 +37,7 @@ def CheckF77Verbose(context):
         context.Result('Failed !')
 
     return res
-        
+
 def CheckF90Verbose(context):
     context.Message('Checking F90 %s verbose flag ... ' % context.env['F90'] )
 
@@ -49,7 +49,7 @@ def CheckF90Verbose(context):
         context.Result('Failed !')
 
     return res
-        
+
 # Checking whether the fortran compiler can compile and link a dummy program
 def _CheckFDryRun(context, fc = 'F77'):
     """Check whether the compiler fc can compile a program."""
@@ -58,7 +58,7 @@ def _CheckFDryRun(context, fc = 'F77'):
         fcomp = env[fc]
     except KeyError:
         raise RuntimeError("Compiler type %s not known !" % fc)
-    
+
     context.Message('Checking if %s compiler %s can create executables - ' % (fc, fcomp))
     # We use our own builder as long as I don't resolve the issue of TryLink
     # returning 1 when it fails.
@@ -104,9 +104,9 @@ def CheckF77Clib(context):
         if built_with_mstools(env) and built_with_gnu_f77(env):
             from fortran import get_g2c_libs
             rtdir, msrtlibs = get_g2c_libs(env, final_flags)
-	    # XXX: this is ugly, we interpolate by hand.
-	    libdirflags = ["/LIBPATH:%s" % os.path.join(env['build_dir'], rtdir)]
-	    libflags    = ["%s" % l for l in msrtlibs]
+            # XXX: this is ugly, we interpolate by hand.
+            libdirflags = ["/LIBPATH:%s" % os.path.join(env['build_dir'], rtdir)]
+            libflags    = ["%s" % l for l in msrtlibs]
             env["F77_LDFLAGS"] = libdirflags + libflags
         else:
             env['F77_LDFLAGS'] = final_flags
@@ -134,8 +134,8 @@ def _CheckFDummyMain(context, fcomp):
         finally:
             env.Replace(LINK = savedLINK)
     else:
-        # Using MS tools (Visual studio) with fortran compiler 
-        
+        # Using MS tools (Visual studio) with fortran compiler
+
         # XXX: this has to be dirty... As scons is using visual studio, it uses
         # the related convention (prefix names for libraries, etc...).  Here,
         # we want to compile object code with cl.exe, but link with the fortran
@@ -299,7 +299,7 @@ def _set_mangling_var(context, u, du, case, type = 'F77'):
 
 def CheckF77Mangling(context):
     """Find mangling of the F77 compiler.
-    
+
     If sucessfull, env['F77_NAME_MANGLER'] is a function which given the C
     name, returns the F77 name as seen by the linker."""
     env = context.env
@@ -335,7 +335,7 @@ def CheckF90Mangling(context):
 def _check_f_vflag(context, flag, fcomp):
     """Return True if flag is an acceptable verbose flag for fortran compiler
     fcomp."""
-    
+
     oldLINKFLAGS = context.env['LINKFLAGS']
     res = 0
     try:
@@ -343,7 +343,7 @@ def _check_f_vflag(context, flag, fcomp):
         res, out = _build_empty_program(context, fcomp)
     finally:
         context.env['LINKFLAGS'] = oldLINKFLAGS
-        
+
     return res and check_link_verbose(out)
 
 def _build_empty_program(context, fcomp):
@@ -371,17 +371,17 @@ def _build_empty_program(context, fcomp):
             res, cnt = _build_empty_program_posix(context, fcomp)
         else:
             res, cnt = _build_empty_program_ms(context, fcomp)
-            
+
     return res, cnt
 
 def _build_empty_program_ms(context, fcomp):
     # MS tools and g77/gfortran semantics are totally different, so we cannot
     # just compile a program replacing MS linker by g77/gfortran as we can for
-    # all other platforms. 
+    # all other platforms.
     slast = str(context.lastTarget)
     dir = dirname(slast)
     test_prog = pjoin(dir, basename(slast).split('.')[0])
-    cmd = context.env.subst("$%s -v -o $TARGET $SOURCES" % fcomp, 
+    cmd = context.env.subst("$%s -v -o $TARGET $SOURCES" % fcomp,
                             target = context.env.File(test_prog),
                             source = context.lastTarget)
 
@@ -409,7 +409,7 @@ def _build_empty_program_posix(context, fcomp):
         slast = str(context.lastTarget)
         dir = dirname(slast)
         test_prog = pjoin(dir, basename(slast).split('.')[0])
-        cmd = context.env.subst('$LINKCOM', 
+        cmd = context.env.subst('$LINKCOM',
                                 target = context.env.File(test_prog),
                                 source = context.lastTarget)
         st, out = popen_wrapper(cmd, merge = True)
