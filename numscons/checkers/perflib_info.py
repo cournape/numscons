@@ -5,6 +5,10 @@
     - add/retrieve info about checked meta-lib for show_config functionality.
 """
 import os
+import os.path
+import shutil
+
+from numscons.core.misc import get_scons_configres_dir
 
 __all__ = ['write_info']
 
@@ -40,9 +44,18 @@ def write_info(env):
     config_str = {}
     for k, i in cfg.items():
         config_str[k] = str(i)
+
+    # XXX: do it the scons way to put this in the DAG
     f = open(env['NUMPY_PKG_CONFIG_FILE'], 'w')
     f.writelines("%s" % str(config_str))
     f.close()
+
+    target = os.path.join(str(env.fs.Top), get_scons_configres_dir(),
+			  env['src_dir'], "__configres.py")
+
+    if not os.path.exists(os.path.dirname(target)):
+        os.makedirs(os.path.dirname(target))
+    shutil.copy(env['NUMPY_PKG_CONFIG_FILE'], target)
 
 class PerflibInfo:
     """Instances of this class will keep all informations about a perflib (MKL,
