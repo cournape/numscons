@@ -6,6 +6,7 @@ Tue, 08 Jul 2008 14:09:26 +0900
 	* Fix configres issue so that show_config works again
 	* Add a NumpyPythonExtension builder to avoid dealing with numpy
 	cpppath manually
+	* Add an example for NumpyPythonExtension builder
 
 Sun, 06 Jul 2008 16:53:26 +0900
 	* Autoadd F77 runtime library to LINKFLAGSEND
