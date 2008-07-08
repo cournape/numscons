@@ -11,7 +11,7 @@ from numscons.core.default import tool_list
 from numscons.core.compiler_config import get_config as get_compiler_config, \
      NoCompilerConfig, CompilerConfig
 from numscons.core.custom_builders import DistutilsSharedLibrary, NumpyCtypes, \
-     DistutilsPythonExtension, DistutilsStaticExtLibrary
+     DistutilsPythonExtension, DistutilsStaticExtLibrary, NumpyPythonExtension
 from numscons.core.siteconfig import get_config
 from numscons.core.extension_scons import createStaticExtLibraryBuilder
 from numscons.core.extension import get_pythonlib_dir
@@ -435,6 +435,7 @@ def add_custom_builders(env):
     env['BUILDERS']['DistutilsSharedLibrary'] = DistutilsSharedLibrary
     env['BUILDERS']['NumpyCtypes'] = NumpyCtypes
     env['BUILDERS']['DistutilsPythonExtension'] = DistutilsPythonExtension
+    env['BUILDERS']['NumpyPythonExtension'] = NumpyPythonExtension
 
     tpl_scanner = Scanner(function = generate_from_template_scanner,
                           skeys = ['.src'])
