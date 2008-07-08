@@ -1,3 +1,12 @@
+Tue, 08 Jul 2008 14:09:26 +0900
+	* Do not set compiler customization without checking the compiler is
+	available
+	* Automatically prepend F2PYINCLUDEDIR to CPPPATH if the f2py tool is
+	used
+	* Fix configres issue so that show_config works again
+	* Add a NumpyPythonExtension builder to avoid dealing with numpy
+	cpppath manually
+
 Sun, 06 Jul 2008 16:53:26 +0900
 	* Autoadd F77 runtime library to LINKFLAGSEND
 	* Fix custom site.cfg not found when building scipy
