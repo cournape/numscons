@@ -579,10 +579,10 @@ def customize_pyext(env):
 
     # Add numpy path
     if is_bootstrapping(env):
-        env['NUMPY_CPPPATH'] = scons_get_paths(env['include_bootstrap'])
+        env['NUMPYCPPPATH'] = scons_get_paths(env['include_bootstrap'])
     else:
 	from numpy.distutils.misc_util import get_numpy_include_dirs
-        env['NUMPY_CPPPATH'] = get_numpy_include_dirs()
+        env['NUMPYCPPPATH'] = get_numpy_include_dirs()
 
 def customize_link_flags(env):
     # We sometimes need to put link flags at the really end of the command
