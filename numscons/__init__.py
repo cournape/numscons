@@ -14,7 +14,8 @@ from core.extension import get_python_inc, get_pythonlib_dir
 
 # XXX those are needed by the scons command only...
 from core.misc import get_scons_path, get_scons_build_dir, \
-                      get_scons_configres_dir, get_scons_configres_filename
+                      get_scons_configres_dir, get_scons_configres_filename, \
+                      scons_get_paths
 #from core.libinfo import get_paths as scons_get_paths
 
 # XXX those should not be needed by the scons command only...
@@ -34,12 +35,6 @@ def get_version():
 def is_dev_version():
     import version
     return version.DEV
-
-# XXX: this is ugly, better find the mathlibs with a checker 
-# XXX: this had nothing to do here, too...
-def scons_get_paths(paths):
-    import os
-    return paths.split(os.pathsep)
 
 def scons_get_mathlib(env):
     from numscons.numdist import get_mathlibs

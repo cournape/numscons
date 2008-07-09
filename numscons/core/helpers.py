@@ -11,7 +11,7 @@ from numscons.core.default import tool_list
 from numscons.core.compiler_config import get_config as get_compiler_config, \
      NoCompilerConfig, CompilerConfig
 from numscons.core.custom_builders import DistutilsSharedLibrary, NumpyCtypes, \
-     DistutilsPythonExtension, DistutilsStaticExtLibrary
+     DistutilsPythonExtension, DistutilsStaticExtLibrary, NumpyPythonExtension
 from numscons.core.siteconfig import get_config
 from numscons.core.extension_scons import createStaticExtLibraryBuilder
 from numscons.core.extension import get_pythonlib_dir
@@ -19,7 +19,7 @@ from numscons.core.utils import pkg_to_path, flatten
 from numscons.core.misc import pyplat2sconsplat, is_cc_suncc, \
      get_numscons_toolpaths, iscplusplus, get_pythonlib_name, \
      is_f77_gnu, get_vs_version, built_with_mstools, cc_version, \
-     isfortran, isf2py, is_cxx_suncc, is_cc_gnu
+     isfortran, isf2py, is_cxx_suncc, is_cc_gnu, scons_get_paths
 
 from numscons.core.template_generators import generate_from_c_template, \
      generate_from_f_template, generate_from_template_emitter, \
@@ -435,6 +435,7 @@ def add_custom_builders(env):
     env['BUILDERS']['DistutilsSharedLibrary'] = DistutilsSharedLibrary
     env['BUILDERS']['NumpyCtypes'] = NumpyCtypes
     env['BUILDERS']['DistutilsPythonExtension'] = DistutilsPythonExtension
+    env['BUILDERS']['NumpyPythonExtension'] = NumpyPythonExtension
 
     tpl_scanner = Scanner(function = generate_from_template_scanner,
                           skeys = ['.src'])
@@ -576,6 +577,13 @@ def customize_pyext(env):
             pyext_runtime_action = Action(pyext_runtime, '')
             old_action = env['BUILDERS']['PythonExtension'].action
             env['BUILDERS']['PythonExtension'].action = Action([pyext_runtime_action, old_action])
+
+    # Add numpy path
+    if is_bootstrapping(env):
+        env['NUMPYCPPPATH'] = scons_get_paths(env['include_bootstrap'])
+    else:
+	from numpy.distutils.misc_util import get_numpy_include_dirs
+        env['NUMPYCPPPATH'] = get_numpy_include_dirs()
 
 def customize_link_flags(env):
     # We sometimes need to put link flags at the really end of the command
