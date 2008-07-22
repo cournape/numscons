@@ -20,6 +20,7 @@ from numscons.core.misc import pyplat2sconsplat, is_cc_suncc, \
      get_numscons_toolpaths, iscplusplus, get_pythonlib_name, \
      is_f77_gnu, get_vs_version, built_with_mstools, cc_version, \
      isfortran, isf2py, is_cxx_suncc, is_cc_gnu, scons_get_paths
+from numscons.core.compiler_detection import get_cc_type
 
 from numscons.core.template_generators import generate_from_c_template, \
      generate_from_f_template, generate_from_template_emitter, \
@@ -186,36 +187,25 @@ def initialize_cc(env, path_list):
                 # Intel Compiler SCons.Tool has a special way to set the
                 # path, so we use this one instead of changing
                 # env['ENV']['PATH'].
-                t = Tool(env['cc_opt'],
+                t = Tool("intelc",
                          toolpath = get_numscons_toolpaths(env),
                          topdir = os.path.split(env['cc_opt_path'])[0])
-                t(env)
             elif built_with_mstools(env):
-                 t = Tool(env['cc_opt'],
-                          toolpath = get_numscons_toolpaths(env))
-                 t(env)
+                 t = Tool("msvc", toolpath = get_numscons_toolpaths(env))
                  # We need msvs tool too (before customization !)
                  Tool('msvs')(env)
                  path_list.append(env['cc_opt_path'])
             else:
-                # XXX: hack to handle pyCC/pycc wrapper in open solaris.
-                # Solving this in a nice and efficient way is not
-                # trivial.
-                if is_cc_suncc(pjoin(env['cc_opt_path'], env['cc_opt'])):
-                    env['cc_opt'] = 'suncc'
-                elif is_cc_gnu(pjoin(env['cc_opt_path'], env['cc_opt'])):
-                    env['cc_opt'] = 'gcc'
-                elif env['cc_opt'] == 'icc':
-                    env['cc_opt'] = 'intelc'
-                t = Tool(env['cc_opt'],
-                         toolpath = get_numscons_toolpaths(env))
-                t(env)
+                cc = pjoin(env['cc_opt_path'], env['cc_opt'])
+                t = Tool(get_cc_type(cc), toolpath = get_numscons_toolpaths(env))
                 path_list.append(env['cc_opt_path'])
         else:
             # Do not care about PATH info because none given from scons
             # distutils command
-            t = Tool(env['cc_opt'], toolpath = get_numscons_toolpaths(env))
-            t(env)
+            try:
+                t = Tool(env['cc_opt'], toolpath = get_numscons_toolpaths(env))
+            except ImportError:
+                raise UnknownCompiler(env['cc_opt'])
 
         return t
 
@@ -224,7 +214,7 @@ def initialize_cc(env, path_list):
     else:
         t = Tool(FindTool(DEF_C_COMPILERS, env),
                  toolpath = get_numscons_toolpaths(env))
-        t(env)
+    t(env)
     
     customize_compiler(t.name, env, "C")
 
