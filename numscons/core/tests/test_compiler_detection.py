@@ -7,6 +7,7 @@ import unittest
 
 from numscons.core.compiler_detection import *
 
+# Output of gcc -v
 GCC_4_2_3 = """
 Using built-in specs.
 Target: i486-linux-gnu
@@ -14,6 +15,7 @@ Configured with: ../src/configure -v --enable-languages=c,c++,fortran,objc,obj-c
 Thread model: posix
 gcc version 4.2.3 (Ubuntu 4.2.3-2ubuntu7)"""
 
+# Output of suncc -V -### main.c
 SUNCC_12 = """
 cc: Sun C 5.9 Linux_i386 Patch 124871-01 2007/07/31
 ### Note: NLSPATH = /home/david/opt/sunstudio12/prod/bin/../lib/locale/%L/LC_MESSAGES/%N.cat:/home/david/opt/sunstudio12/prod/bin/../../lib/locale/%L/LC_MESSAGES/%N.cat
@@ -25,8 +27,10 @@ cc: Sun C 5.9 Linux_i386 Patch 124871-01 2007/07/31
 /usr/bin/ld -m elf_i386 -dynamic-linker /lib/ld-linux.so.2 --enable-new-dtags /home/david/opt/sunstudio12/prod/lib/crti.o /home/david/opt/sunstudio12/prod/lib/crt1.o /home/david/opt/sunstudio12/prod/lib/values-xa.o -V main.o -Y "/home/david/opt/sunstudio12/prod/lib:/lib:/usr/lib" -Qy -lc /home/david/opt/sunstudio12/prod/lib/libc_supp.a /home/david/opt/sunstudio12/prod/lib/crtn.o
 """
 
+# Output of sunCC -V
 SUNCXX_12 = """sunCC: Sun C++ 5.9 Linux_i386 Patch 124865-01 2007/07/30"""
 
+# Output of sunf77 -V
 SUNFORTRAN_12 = """
 NOTICE: Invoking /home/david/opt/sunstudio12/bin/f90 -f77 -ftrap=%none -V
 f90: Sun Fortran 95 8.3 Linux_i386 Patch 127145-01 2007/07/31
