@@ -1,6 +1,7 @@
 import re
 
 from numscons.core.utils import popen_wrapper
+from numscons.core.errors import UnknownCompiler
 
 GNUCC = re.compile('gcc version ([0-9-.]+)')
 SUNCC = re.compile('Sun C ([0-9-.]+)')
@@ -42,10 +43,10 @@ def is_suncc(path):
     # existing file as an argument: this seems to work, at least for Sun Studio
     # 12 (5.9)
     cmd = [path, '-V', "-###", "nonexistingfile.fakec"]
-    st, cnt = popen_wrapper(cmd, merge = True)
-    ret = parse_suncc(cnt)
+    st, cnt = popen_wrapper(cmd, merge = True, shell = False)
+    ret, ver = parse_suncc(cnt)
     if st == 0 and ret:
-        return ret
+        return ret, ver
     else:
         return False, None
 
@@ -54,10 +55,10 @@ def is_suncxx(path):
     # Works on 5.9 (Sun Studio 12). Note that the C++ compiler works in a
     # sensible manner when given -V compared to the C compiler...
     cmd = [path, '-V']
-    st, cnt = popen_wrapper(cmd, merge = True)
-    ret = parse_suncxx(cnt)
+    st, cnt = popen_wrapper(cmd, merge = True, shell = False)
+    ret, ver = parse_suncxx(cnt)
     if st == 0 and ret:
-        return ret
+        return ret, ver
     else:
         return False, None
 
@@ -66,28 +67,47 @@ def is_sunfortran(path):
     # Works on 8.3 (Sun Studio 12)
     cmd = [path, '-V']
     st, cnt = popen_wrapper(cmd, merge = True)
-    ret = parse_sunfortran(cnt)
+    ret, ver = parse_sunfortran(cnt)
     if st == 0 and ret:
-        return ret
+        return ret, ver
     else:
         return False, None
 
 def is_gcc(path):
     """Return True if the compiler in path is GNU compiler."""
     cmd = [path, '-v']
-    st, cnt = popen_wrapper(cmd, merge = True)
-    ret = parse_gnu(cnt)
+    st, cnt = popen_wrapper(cmd, merge = True, shell = False)
+    ret, ver = parse_gnu(cnt)
     if st == 0 and ret:
-        return ret
+        return ret, ver
     else:
         return False, None
+
+def get_cc_type(path):
+    if is_gcc(path)[0]:
+        return "gcc"
+    elif is_suncc(path)[0]:
+        return "suncc"
+    raise UnknownCompiler("Unknown C compiler %s" % path)
+
+def get_cxx_type(path):
+    if is_gcc(path)[0]:
+        return "g++"
+    elif is_suncxx(path)[0]:
+        return "suncc"
+    raise UnknownCompiler("Unknown CXX compiler %s" % path)
 
 if __name__ == "__main__":
     import sys
     if len(sys.argv) < 2:
         raise ValueError("Usage: %s compiler" % __file__)
     cc = sys.argv[1]
-    print "Is Sun C: ", is_suncc(cc)
-    print "Is Sun CXX: ", is_suncxx(cc)
-    print "Is Sun Fortran: ", is_sunfortran(cc)
-    print "Is Gnu : ", is_gcc(cc)
+    try:
+        print get_cc_type(cc)
+    except UnknownCompiler, e:
+        print e
+
+    try:
+        print get_cxx_type(cc)
+    except UnknownCompiler, e:
+        print e
