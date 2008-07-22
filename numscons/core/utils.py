@@ -12,7 +12,7 @@ from subprocess import Popen, PIPE, STDOUT
 
 _START_WITH_MINUS = re.compile('^\s*-')
 
-def popen_wrapper(cmd, merge = False):
+def popen_wrapper(cmd, merge = False, shell = False):
     """This works like popen, but it returns both the status and the output.
     expects a list for input.
 
@@ -33,8 +33,7 @@ def popen_wrapper(cmd, merge = False):
     else:
         stderr = None
 
-    p = Popen(cmd, stdout = PIPE, stderr = stderr, shell = True,
-              close_fds = True)
+    p = Popen(cmd, stdout = PIPE, stderr = stderr, shell = shell)
     st = p.wait()
     out = ''.join(p.stdout)
     return st, out
