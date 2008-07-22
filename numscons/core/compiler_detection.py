@@ -66,7 +66,7 @@ def is_sunfortran(path):
     """Return True if the compiler in path is sun fortran compiler."""
     # Works on 8.3 (Sun Studio 12)
     cmd = [path, '-V']
-    st, cnt = popen_wrapper(cmd, merge = True)
+    st, cnt = popen_wrapper(cmd, merge = True, shell = False)
     ret, ver = parse_sunfortran(cnt)
     if st == 0 and ret:
         return ret, ver
@@ -96,6 +96,21 @@ def get_cxx_type(path):
     elif is_suncxx(path)[0]:
         return "suncc"
     raise UnknownCompiler("Unknown CXX compiler %s" % path)
+
+def get_f77_type(path):
+    st, v = is_gcc(path)
+    if st:
+        try:
+            major = int(v.split(".")[0])
+            if major < 4:
+                return "g77"
+            else:
+                return "gfortran"
+        except ValueError:
+            raise UnknownCompiler("Could not parse version %v" % v)
+    elif is_sunfortran(path)[0]:
+        return "sunf77"
+    raise UnknownCompiler("Unknown F77 compiler %s" % path)
 
 if __name__ == "__main__":
     import sys

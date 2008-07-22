@@ -20,7 +20,7 @@ from numscons.core.misc import pyplat2sconsplat, is_cc_suncc, \
      get_numscons_toolpaths, iscplusplus, get_pythonlib_name, \
      is_f77_gnu, get_vs_version, built_with_mstools, cc_version, \
      isfortran, isf2py, is_cxx_suncc, is_cc_gnu, scons_get_paths
-from numscons.core.compiler_detection import get_cc_type
+from numscons.core.compiler_detection import get_cc_type, get_f77_type
 
 from numscons.core.template_generators import generate_from_c_template, \
      generate_from_f_template, generate_from_template_emitter, \
@@ -225,20 +225,29 @@ def initialize_f77(env, path_list):
     """Initialize F77 compiler from distutils info."""
     from SCons.Tool import Tool, FindTool
 
-    if len(env['f77_opt']) > 0:
-        if len(env['f77_opt_path']) > 0:
-            env.AppendUnique(F77FILESUFFIXES = ['.f'])
-            t = Tool(env['f77_opt'],
-                     toolpath = get_numscons_toolpaths(env))
-            t(env)
-            path_list.append(env['f77_opt_path'])
-    else:
-        def_fcompiler =  FindTool(DEF_FORTRAN_COMPILERS, env)
-        if def_fcompiler:
-            t = Tool(def_fcompiler, toolpath = get_numscons_toolpaths(env))
-            t(env)
+    def set_f77_from_distutils():
+        t = None
+        env.AppendUnique(F77FILESUFFIXES = ['.f'])
+        if len(env['f77_opt']) > 0:
+            if len(env['f77_opt_path']) > 0:
+                f77 = pjoin(env['f77_opt_path'], env['f77_opt'])
+                t = Tool(get_f77_type(f77),
+                         toolpath = get_numscons_toolpaths(env))
+                path_list.append(env['f77_opt_path'])
+            else:
+                t = Tool(get_f77_type(env["f77_opt"]),
+                         toolpath = get_numscons_toolpaths(env))
+        else:
+            def_fcompiler =  FindTool(DEF_FORTRAN_COMPILERS, env)
+            if def_fcompiler:
+                t = Tool(def_fcompiler, toolpath = get_numscons_toolpaths(env))
 
-    customize_compiler(t.name, env, "F77")
+        return t
+
+    t = set_f77_from_distutils()
+    if t:
+        t(env)
+        customize_compiler(t.name, env, "F77")
 
 def initialize_cxx(env, path_list):
     """Initialize C++ compiler from distutils info."""
