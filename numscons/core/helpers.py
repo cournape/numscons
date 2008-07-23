@@ -16,7 +16,7 @@ from numscons.core.siteconfig import get_config
 from numscons.core.extension_scons import createStaticExtLibraryBuilder
 from numscons.core.extension import get_pythonlib_dir
 from numscons.core.utils import pkg_to_path, flatten
-from numscons.core.misc import pyplat2sconsplat, is_cc_suncc, \
+from numscons.core.misc import pyplat2sconsplat, \
      get_numscons_toolpaths, iscplusplus, get_pythonlib_name, \
      is_f77_gnu, get_vs_version, built_with_mstools, cc_version, \
      isfortran, isf2py, is_cxx_suncc, is_cc_gnu, scons_get_paths
@@ -194,11 +194,11 @@ def initialize_cc(env, path_list):
                  t = Tool("msvc", toolpath = get_numscons_toolpaths(env))
                  # We need msvs tool too (before customization !)
                  Tool('msvs')(env)
-                 path_list.append(env['cc_opt_path'])
+                 path_list.insert(0, env['cc_opt_path'])
             else:
                 cc = pjoin(env['cc_opt_path'], env['cc_opt'])
                 t = Tool(get_cc_type(cc), toolpath = get_numscons_toolpaths(env))
-                path_list.append(env['cc_opt_path'])
+                path_list.insert(0, env['cc_opt_path'])
         else:
             # Do not care about PATH info because none given from scons
             # distutils command
@@ -233,7 +233,7 @@ def initialize_f77(env, path_list):
                 f77 = pjoin(env['f77_opt_path'], env['f77_opt'])
                 t = Tool(get_f77_type(f77),
                          toolpath = get_numscons_toolpaths(env))
-                path_list.append(env['f77_opt_path'])
+                path_list.insert(0, env['f77_opt_path'])
             else:
                 t = Tool(get_f77_type(env["f77_opt"]),
                          toolpath = get_numscons_toolpaths(env))
@@ -270,7 +270,7 @@ def initialize_cxx(env, path_list):
         # open solaris
         if not env['CXX']:
             env['CXX'] = basename(env['cxx_opt'])
-            path_list.append(env['cxx_opt_path'])
+            path_list.insert(0, env['cxx_opt_path'])
     else:
         def_cxxcompiler =  FindTool(DEF_CXX_COMPILERS, env)
         if def_cxxcompiler:
