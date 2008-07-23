@@ -1,6 +1,6 @@
 """engine.SCons.Tool.icc
 
-Tool-specific initialization for the OS/2 icc compiler.
+Tool-specific initialization for the Linux Intel C/C++ icc compiler.
 
 There normally shouldn't be any need to import this module directly.
 It will usually be imported through the generic SCons.Tool.Tool()
@@ -33,21 +33,19 @@ selection method.
 
 __revision__ = "src/engine/SCons/Tool/icc.py 3057 2008/06/09 22:21:00 knight"
 
+import SCons
+
 import cc
+cplusplus = __import__('c++', globals(), locals(), [])
 
 def generate(env):
     """Add Builders and construction variables for the OS/2 to an Environment."""
     cc.generate(env)
+    cplusplus.generate(env)
 
-    env['CC']         = 'icc'
-    env['CCCOM']      = '$CC $CFLAGS $CCFLAGS $CPPFLAGS $_CPPDEFFLAGS $_CPPINCFLAGS /c $SOURCES /Fo$TARGET'
-    env['CXXCOM']     = '$CXX $CXXFLAGS $CPPFLAGS $_CPPDEFFLAGS $_CPPINCFLAGS /c $SOURCES /Fo$TARGET'
-    env['CPPDEFPREFIX']  = '/D'
-    env['CPPDEFSUFFIX']  = ''
-    env['INCPREFIX']  = '/I'
-    env['INCSUFFIX']  = ''
-    env['CFILESUFFIX'] = '.c'
-    env['CXXFILESUFFIX'] = '.cc'
+    env['CC'] = 'icc'
+    env['CXX'] = 'icc'
+    env['SHCCFLAGS'] = SCons.Util.CLVar("$CCFLAGS -fPIC")
 
 def exists(env):
     return env.Detect('icc')
