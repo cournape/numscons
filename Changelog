@@ -1,3 +1,9 @@
+Thu, 24 Jul 2008 04:23:42 +0900
+	* Revamp the way we detect compilers; instead of relying on
+	distutils/scons fragile convertions, we detect version directly from
+	the given compiler command line (ala autoconf). Hopefully, this should
+	be much more robust.
+
 Wed, 09 Jul 2008 07:49:26 +0200
 	* release 0.8.2
 
