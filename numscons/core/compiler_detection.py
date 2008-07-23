@@ -4,9 +4,25 @@ from numscons.core.utils import popen_wrapper
 from numscons.core.errors import UnknownCompiler
 
 GNUCC = re.compile('gcc version ([0-9-.]+)')
+ICC = re.compile(r'Intel.*?C Compiler.*?Version ([0-9-.]+)')
+IFORT = re.compile(r'Intel.*?Fortran Compiler.*?Version ([0-9-.]+)')
 SUNCC = re.compile('Sun C ([0-9-.]+)')
 SUNCXX = re.compile('Sun C\+\+ ([0-9-.]+)')
 SUNFC = re.compile('Sun Fortran 95 ([0-9-.]+)')
+
+def parse_icc(string):
+    m = ICC.search(string)
+    if m:
+        return True, m.group(1)
+    else:
+        return False, None
+
+def parse_ifort(string):
+    m = IFORT.search(string)
+    if m:
+        return True, m.group(1)
+    else:
+        return False, None
 
 def parse_suncc(string):
     m = SUNCC.search(string)
@@ -73,6 +89,26 @@ def is_sunfortran(path):
     else:
         return False, None
 
+def is_icc(path):
+    """Return True if the compiler in path is Intel C compiler."""
+    cmd = [path, '-V']
+    st, cnt = popen_wrapper(cmd, merge = True, shell = False)
+    ret, ver = parse_icc(cnt)
+    if st == 0 and ret:
+        return ret, ver
+    else:
+        return False, None
+
+def is_ifort(path):
+    """Return True if the compiler in path is Intel Fortran compiler."""
+    cmd = [path, '-V']
+    st, cnt = popen_wrapper(cmd, merge = True, shell = False)
+    ret, ver = parse_ifort(cnt)
+    if st == 0 and ret:
+        return ret, ver
+    else:
+        return False, None
+
 def is_gcc(path):
     """Return True if the compiler in path is GNU compiler."""
     cmd = [path, '-v']
@@ -88,6 +124,8 @@ def get_cc_type(path):
         return "gcc"
     elif is_suncc(path)[0]:
         return "suncc"
+    elif is_icc(path)[0]:
+        return "intelc"
     raise UnknownCompiler("Unknown C compiler %s" % path)
 
 def get_cxx_type(path):
@@ -95,6 +133,8 @@ def get_cxx_type(path):
         return "g++"
     elif is_suncxx(path)[0]:
         return "suncc"
+    elif is_icc(path)[0]:
+        return "intelc"
     raise UnknownCompiler("Unknown CXX compiler %s" % path)
 
 def get_f77_type(path):
@@ -110,6 +150,8 @@ def get_f77_type(path):
             raise UnknownCompiler("Could not parse version %v" % v)
     elif is_sunfortran(path)[0]:
         return "sunf77"
+    elif is_ifort(path)[0]:
+        return "ifort"
     raise UnknownCompiler("Unknown F77 compiler %s" % path)
 
 if __name__ == "__main__":
@@ -117,12 +159,9 @@ if __name__ == "__main__":
     if len(sys.argv) < 2:
         raise ValueError("Usage: %s compiler" % __file__)
     cc = sys.argv[1]
-    try:
-        print get_cc_type(cc)
-    except UnknownCompiler, e:
-        print e
 
-    try:
-        print get_cxx_type(cc)
-    except UnknownCompiler, e:
-        print e
+    for f in [get_cc_type, get_cxx_type, get_f77_type]:
+        try:
+            print f(cc)
+        except UnknownCompiler, e:
+            print e

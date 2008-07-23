@@ -36,6 +36,23 @@ NOTICE: Invoking /home/david/opt/sunstudio12/bin/f90 -f77 -ftrap=%none -V
 f90: Sun Fortran 95 8.3 Linux_i386 Patch 127145-01 2007/07/31
 Usage: f90 [ options ] files.  Use 'f90 -flags' for details"""
 
+# Output of icc -V, 10.1.015
+ICC_10 = """
+Intel(R) C Compiler for applications running on IA-32, Version 10.1    Build 20080312 Package ID: l_cc_p_10.1.015
+Copyright (C) 1985-2008 Intel Corporation.  All rights reserved.
+FOR NON-COMMERCIAL USE ONLY
+
+"""
+
+# Output of ifort -V, 10.1.015
+IFORT_10 = """
+Intel(R) Fortran Compiler for applications running on IA-32, Version 10.1 Build 20080312 Package ID: l_fc_p_10.1.015
+Copyright (C) 1985-2008 Intel Corporation.  All rights reserved.
+FOR NON-COMMERCIAL USE ONLY
+
+"""
+
+
 class OutputParser(unittest.TestCase):
     def test_gnu(self):
         ret = parse_gnu(GCC_4_2_3)
@@ -52,6 +69,14 @@ class OutputParser(unittest.TestCase):
     def test_sunfortran(self):
         ret = parse_sunfortran(SUNFORTRAN_12)
         assert ret == (True, "8.3")
+
+    def test_icc(self):
+        ret = parse_icc(ICC_10)
+        assert ret == (True, "10.1")
+
+    def test_ifort(self):
+        ret = parse_ifort(IFORT_10)
+        assert ret == (True, "10.1")
 
 if __name__ == "__main__":
     unittest.main()
