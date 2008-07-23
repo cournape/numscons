@@ -191,11 +191,7 @@ def initialize_cc(env, path_list):
                  path_list.insert(0, env['cc_opt_path'])
             else:
                 cc = get_cc_type(pjoin(env['cc_opt_path'], env['cc_opt']))
-                if cc == "intelc":
-                    t = Tool("intelc", toolpath = get_numscons_toolpaths(env),
-                             topdir = os.path.split(env['cc_opt_path'])[0])
-                else:
-                    t = Tool(cc, toolpath = get_numscons_toolpaths(env))
+                t = Tool(cc, toolpath = get_numscons_toolpaths(env))
                 path_list.insert(0, env['cc_opt_path'])
         else:
             # Do not care about PATH info because none given from scons
@@ -255,8 +251,8 @@ def initialize_cxx(env, path_list):
         t = None
         if len(env['cxx_opt']) > 0:
             if len(env['cxx_opt_path']) > 0:
-                cxx = pjoin(env['cxx_opt_path'], env['cxx_opt'])
-                t = Tool(get_cxx_type(cxx), toolpath = get_numscons_toolpaths(env))
+                cxx = get_cxx_type(pjoin(env['cxx_opt_path'], env['cxx_opt']))
+                t = Tool(cxx, toolpath = get_numscons_toolpaths(env))
                 path_list.insert(0, env['cxx_opt_path'])
         else:
             def_cxxcompiler =  FindTool(DEF_CXX_COMPILERS, env)

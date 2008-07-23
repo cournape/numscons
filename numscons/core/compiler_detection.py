@@ -125,7 +125,7 @@ def get_cc_type(path):
     elif is_suncc(path)[0]:
         return "suncc"
     elif is_icc(path)[0]:
-        return "intelc"
+        return "icc"
     raise UnknownCompiler("Unknown C compiler %s" % path)
 
 def get_cxx_type(path):
@@ -134,7 +134,7 @@ def get_cxx_type(path):
     elif is_suncxx(path)[0]:
         return "suncc"
     elif is_icc(path)[0]:
-        return "intelc"
+        return "icc"
     raise UnknownCompiler("Unknown CXX compiler %s" % path)
 
 def get_f77_type(path):
