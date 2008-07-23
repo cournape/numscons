@@ -19,8 +19,9 @@ from numscons.core.utils import pkg_to_path, flatten
 from numscons.core.misc import pyplat2sconsplat, \
      get_numscons_toolpaths, iscplusplus, get_pythonlib_name, \
      is_f77_gnu, get_vs_version, built_with_mstools, cc_version, \
-     isfortran, isf2py, is_cxx_suncc, is_cc_gnu, scons_get_paths
-from numscons.core.compiler_detection import get_cc_type, get_f77_type
+     isfortran, isf2py, scons_get_paths
+from numscons.core.compiler_detection import get_cc_type, get_f77_type, \
+     get_cxx_type
 
 from numscons.core.template_generators import generate_from_c_template, \
      generate_from_f_template, generate_from_template_emitter, \
@@ -253,40 +254,30 @@ def initialize_cxx(env, path_list):
     """Initialize C++ compiler from distutils info."""
     from SCons.Tool import Tool, FindTool
 
-    if len(env['cxx_opt']) > 0:
-        if len(env['cxx_opt_path']) > 0:
-            # XXX: hack to handle pyCC/pycc wrapper in open solaris.
-            # Solving this in a nice and efficient way is not
-            # trivial.
-            toolname = env['cxx_opt']
-            if is_cxx_suncc(pjoin(env['cxx_opt_path'], env['cxx_opt'])):
-                toolname = 'sunc++'
-            elif is_cc_gnu(pjoin(env['cxx_opt_path'], env['cxx_opt'])):
-                toolname = 'g++'
-            t = Tool(toolname,
-                     toolpath = get_numscons_toolpaths(env))
-            t(env)
-        # XXX: this is an hack around scons sunc++ which does not work on
-        # open solaris
-        if not env['CXX']:
-            env['CXX'] = basename(env['cxx_opt'])
-            path_list.insert(0, env['cxx_opt_path'])
-    else:
-        def_cxxcompiler =  FindTool(DEF_CXX_COMPILERS, env)
-        if def_cxxcompiler:
-            t = Tool(def_cxxcompiler, toolpath = get_numscons_toolpaths(env))
-            t(env)
+    def set_cxx_from_distutils():
+        t = None
+        if len(env['cxx_opt']) > 0:
+            if len(env['cxx_opt_path']) > 0:
+                cxx = pjoin(env['cxx_opt_path'], env['cxx_opt'])
+                t = Tool(get_cxx_type(cxx), toolpath = get_numscons_toolpaths(env))
+                path_list.insert(0, env['cxx_opt_path'])
         else:
-            # Some scons tools initialize CXX env var even if no CXX available.
-            # This is just confusing, so remove the key here since we could not
-            # initialize any CXX tool.
-            try:
-                del env['CXX']
-            except KeyError:
-                pass
+            def_cxxcompiler =  FindTool(DEF_CXX_COMPILERS, env)
+            if def_cxxcompiler:
+                t = Tool(def_cxxcompiler, toolpath = get_numscons_toolpaths(env))
+        return t
 
-    customize_compiler(t.name, env, "CXX")
-    env['CXXFILESUFFIX'] = '.cxx'
+    t = set_cxx_from_distutils()
+    if t:
+        t(env)
+        customize_compiler(t.name, env, "CXX")
+        env['CXXFILESUFFIX'] = '.cxx'
+    else:
+        # Some scons tools initialize CXX env var even if no CXX available.
+        # This is just confusing, so remove the key here since we could not
+        # initialize any CXX tool.
+        if env.has_key('CXX'):
+            del env['CXX']
 
 def set_bootstrap(env):
     import __builtin__
