@@ -355,6 +355,9 @@ def _get_numpy_env(args):
     if sys.platform == "win32":
         env["ENV"]["PATH"] = os.environ["PATH"]
 
+    # XXX: Make up my mind about importing env or not at some point
+    if os.environ.has_key('LD_LIBRARY_PATH'):
+        env["ENV"]["LD_LIBRARY_PATH"] = os.environ["LD_LIBRARY_PATH"]
     set_verbosity(env)
 
     return env
