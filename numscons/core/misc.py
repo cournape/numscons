@@ -75,27 +75,6 @@ def pyplat2sconsplat():
     else:
         return sys.platform
 
-def is_cc_gnu(fullpath):
-    """Return True if the compiler is gcc."""
-    gnucc = re.compile('gcc version')
-    cmd = [fullpath, ' -v']
-    st, cnt = popen_wrapper(cmd, merge = True)
-    return st == 0 and gnucc.search(cnt)
-
-def is_cxx_suncc(fullpath):
-    """Return true if the compiler is suncc."""
-    suncc = re.compile('CC: Sun')
-    cmd = [fullpath, ' -V']
-    st, cnt = popen_wrapper(cmd, merge = True)
-    return suncc.search(cnt)
-
-def is_cc_suncc(fullpath):
-    """Return true if the compiler is suncc."""
-    suncc = re.compile('Sun C')
-    cmd = [fullpath, ' -V']
-    st, cnt = popen_wrapper(cmd, merge = True)
-    return suncc.search(cnt)
-
 def get_local_toolpaths():
     """Returns the full pathname for the numscons tools directory."""
     return [pdirname(numscons.tools.__file__)]
