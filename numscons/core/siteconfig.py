@@ -29,8 +29,11 @@ class ConfigOpts(DefaultDict):
         return '\n'.join(msg)
 
 def _get_standard_file(fname):
-    from numpy.distutils.system_info import get_standard_file
-    return get_standard_file(fname)
+    try:
+        from numpy.distutils.system_info import get_standard_file
+        return get_standard_file(fname)
+    except ImportError:
+        return fname
 
 # Think about a cache mechanism, to avoid reparsing the config file everytime.
 def get_config(src_dir = None):
