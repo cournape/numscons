@@ -184,21 +184,18 @@ def initialize_cc(env, path_list):
 
     def set_cc_from_distutils():
         if len(env['cc_opt_path']) > 0:
-            if env['cc_opt'] == 'intelc':
-                # Intel Compiler SCons.Tool has a special way to set the
-                # path, so we use this one instead of changing
-                # env['ENV']['PATH'].
-                t = Tool("intelc",
-                         toolpath = get_numscons_toolpaths(env),
-                         topdir = os.path.split(env['cc_opt_path'])[0])
-            elif built_with_mstools(env):
+            if built_with_mstools(env):
                  t = Tool("msvc", toolpath = get_numscons_toolpaths(env))
                  # We need msvs tool too (before customization !)
                  Tool('msvs')(env)
                  path_list.insert(0, env['cc_opt_path'])
             else:
-                cc = pjoin(env['cc_opt_path'], env['cc_opt'])
-                t = Tool(get_cc_type(cc), toolpath = get_numscons_toolpaths(env))
+                cc = get_cc_type(pjoin(env['cc_opt_path'], env['cc_opt']))
+                if cc == "intelc":
+                    t = Tool("intelc", toolpath = get_numscons_toolpaths(env),
+                             topdir = os.path.split(env['cc_opt_path'])[0])
+                else:
+                    t = Tool(cc, toolpath = get_numscons_toolpaths(env))
                 path_list.insert(0, env['cc_opt_path'])
         else:
             # Do not care about PATH info because none given from scons
