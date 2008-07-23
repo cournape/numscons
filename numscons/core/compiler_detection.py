@@ -3,19 +3,19 @@ import re
 from numscons.core.utils import popen_wrapper
 from numscons.core.errors import UnknownCompiler
 
-GNUCC = re.compile('gcc version ([0-9-.]+)')
-ICC = re.compile(r'Intel.*?C Compiler.*?Version ([0-9-.]+)')
-IFORT = re.compile(r'Intel.*?Fortran Compiler.*?Version ([0-9-.]+)')
-SUNCC = re.compile('Sun C ([0-9-.]+)')
-SUNCXX = re.compile('Sun C\+\+ ([0-9-.]+)')
-SUNFC = re.compile('Sun Fortran 95 ([0-9-.]+)')
+GNUCC = [re.compile('gcc version ([0-9-.]+)')]
+ICC = [re.compile(r'Intel.*?C Compiler.*?Version ([0-9-.]+)')]
+IFORT = [re.compile(r'Intel.*?Fortran Compiler.*?Version ([0-9-.]+)')]
+SUNCC = [re.compile('Sun C ([0-9-.]+)')]
+SUNCXX = [re.compile('Sun C\+\+ ([0-9-.]+)')]
+SUNFC = [re.compile('Sun Fortran 95 ([0-9-.]+)')]
 
 def _parse(regex, string):
-    m = regex.search(string)
-    if m:
-        return True, m.group(1)
-    else:
-        return False, None
+    for r in regex:
+        m = r.search(string)
+        if m:
+            return True, m.group(1)
+    return False, None
 
 def parse_icc(string):
     return _parse(ICC, string)
