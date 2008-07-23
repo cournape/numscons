@@ -183,6 +183,11 @@ def initialize_cc(env, path_list):
     from SCons.Tool import Tool, FindTool
 
     def set_cc_from_distutils():
+        # XXX: To keep backward compatibility with numpy 1.1.1. Can be dropped at
+        # 1.1.2 
+        if env["cc_opt"] == "intelc":
+            env["cc_opt"] = "icc"
+
         if len(env['cc_opt_path']) > 0:
             if built_with_mstools(env):
                  t = Tool("msvc", toolpath = get_numscons_toolpaths(env))
