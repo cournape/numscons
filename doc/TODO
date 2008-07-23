@@ -8,19 +8,19 @@ were when scons was inside numpy repository):
     - clean the code of numpyenv; in perticular: builder creation (should be
       done through tools), rename functions, and set the order right (0.7*
       serie).
-    - CXX optimizations flags + Control cxxflags from env
-    - Add CPPPDEFINES in perflib checkers
     - handle inplace
     - doc
-    - CLAPACK: check old atlas
     - setuptools integration
     - solution to handle sdist (source files)
-    - handle numpy headers, too
 
 Meta Goals:
-    - 0.9: clean up core and checkers code. Remove duplicated code, clean-up
-      numpyenv, etc\.\.\. Handles setuptools integration (inplace, etc...) +
-      sdist problems. Put documentation in shape.
+    - 0.9: clean up core and change compiler detection. 
+    - 0.10: Clean up checkers code. Remove duplicated code, clean-up. 
+    - 0.11: Put documentation in shape. User-doc: customization of
+compiler/options/etc... Dev-doc: basic design, custom builders, checkers code,
+etc...
+    - 0.12: Handles setuptools integration (at least inplace for develop
+option, etc...). sdist problems ?
 
 Cleaning checkers modules:
     - Refactor site config custom: remove duplicate between core.libinfo and
@@ -68,7 +68,7 @@ Misc
 We need the following:
 
     - Being able to run a builder and capture its output (both stdout and
-      stderr)
+stderr): difficult. SConf is extremely fragile. May need to wait for 2.0 ?
     - building blocks for checkers
 
 Documentation:
