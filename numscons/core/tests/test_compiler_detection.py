@@ -52,6 +52,24 @@ FOR NON-COMMERCIAL USE ONLY
 
 """
 
+# Output of suncc -V -### main.c with sunstudio express on open solaris bld 93
+SUNCC_13 = """cc: Sun Ceres C 5.10 SunOS_i386 2008/04/04
+### Note: NLSPATH = /opt/SunStudioExpress/prod/bin/../lib/locale/%L/LC_MESSAGES/%N.cat:/opt/SunStudioExpress/prod/bin/../../lib/locale/%L/LC_MESSAGES/%N.cat
+###     command line files and options (expanded):
+### -V fake.c
+/opt/SunStudioExpress/prod/bin/acomp -xldscope=global -i fake.c -y-fbe -y/opt/SunStudioExpress/prod/bin/fbe -y-xarch=generic -y-o -yfake.o -y-verbose -y-xthreadvar=no%dynamic -y-comdat -xdbggen=no%stabs+dwarf2+usedonly -V -xdbggen=incl -y-s -m32 -fparam_ir -Qy -D__SunOS_5_11 -D__SUNPRO_C=0x5100 -D__SVR4 -D__sun -D__SunOS -D__unix -D__i386 -D__BUILTIN_VA_ARG_INCR -D__C99FEATURES__ -Xa -D__PRAGMA_REDEFINE_EXTNAME -Dunix -Dsun -Di386 -D__RESTRICT -xc99=%all,no%lib -D__FLT_EVAL_METHOD__=-1 -I/opt/SunStudioExpress/prod/include/cc "-g/opt/SunStudioExpress/prod/bin/cc -V -c " -fsimple=0 -D__SUN_PREFETCH -destination_ir=yabe
+### Note: LD_LIBRARY_PATH = <null>
+### Note: LD_RUN_PATH = <null>
+/usr/ccs/bin/ld /opt/SunStudioExpress/prod/lib/crti.o /opt/SunStudioExpress/prod/lib/crt1.o /opt/SunStudioExpress/prod/lib/values-xa.o -V fake.o -Y "P,/opt/SunStudioExpress/prod/lib:/usr/ccs/lib:/lib:/usr/lib" -Qy -lc /opt/SunStudioExpress/prod/lib/crtn.o"""
+
+# Output of sunCC -V (opensolaris bld 93)
+SUNCXX_13 = """sunCC: Sun Ceres C++ 5.9 SunOS_i386 2008/04/04"""
+
+# output of sunf77 -V (opensolaris bld 93)
+SUNFORTRAN_13 = """
+NOTICE: Invoking /opt/SunStudioExpress/bin/f90 -f77 -ftrap=%none -V
+f90: Sun Ceres Fortran 95 8.3 SunOS_i386 2008/04/04
+Usage: f90 [ options ] files.  Use 'f90 -flags' for details"""
 
 class OutputParser(unittest.TestCase):
     def test_gnu(self):
@@ -62,12 +80,21 @@ class OutputParser(unittest.TestCase):
         ret = parse_suncc(SUNCC_12)
         assert ret == (True, "5.9")
 
+        ret = parse_suncc(SUNCC_13)
+        assert ret == (True, "5.10")
+
     def test_suncxx(self):
         ret = parse_suncxx(SUNCXX_12)
         assert ret == (True, "5.9")
 
+        ret = parse_suncxx(SUNCXX_13)
+        assert ret == (True, "5.9")
+
     def test_sunfortran(self):
         ret = parse_sunfortran(SUNFORTRAN_12)
+        assert ret == (True, "8.3")
+
+        ret = parse_sunfortran(SUNFORTRAN_13)
         assert ret == (True, "8.3")
 
     def test_icc(self):

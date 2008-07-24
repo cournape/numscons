@@ -6,9 +6,9 @@ from numscons.core.errors import UnknownCompiler
 GNUCC = [re.compile('gcc version ([0-9-.]+)')]
 ICC = [re.compile(r'Intel.*?C Compiler.*?Version ([0-9-.]+)')]
 IFORT = [re.compile(r'Intel.*?Fortran Compiler.*?Version ([0-9-.]+)')]
-SUNCC = [re.compile('Sun C ([0-9-.]+)')]
-SUNCXX = [re.compile('Sun C\+\+ ([0-9-.]+)')]
-SUNFC = [re.compile('Sun Fortran 95 ([0-9-.]+)')]
+SUNCC = [re.compile('Sun Ceres C ([0-9-.]+)'), re.compile('Sun C ([0-9-.]+)')]
+SUNCXX = [re.compile('Sun Ceres C\+\+ ([0-9-.]+)'), re.compile('Sun C\+\+ ([0-9-.]+)')]
+SUNFC = [re.compile('Sun Ceres Fortran 95 ([0-9-.]+)'), re.compile('Sun Fortran 95 ([0-9-.]+)')]
 
 def _parse(regex, string):
     for r in regex:
