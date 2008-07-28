@@ -505,10 +505,7 @@ def initialize_tools(env):
 
     finalize_env(env)
 
-    # Add the tool paths in the environment
-    if env['ENV'].has_key('PATH'):
-        path_list += env['ENV']['PATH'].split(os.pathsep)
-    env['ENV']['PATH'] = os.pathsep.join(path_list)
+    env['ENV']['PATH'] = os.environ['PATH']
 
 def customize_pyext(env):
     from SCons.Tool import Tool
