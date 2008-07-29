@@ -163,6 +163,8 @@ def apply_compilers_customization(env):
         else:
             env.AppendUnique(CXXFLAGS  = flatten(custom.values()))
 
+    if 'LDFLAGS' in os.environ:
+        env.Prepend(LINKFLAGS = os.environ['LDFLAGS'])
 
 def GetNumpyEnvironment(args):
     """Returns a correctly initialized scons environment.
