@@ -198,6 +198,8 @@ def initialize_cc(env, path_list):
                  path_list.insert(0, env['cc_opt_path'])
             else:
                 cc = get_cc_type(pjoin(env['cc_opt_path'], env['cc_opt']))
+                if cc == 'gcc' and sys.platform == 'win32':
+                    cc = 'mingw'
                 t = Tool(cc, toolpath = get_numscons_toolpaths(env))
                 path_list.insert(0, env['cc_opt_path'])
         else:
@@ -481,7 +483,7 @@ def initialize_tools(env):
     # Adding default tools for the one we do not customize: mingw is special
     # according to scons, don't ask me why, but this does not work as expected
     # for this tool.
-    if not env['cc_opt'] == 'mingw':
+    if not built_with_mingw(env):
         for i in [DEF_LINKERS, DEF_ASSEMBLERS, DEF_ARS]:
             t = FindTool(i, env) or i[0]
             Tool(t)(env)
