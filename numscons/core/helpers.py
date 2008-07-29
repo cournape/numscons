@@ -260,9 +260,13 @@ def initialize_cxx(env, path_list):
         t = None
         if len(env['cxx_opt']) > 0:
             if len(env['cxx_opt_path']) > 0:
-                cxx = get_cxx_type(pjoin(env['cxx_opt_path'], env['cxx_opt']))
-                t = Tool(cxx, toolpath = get_numscons_toolpaths(env))
-                path_list.insert(0, env['cxx_opt_path'])
+                if built_with_mstools(env):
+                    t = Tool("msvc", toolpath = get_numscons_toolpaths(env))
+                    # We need msvs tool too (before customization !)
+                else:
+                    cxx = get_cxx_type(pjoin(env['cxx_opt_path'], env['cxx_opt']))
+                    t = Tool(cxx, toolpath = get_numscons_toolpaths(env))
+                    path_list.insert(0, env['cxx_opt_path'])
         else:
             def_cxxcompiler =  FindTool(DEF_CXX_COMPILERS, env)
             if def_cxxcompiler:
