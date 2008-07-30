@@ -97,7 +97,7 @@ def customize_compiler(name, env, lang):
     try:
         cfg = get_compiler_config(name, lang)
     except NoCompilerConfig, e:
-        print e
+        print "%s => using default configuration." % e
         cfg = CompilerConfig()
     env["NUMPY_CUSTOMIZATION"][lang] = cfg
 
@@ -173,8 +173,6 @@ def GetNumpyEnvironment(args):
 
     This method returns an environment with fully customized flags."""
     env = _get_numpy_env(args)
-
-    apply_compilers_customization(env)
 
     return env
 
@@ -324,6 +322,13 @@ def _get_numpy_env(args):
     """Call this with args = ARGUMENTS."""
     env = _init_environment(args)
 
+    customize_scons_dirs(env)
+
+    # Getting the config options from *.cfg files
+    set_site_config(env)
+
+    set_verbosity(env)
+
     #------------------------------------------------
     # Setting tools according to command line options
     #------------------------------------------------
@@ -332,16 +337,14 @@ def _get_numpy_env(args):
     #---------------
     #     Misc
     #---------------
-    customize_link_flags(env)
-
-    customize_scons_dirs(env)
+    customize_tools(env)
 
     # Adding custom builders
     add_custom_builders(env)
 
-    # Getting the config options from *.cfg files
-    set_site_config(env)
-
+    #--------------------------------------------------
+    # Customize scons environment from user environment
+    #--------------------------------------------------
     # Add HOME in the environment: some tools seem to require it (Intel
     # compiler, for licenses stuff)
     if os.environ.has_key('HOME'):
@@ -353,7 +356,6 @@ def _get_numpy_env(args):
     # XXX: Make up my mind about importing env or not at some point
     if os.environ.has_key('LD_LIBRARY_PATH'):
         env["ENV"]["LD_LIBRARY_PATH"] = os.environ["LD_LIBRARY_PATH"]
-    set_verbosity(env)
 
     return env
 
@@ -507,11 +509,16 @@ def initialize_tools(env):
     # link flags.
     env['SMARTLINK']   = dumb_link
 
+def customize_tools(env):
     customize_pyext(env)
 
     finalize_env(env)
 
     env['ENV']['PATH'] = os.environ['PATH']
+
+    apply_compilers_customization(env)
+
+    customize_link_flags(env)
 
 def customize_pyext(env):
     from SCons.Tool import Tool
