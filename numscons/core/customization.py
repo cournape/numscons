@@ -1,13 +1,21 @@
 import os
+from os.path import join as pjoin
 import sys
-from distutils.sysconfig import get_config_var
+from distutils.sysconfig import get_config_var, get_python_version, get_python_inc
 
 from numscons.core.utils import flatten
 from numscons.core.misc import get_numscons_toolpaths, get_pythonlib_name, \
      is_f77_gnu, get_vs_version, built_with_mstools, \
      isfortran, isf2py, scons_get_paths, built_with_mingw
-from numscons.core.extension import get_pythonlib_dir
 from numscons.numdist import msvc_runtime_library
+
+def get_pythonlib_dir():
+    """Returns a list of path to look for the python engine library
+    (pythonX.X.lib on win32, libpythonX.X.so on unix, etc...)."""
+    if os.name == 'nt':
+        return [pjoin(sys.exec_prefix, 'libs')]
+    else:
+        return [pjoin(sys.exec_prefix, 'lib')]
 
 def is_bootstrapping(env):
     return env['bootstrapping']
