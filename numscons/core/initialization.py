@@ -19,7 +19,7 @@ from numscons.core.allow_undefined import get_darwin_allow_undefined
 DEF_LINKERS, DEF_C_COMPILERS, DEF_CXX_COMPILERS, DEF_ASSEMBLERS, \
 DEF_FORTRAN_COMPILERS, DEF_ARS, DEF_OTHER_TOOLS = tool_list(pyplat2sconsplat())
 
-def customize_compiler(name, env, lang):
+def configure_compiler(name, env, lang):
     """Customize env options related to the given tool and language."""
     # XXX: we have to fix how to detect compilers/version instead of hack after
     # hack...
@@ -74,7 +74,7 @@ def initialize_cc(env, path_list):
                  toolpath = get_numscons_toolpaths(env))
     t(env)
 
-    customize_compiler(t.name, env, "C")
+    configure_compiler(t.name, env, "C")
 
 def initialize_f77(env, path_list):
     """Initialize F77 compiler from distutils info."""
@@ -102,7 +102,7 @@ def initialize_f77(env, path_list):
     t = set_f77_from_distutils()
     if t:
         t(env)
-        customize_compiler(t.name, env, "F77")
+        configure_compiler(t.name, env, "F77")
 
 def initialize_cxx(env, path_list):
     """Initialize C++ compiler from distutils info."""
@@ -130,7 +130,7 @@ def initialize_cxx(env, path_list):
     t = set_cxx_from_distutils()
     if t:
         t(env)
-        customize_compiler(t.name, env, "CXX")
+        configure_compiler(t.name, env, "CXX")
         env['CXXFILESUFFIX'] = '.cxx'
     else:
         # Some scons tools initialize CXX env var even if no CXX available.
