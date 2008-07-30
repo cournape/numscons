@@ -192,7 +192,6 @@ def _get_numpy_env(args):
     env = _init_environment(args)
 
     customize_scons_env(env)
-    customize_scons_dirs(env)
 
     # Getting the config options from *.cfg files
     set_site_config(env)
@@ -269,27 +268,6 @@ def set_site_config(env):
     # This will be used to keep configuration information on a per package basis
     env['NUMPY_PKG_CONFIG'] = {'PERFLIB' : {}, 'LIB' : {}}
     env['NUMPY_PKG_CONFIG_FILE'] = get_scons_configres_filename()
-
-def customize_scons_dirs(env):
-    # Keep NumpyConfigure for backward compatibility...
-    env.NumpyConfigure = env.Configure
-
-    # Put sconsign file in build dir
-
-    # XXX: ugly hack ! SConsign needs an absolute path or a path relative to
-    # where the SConstruct file is. We have to find the path of the build dir
-    # relative to the src_dir: we add n .., where n is the number of occurances
-    # of the path separator in the src dir.
-    def get_build_relative_src(srcdir, builddir):
-        n = srcdir.count(os.sep)
-        if len(srcdir) > 0 and not srcdir == '.':
-            n += 1
-        return pjoin(os.sep.join([os.pardir for i in range(n)]), builddir)
-
-    sconsign = pjoin(get_build_relative_src(env['src_dir'],
-                                            env['build_dir']),
-                     'sconsign.dblite')
-    env.SConsignFile(sconsign)
 
 def add_custom_builders(env):
     """Call this to add all our custom builders to the environment."""

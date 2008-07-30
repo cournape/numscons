@@ -1,4 +1,5 @@
 # This module cannot be imported directly, because it needs scons module.
+import os
 from os.path import join as pjoin
 
 from SCons.Environment import Environment
@@ -29,6 +30,27 @@ class NumpyEnvironment(Environment):
         # This will keep our compiler dependent customization (optimization,
         # warning, etc...)
         self['NUMPY_CUSTOMIZATION'] = {}
+
+        self._set_sconsign_location()
+
+    def _set_sconsign_location(self):
+        """Put sconsign file in build dir. This is surprisingly difficult to do
+        because of build_dir interactions."""
+
+        # SConsign needs an absolute path or a path relative to
+        # where the SConstruct file is. We have to find the path of the build dir
+        # relative to the src_dir: we add n .., where n is the number of occurances
+        # of the path separator in the src dir.
+        def get_build_relative_src(srcdir, builddir):
+            n = srcdir.count(os.sep)
+            if len(srcdir) > 0 and not srcdir == '.':
+                n += 1
+            return pjoin(os.sep.join([os.pardir for i in range(n)]), builddir)
+
+        sconsign = pjoin(get_build_relative_src(self['src_dir'],
+                                                self['build_dir']),
+                         'sconsign.dblite')
+        self.SConsignFile(sconsign)
 
     def Configure(self, *args, **kw):
         if kw.has_key('conf_dir') or kw.has_key('log_file'):
