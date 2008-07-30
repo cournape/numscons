@@ -4,12 +4,31 @@ from os.path import join as pjoin
 from SCons.Environment import Environment
 
 from numscons.core.misc import get_numscons_toolpaths
+from numscons.core.errors import NumsconsError
+from numscons.core.utils import pkg_to_path
 
 class NumpyEnvironment(Environment):
     """An SCons Environment subclass which knows how to deal with distutils
     idiosyncraties."""
     def __init__(self, *args, **kw):
+        if kw.has_key('tools'):
+            raise NumsconsError("NumpyEnvironment has received a tools "\
+                                "argument.")
+        else:
+            kw['tools'] = []
+
         Environment.__init__(self, *args, **kw)
+
+        # Setting dirs according to command line options
+        self.AppendUnique(build_dir = pjoin(self['build_prefix'],
+                                           self['src_dir']))
+        self.AppendUnique(distutils_installdir =
+                         pjoin(self['distutils_libdir'],
+                               pkg_to_path(self['pkg_name'])))
+
+        # This will keep our compiler dependent customization (optimization,
+        # warning, etc...)
+        self['NUMPY_CUSTOMIZATION'] = {}
 
     def Configure(self, *args, **kw):
         if kw.has_key('conf_dir') or kw.has_key('log_file'):

@@ -172,21 +172,13 @@ def _init_environment(args):
     from SCons.Script import Help
 
     opts = GetNumpyOptions(args)
-    env = NumpyEnvironment(options = opts, tools = [])
+    env = NumpyEnvironment(options = opts)
 
     set_bootstrap(env)
+
     # We explicily set DefaultEnvironment to avoid wasting time on initializing
     # tools a second time.
     DefaultEnvironment(tools = [])
-
-    # Setting dirs according to command line options
-    env.AppendUnique(build_dir = pjoin(env['build_prefix'], env['src_dir']))
-    env.AppendUnique(distutils_installdir = pjoin(env['distutils_libdir'],
-                                                  pkg_to_path(env['pkg_name'])))
-
-    # This will keep our compiler dependent customization (optimization,
-    # warning, etc...)
-    env['NUMPY_CUSTOMIZATION'] = {}
 
     Help(opts.GenerateHelpText(env))
 
