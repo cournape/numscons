@@ -167,7 +167,7 @@ def is_bootstrapping(env):
     return env['bootstrapping']
 
 def _init_environment(args):
-    from numpyenv import NumpyEnvironment
+    from numscons.core.numpyenv import NumpyEnvironment
     from SCons.Defaults import DefaultEnvironment
     from SCons.Script import Help
 
