@@ -1,6 +1,7 @@
 # This module cannot be imported directly, because it needs scons module.
 import os
 from os.path import join as pjoin
+import logging
 
 from SCons.Environment import Environment
 
@@ -31,6 +32,25 @@ class NumpyEnvironment(Environment):
 
         self._set_sconsign_location()
         self._customize_scons_env()
+        self._set_logging()
+
+    def _set_logging(self):
+        vlevels = ['CRITICAL', 'ERROR', 'WARNING', 'INFO', 'DEBUG', 'NOTSET']
+        try:
+            level = self['log_level']
+            if not level in vlevels:
+                try:
+                    level = int(level)
+                except ValueError:
+                    raise NumsconsException(
+                        "level is %s (type %s), but should be an integer or in %s" \
+                        % (level, type(level), vlevels))
+
+        except KeyError:
+            level = logging.CRITICAL
+
+        logging.basicConfig(level = level)
+        logger = logging.getLogger('numscons')
 
     def _set_sconsign_location(self):
         """Put sconsign file in build dir. This is surprisingly difficult to do

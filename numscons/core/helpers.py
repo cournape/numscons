@@ -3,6 +3,7 @@
 """This initialize a scons environment using info from distutils, and all our
 customization (python extension builders, build_dir, etc...)."""
 from os.path import join as pjoin
+import logging
 
 from numscons.core.custom_builders import DistutilsSharedLibrary, NumpyCtypes, \
      DistutilsPythonExtension, DistutilsStaticExtLibrary, NumpyPythonExtension
@@ -19,6 +20,8 @@ from numscons.core.template_generators import generate_from_c_template, \
 from numscons.tools.substinfile import TOOL_SUBST
 
 __all__ = ['GetNumpyEnvironment', 'GetInitEnvironment']
+
+_LOGGER = logging.getLogger('numscons')
 
 def GetNumpyOptions(args):
     """Call this with args=ARGUMENTS to take into account command line args."""
@@ -63,6 +66,11 @@ def GetNumpyOptions(args):
                         '0', allowed_values = ('0', '1', '2')))
     opts.Add(BoolOption('bootstrapping',
                         "true if bootrapping numpy, false if not", 0))
+
+    # Logging option
+    opts.Add('log_level',
+             '0 means max log, Any positive integer is OK '\
+             '(logging value)', logging.CRITICAL)
 
     return opts
 
