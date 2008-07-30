@@ -219,6 +219,11 @@ def _get_numpy_env(args):
     # Adding custom builders
     add_custom_builders(env)
 
+    customize_scons_env(env)
+
+    return env
+
+def customize_scons_env(env):
     #--------------------------------------------------
     # Customize scons environment from user environment
     #--------------------------------------------------
@@ -233,8 +238,6 @@ def _get_numpy_env(args):
     # XXX: Make up my mind about importing env or not at some point
     if os.environ.has_key('LD_LIBRARY_PATH'):
         env["ENV"]["LD_LIBRARY_PATH"] = os.environ["LD_LIBRARY_PATH"]
-
-    return env
 
 def set_verbosity(env):
     level = int(env['silent'])
