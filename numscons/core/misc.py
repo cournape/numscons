@@ -46,7 +46,7 @@ def built_with_mstools(env):
 
 def built_with_mingw(env):
     """Return true if C code built with mingw compiler."""
-    return env['cc_opt'] == 'mingw'
+    return env['CC'] == 'gcc' and sys.platform == 'win32'
 
 def built_with_gnu_f77(env):
     """Return true if f77 compiler is gnu (g77, gfortran, etc...)."""
@@ -74,27 +74,6 @@ def pyplat2sconsplat():
         return 'sunos'
     else:
         return sys.platform
-
-def is_cc_gnu(fullpath):
-    """Return True if the compiler is gcc."""
-    gnucc = re.compile('gcc version')
-    cmd = [fullpath, ' -v']
-    st, cnt = popen_wrapper(cmd, merge = True)
-    return st == 0 and gnucc.search(cnt)
-
-def is_cxx_suncc(fullpath):
-    """Return true if the compiler is suncc."""
-    suncc = re.compile('CC: Sun')
-    cmd = [fullpath, ' -V']
-    st, cnt = popen_wrapper(cmd, merge = True)
-    return suncc.search(cnt)
-
-def is_cc_suncc(fullpath):
-    """Return true if the compiler is suncc."""
-    suncc = re.compile('Sun C')
-    cmd = [fullpath, ' -V']
-    st, cnt = popen_wrapper(cmd, merge = True)
-    return suncc.search(cnt)
 
 def get_local_toolpaths():
     """Returns the full pathname for the numscons tools directory."""

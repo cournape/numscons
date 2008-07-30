@@ -16,10 +16,12 @@ from numscons.core.siteconfig import get_config
 from numscons.core.extension_scons import createStaticExtLibraryBuilder
 from numscons.core.extension import get_pythonlib_dir
 from numscons.core.utils import pkg_to_path, flatten
-from numscons.core.misc import pyplat2sconsplat, is_cc_suncc, \
+from numscons.core.misc import pyplat2sconsplat, \
      get_numscons_toolpaths, iscplusplus, get_pythonlib_name, \
      is_f77_gnu, get_vs_version, built_with_mstools, cc_version, \
-     isfortran, isf2py, is_cxx_suncc, is_cc_gnu, scons_get_paths
+     isfortran, isf2py, scons_get_paths
+from numscons.core.compiler_detection import get_cc_type, get_f77_type, \
+     get_cxx_type
 
 from numscons.core.template_generators import generate_from_c_template, \
      generate_from_f_template, generate_from_template_emitter, \
@@ -161,6 +163,8 @@ def apply_compilers_customization(env):
         else:
             env.AppendUnique(CXXFLAGS  = flatten(custom.values()))
 
+    if 'LDFLAGS' in os.environ:
+        env.Prepend(LINKFLAGS = os.environ['LDFLAGS'])
 
 def GetNumpyEnvironment(args):
     """Returns a correctly initialized scons environment.
@@ -181,41 +185,30 @@ def initialize_cc(env, path_list):
     from SCons.Tool import Tool, FindTool
 
     def set_cc_from_distutils():
+        # XXX: To keep backward compatibility with numpy 1.1.1. Can be dropped at
+        # 1.1.2 
+        if env["cc_opt"] == "intelc":
+            env["cc_opt"] = "icc"
+
         if len(env['cc_opt_path']) > 0:
-            if env['cc_opt'] == 'intelc':
-                # Intel Compiler SCons.Tool has a special way to set the
-                # path, so we use this one instead of changing
-                # env['ENV']['PATH'].
-                t = Tool(env['cc_opt'],
-                         toolpath = get_numscons_toolpaths(env),
-                         topdir = os.path.split(env['cc_opt_path'])[0])
-                t(env)
-            elif built_with_mstools(env):
-                 t = Tool(env['cc_opt'],
-                          toolpath = get_numscons_toolpaths(env))
-                 t(env)
+            if built_with_mstools(env):
+                 t = Tool("msvc", toolpath = get_numscons_toolpaths(env))
                  # We need msvs tool too (before customization !)
                  Tool('msvs')(env)
-                 path_list.append(env['cc_opt_path'])
+                 path_list.insert(0, env['cc_opt_path'])
             else:
-                # XXX: hack to handle pyCC/pycc wrapper in open solaris.
-                # Solving this in a nice and efficient way is not
-                # trivial.
-                if is_cc_suncc(pjoin(env['cc_opt_path'], env['cc_opt'])):
-                    env['cc_opt'] = 'suncc'
-                elif is_cc_gnu(pjoin(env['cc_opt_path'], env['cc_opt'])):
-                    env['cc_opt'] = 'gcc'
-                elif env['cc_opt'] == 'icc':
-                    env['cc_opt'] = 'intelc'
-                t = Tool(env['cc_opt'],
-                         toolpath = get_numscons_toolpaths(env))
-                t(env)
-                path_list.append(env['cc_opt_path'])
+                cc = get_cc_type(pjoin(env['cc_opt_path'], env['cc_opt']))
+                if cc == 'gcc' and sys.platform == 'win32':
+                    cc = 'mingw'
+                t = Tool(cc, toolpath = get_numscons_toolpaths(env))
+                path_list.insert(0, env['cc_opt_path'])
         else:
             # Do not care about PATH info because none given from scons
             # distutils command
-            t = Tool(env['cc_opt'], toolpath = get_numscons_toolpaths(env))
-            t(env)
+            try:
+                t = Tool(env['cc_opt'], toolpath = get_numscons_toolpaths(env))
+            except ImportError:
+                raise UnknownCompiler(env['cc_opt'])
 
         return t
 
@@ -224,7 +217,7 @@ def initialize_cc(env, path_list):
     else:
         t = Tool(FindTool(DEF_C_COMPILERS, env),
                  toolpath = get_numscons_toolpaths(env))
-        t(env)
+    t(env)
     
     customize_compiler(t.name, env, "C")
 
@@ -235,59 +228,62 @@ def initialize_f77(env, path_list):
     """Initialize F77 compiler from distutils info."""
     from SCons.Tool import Tool, FindTool
 
-    if len(env['f77_opt']) > 0:
-        if len(env['f77_opt_path']) > 0:
-            env.AppendUnique(F77FILESUFFIXES = ['.f'])
-            t = Tool(env['f77_opt'],
-                     toolpath = get_numscons_toolpaths(env))
-            t(env)
-            path_list.append(env['f77_opt_path'])
-    else:
-        def_fcompiler =  FindTool(DEF_FORTRAN_COMPILERS, env)
-        if def_fcompiler:
-            t = Tool(def_fcompiler, toolpath = get_numscons_toolpaths(env))
-            t(env)
+    def set_f77_from_distutils():
+        t = None
+        env.AppendUnique(F77FILESUFFIXES = ['.f'])
+        if len(env['f77_opt']) > 0:
+            if len(env['f77_opt_path']) > 0:
+                f77 = pjoin(env['f77_opt_path'], env['f77_opt'])
+                t = Tool(get_f77_type(f77),
+                         toolpath = get_numscons_toolpaths(env))
+                path_list.insert(0, env['f77_opt_path'])
+            else:
+                t = Tool(get_f77_type(env["f77_opt"]),
+                         toolpath = get_numscons_toolpaths(env))
+        else:
+            def_fcompiler =  FindTool(DEF_FORTRAN_COMPILERS, env)
+            if def_fcompiler:
+                t = Tool(def_fcompiler, toolpath = get_numscons_toolpaths(env))
 
-    customize_compiler(t.name, env, "F77")
+        return t
+
+    t = set_f77_from_distutils()
+    if t:
+        t(env)
+        customize_compiler(t.name, env, "F77")
 
 def initialize_cxx(env, path_list):
     """Initialize C++ compiler from distutils info."""
     from SCons.Tool import Tool, FindTool
 
-    if len(env['cxx_opt']) > 0:
-        if len(env['cxx_opt_path']) > 0:
-            # XXX: hack to handle pyCC/pycc wrapper in open solaris.
-            # Solving this in a nice and efficient way is not
-            # trivial.
-            toolname = env['cxx_opt']
-            if is_cxx_suncc(pjoin(env['cxx_opt_path'], env['cxx_opt'])):
-                toolname = 'sunc++'
-            elif is_cc_gnu(pjoin(env['cxx_opt_path'], env['cxx_opt'])):
-                toolname = 'g++'
-            t = Tool(toolname,
-                     toolpath = get_numscons_toolpaths(env))
-            t(env)
-        # XXX: this is an hack around scons sunc++ which does not work on
-        # open solaris
-        if not env['CXX']:
-            env['CXX'] = basename(env['cxx_opt'])
-            path_list.append(env['cxx_opt_path'])
-    else:
-        def_cxxcompiler =  FindTool(DEF_CXX_COMPILERS, env)
-        if def_cxxcompiler:
-            t = Tool(def_cxxcompiler, toolpath = get_numscons_toolpaths(env))
-            t(env)
+    def set_cxx_from_distutils():
+        t = None
+        if len(env['cxx_opt']) > 0:
+            if len(env['cxx_opt_path']) > 0:
+                if built_with_mstools(env):
+                    t = Tool("msvc", toolpath = get_numscons_toolpaths(env))
+                    # We need msvs tool too (before customization !)
+                else:
+                    cxx = get_cxx_type(pjoin(env['cxx_opt_path'], env['cxx_opt']))
+                    t = Tool(cxx, toolpath = get_numscons_toolpaths(env))
+                    path_list.insert(0, env['cxx_opt_path'])
         else:
-            # Some scons tools initialize CXX env var even if no CXX available.
-            # This is just confusing, so remove the key here since we could not
-            # initialize any CXX tool.
-            try:
-                del env['CXX']
-            except KeyError:
-                pass
+            def_cxxcompiler =  FindTool(DEF_CXX_COMPILERS, env)
+            if def_cxxcompiler:
+                t = Tool(def_cxxcompiler, toolpath = get_numscons_toolpaths(env))
+        return t
 
-    customize_compiler(t.name, env, "CXX")
-    env['CXXFILESUFFIX'] = '.cxx'
+    t = set_cxx_from_distutils()
+    if t:
+        t(env)
+        customize_compiler(t.name, env, "CXX")
+        env['CXXFILESUFFIX'] = '.cxx'
+    else:
+        # Some scons tools initialize CXX env var even if no CXX available.
+        # This is just confusing, so remove the key here since we could not
+        # initialize any CXX tool.
+        if env.has_key('CXX'):
+            del env['CXX']
 
 def set_bootstrap(env):
     import __builtin__
@@ -356,6 +352,9 @@ def _get_numpy_env(args):
     if sys.platform == "win32":
         env["ENV"]["PATH"] = os.environ["PATH"]
 
+    # XXX: Make up my mind about importing env or not at some point
+    if os.environ.has_key('LD_LIBRARY_PATH'):
+        env["ENV"]["LD_LIBRARY_PATH"] = os.environ["LD_LIBRARY_PATH"]
     set_verbosity(env)
 
     return env
@@ -488,7 +487,7 @@ def initialize_tools(env):
     # Adding default tools for the one we do not customize: mingw is special
     # according to scons, don't ask me why, but this does not work as expected
     # for this tool.
-    if not env['cc_opt'] == 'mingw':
+    if not built_with_mingw(env):
         for i in [DEF_LINKERS, DEF_ASSEMBLERS, DEF_ARS]:
             t = FindTool(i, env) or i[0]
             Tool(t)(env)
@@ -514,10 +513,7 @@ def initialize_tools(env):
 
     finalize_env(env)
 
-    # Add the tool paths in the environment
-    if env['ENV'].has_key('PATH'):
-        path_list += env['ENV']['PATH'].split(os.pathsep)
-    env['ENV']['PATH'] = os.pathsep.join(path_list)
+    env['ENV']['PATH'] = os.environ['PATH']
 
 def customize_pyext(env):
     from SCons.Tool import Tool

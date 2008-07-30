@@ -35,6 +35,7 @@ __revision__ = "src/engine/SCons/Tool/suncc.py 3057 2008/06/09 22:21:00 knight"
 import SCons.Util
 
 import cc
+cplusplus = __import__('c++', globals(), locals(), [])
 
 def generate(env):
     """
@@ -42,6 +43,7 @@ def generate(env):
     to an Environment.
     """
     cc.generate(env)
+    cplusplus.generate(env)
 
     env['CXX']          = 'CC'
     env['SHCCFLAGS']    = SCons.Util.CLVar('$CCFLAGS -KPIC')
