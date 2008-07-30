@@ -77,6 +77,115 @@ def GetNumpyOptions(args):
 
     return opts
 
+def GetNumpyEnvironment(args):
+    """Returns a correctly initialized scons environment.
+
+    This environment contains builders for python extensions, ctypes
+    extensions, fortran builders, etc... Generally, call it with args =
+    ARGUMENTS, which contain the arguments given to the scons process.
+
+    This method returns an environment with fully customized flags."""
+    env = _get_numpy_env(args)
+
+    return env
+
+def has_f77(env):
+    return len(env['f77_opt']) > 0
+
+def set_bootstrap(env):
+    import __builtin__
+    if env['bootstrapping']:
+        __builtin__.__NUMPY_SETUP__ = True
+
+def is_bootstrapping(env):
+    return env['bootstrapping']
+
+def _init_environment(args):
+    from numscons.core.numpyenv import NumpyEnvironment
+    from SCons.Defaults import DefaultEnvironment
+    from SCons.Script import Help
+
+    opts = GetNumpyOptions(args)
+    env = NumpyEnvironment(options = opts)
+
+    set_bootstrap(env)
+
+    # We explicily set DefaultEnvironment to avoid wasting time on initializing
+    # tools a second time.
+    DefaultEnvironment(tools = [])
+
+    Help(opts.GenerateHelpText(env))
+
+    return env
+
+def GetInitEnvironment(args):
+    return _init_environment(args)
+
+def _get_numpy_env(args):
+    """Call this with args = ARGUMENTS."""
+    env = _init_environment(args)
+
+    # Getting the config options from *.cfg files
+    set_site_config(env)
+
+    set_verbosity(env)
+
+    #------------------------------------------------
+    # Setting tools according to command line options
+    #------------------------------------------------
+    initialize_tools(env)
+
+    #---------------
+    #     Misc
+    #---------------
+    customize_tools(env)
+
+    # Adding custom builders
+    add_custom_builders(env)
+
+    return env
+
+def set_verbosity(env):
+    level = int(env['silent'])
+
+    if level > 0:
+        env['F2PYCOMSTR']           = "F2PY               $SOURCE"
+
+        env['CCCOMSTR']             = "CC                 $SOURCE"
+        env['SHCCCOMSTR']           = "SHCC               $SOURCE"
+
+        env['CXXCOMSTR']            = "CXX                $SOURCE"
+        env['SHCXXCOMSTR']          = "SHCXX              $SOURCE"
+
+        env['PYEXTCCCOMSTR']        = "PYEXTCC            $SOURCE"
+        env['PYEXTCXXCOMSTR']       = "PYEXTCXX           $SOURCE"
+        env['PYEXTLINKCOMSTR']      = "PYEXTLINK          $SOURCE"
+
+        env['F77COMSTR']            = "F77                $SOURCE"
+        env['SHF77COMSTR']          = "SHF77              $SOURCE"
+
+        env['ARCOMSTR']             = "AR                 $SOURCE"
+        env['RANLIBCOMSTR']         = "RANLIB             $SOURCE"
+        env['LDMODULECOMSTR']       = "LDMODULE           $SOURCE"
+
+        env['INSTALLSTR']           = "INSTALL            $SOURCE"
+
+        env['ARRAPIGENCOMSTR']      = "GENERATE ARRAY API $SOURCE"
+        env['UFUNCAPIGENCOMSTR']    = "GENERATE UFUNC API $SOURCE"
+        env['TEMPLATECOMSTR']       = "FROM TEMPLATE      $SOURCE"
+        env['UMATHCOMSTR']          = "GENERATE UMATH     $SOURCE"
+
+        env['CTEMPLATECOMSTR']      = "FROM C TEMPLATE    $SOURCE"
+        env['FTEMPLATECOMSTR']      = "FROM F TEMPLATE    $SOURCE"
+
+def set_site_config(env):
+    config = get_config(str(env.fs.Top))
+    env['NUMPY_SITE_CONFIG'] = config
+
+    # This will be used to keep configuration information on a per package basis
+    env['NUMPY_PKG_CONFIG'] = {'PERFLIB' : {}, 'LIB' : {}}
+    env['NUMPY_PKG_CONFIG_FILE'] = get_scons_configres_filename()
+
 def finalize_env(env):
     """Call this at the really end of the numpy environment initialization."""
     # This will customize some things, to cope with some idiosyncraties with
@@ -142,132 +251,6 @@ def apply_compilers_customization(env):
 
     if 'LDFLAGS' in os.environ:
         env.Prepend(LINKFLAGS = os.environ['LDFLAGS'])
-
-def GetNumpyEnvironment(args):
-    """Returns a correctly initialized scons environment.
-
-    This environment contains builders for python extensions, ctypes
-    extensions, fortran builders, etc... Generally, call it with args =
-    ARGUMENTS, which contain the arguments given to the scons process.
-
-    This method returns an environment with fully customized flags."""
-    env = _get_numpy_env(args)
-
-    return env
-
-def has_f77(env):
-    return len(env['f77_opt']) > 0
-
-def set_bootstrap(env):
-    import __builtin__
-    if env['bootstrapping']:
-        __builtin__.__NUMPY_SETUP__ = True
-
-def is_bootstrapping(env):
-    return env['bootstrapping']
-
-def _init_environment(args):
-    from numscons.core.numpyenv import NumpyEnvironment
-    from SCons.Defaults import DefaultEnvironment
-    from SCons.Script import Help
-
-    opts = GetNumpyOptions(args)
-    env = NumpyEnvironment(options = opts)
-
-    set_bootstrap(env)
-
-    # We explicily set DefaultEnvironment to avoid wasting time on initializing
-    # tools a second time.
-    DefaultEnvironment(tools = [])
-
-    Help(opts.GenerateHelpText(env))
-
-    return env
-
-def GetInitEnvironment(args):
-    return _init_environment(args)
-
-def _get_numpy_env(args):
-    """Call this with args = ARGUMENTS."""
-    env = _init_environment(args)
-
-    customize_scons_env(env)
-
-    # Getting the config options from *.cfg files
-    set_site_config(env)
-
-    set_verbosity(env)
-
-    #------------------------------------------------
-    # Setting tools according to command line options
-    #------------------------------------------------
-    initialize_tools(env)
-
-    #---------------
-    #     Misc
-    #---------------
-    customize_tools(env)
-
-    # Adding custom builders
-    add_custom_builders(env)
-
-    return env
-
-def customize_scons_env(env):
-    #--------------------------------------------------
-    # Customize scons environment from user environment
-    #--------------------------------------------------
-    env["ENV"]["PATH"] = os.environ["PATH"]
-
-    # Add HOME in the environment: some tools seem to require it (Intel
-    # compiler, for licenses stuff)
-    if os.environ.has_key('HOME'):
-        env['ENV']['HOME'] = os.environ['HOME']
-
-    # XXX: Make up my mind about importing env or not at some point
-    if os.environ.has_key('LD_LIBRARY_PATH'):
-        env["ENV"]["LD_LIBRARY_PATH"] = os.environ["LD_LIBRARY_PATH"]
-
-def set_verbosity(env):
-    level = int(env['silent'])
-
-    if level > 0:
-        env['F2PYCOMSTR']           = "F2PY               $SOURCE"
-
-        env['CCCOMSTR']             = "CC                 $SOURCE"
-        env['SHCCCOMSTR']           = "SHCC               $SOURCE"
-
-        env['CXXCOMSTR']            = "CXX                $SOURCE"
-        env['SHCXXCOMSTR']          = "SHCXX              $SOURCE"
-
-        env['PYEXTCCCOMSTR']        = "PYEXTCC            $SOURCE"
-        env['PYEXTCXXCOMSTR']       = "PYEXTCXX           $SOURCE"
-        env['PYEXTLINKCOMSTR']      = "PYEXTLINK          $SOURCE"
-
-        env['F77COMSTR']            = "F77                $SOURCE"
-        env['SHF77COMSTR']          = "SHF77              $SOURCE"
-
-        env['ARCOMSTR']             = "AR                 $SOURCE"
-        env['RANLIBCOMSTR']         = "RANLIB             $SOURCE"
-        env['LDMODULECOMSTR']       = "LDMODULE           $SOURCE"
-
-        env['INSTALLSTR']           = "INSTALL            $SOURCE"
-
-        env['ARRAPIGENCOMSTR']      = "GENERATE ARRAY API $SOURCE"
-        env['UFUNCAPIGENCOMSTR']    = "GENERATE UFUNC API $SOURCE"
-        env['TEMPLATECOMSTR']       = "FROM TEMPLATE      $SOURCE"
-        env['UMATHCOMSTR']          = "GENERATE UMATH     $SOURCE"
-
-        env['CTEMPLATECOMSTR']      = "FROM C TEMPLATE    $SOURCE"
-        env['FTEMPLATECOMSTR']      = "FROM F TEMPLATE    $SOURCE"
-
-def set_site_config(env):
-    config = get_config(str(env.fs.Top))
-    env['NUMPY_SITE_CONFIG'] = config
-
-    # This will be used to keep configuration information on a per package basis
-    env['NUMPY_PKG_CONFIG'] = {'PERFLIB' : {}, 'LIB' : {}}
-    env['NUMPY_PKG_CONFIG_FILE'] = get_scons_configres_filename()
 
 def add_custom_builders(env):
     """Call this to add all our custom builders to the environment."""
