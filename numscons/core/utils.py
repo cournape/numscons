@@ -1,5 +1,5 @@
 #! /usr/bin/env python
-# Last Change: Sat Jul 05 04:00 PM 2008 J
+# Last Change: Wed Jul 30 02:00 PM 2008 J
 
 """This module defines various utilities used throughout the scons support
 library."""
@@ -92,28 +92,10 @@ class DefaultDict(dict):
 def flatten(l):
     """Flatten a list."""
     # XXX: needs testing
-    if isinstance(l,list):
-        return sum(map(flatten,l), [])
+    if isinstance(l, list):
+        return sum(map(flatten, l), [])
     else:
         return [l]
-
-def rsplit(s, sep, maxsplit = -1):
-    """Equivalent of rsplit, but works on 2.3."""
-    try:
-        return s.rsplit(sep, maxsplit)
-    except AttributeError:
-        return _rsplit(s, sep, maxsplit)
-
-def _rsplit(s, sep, maxsplit):
-    """Equivalent of rsplit, but works on 2.3."""
-    l = s.split(sep)
-    if len(l) < 2 or maxsplit == 0:
-        return [s]
-    elif maxsplit < 0:
-        return l[-len(l):]
-    else:
-        st = sep.join(l[0:-maxsplit])
-        return [st] + l[-maxsplit:]
 
 class partial:
     def __init__(self, fun, *args, **kwargs):
