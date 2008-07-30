@@ -168,8 +168,6 @@ def initialize_tools(env):
         except EnvironmentError:
             raise RuntimeError('g++ not found: this is necessary with mingw32 '\
                                'to build numpy !')
-        # XXX: is this really the right place ?
-        env.AppendUnique(CFLAGS = '-mno-cygwin')
 
     # Set ALLOW_UNDEFINED link flags to allow undefined symbols in dynamic
     # libraries

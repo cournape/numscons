@@ -99,6 +99,9 @@ def finalize_env(env):
     if is_f77_gnu(env):
         env.AppendUnique(F77FLAGS = ['-fno-second-underscore'])
 
+    if built_with_mingw(env):
+        env.AppendUnique(CFLAGS = '-mno-cygwin')
+
 def apply_compilers_customization(env):
     """Apply customization for compilers' flags to the environment."""
     #------------------------------
