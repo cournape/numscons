@@ -63,22 +63,6 @@ class DefaultDictTester(unittest.TestCase):
         assert b['a'] == a['a']
         assert b['a'] is not a['a']
 
-class DelConsDupTester(unittest.TestCase):
-    def test_basic1(self):
-        """Check seq wo dup is identical."""
-        a = [1, 2, 3]
-        assert delconsdup(a) == a
-
-    def test_basic2(self):
-        """Check seq with one dup is correctly processed."""
-        a = [1, 2, 3, 3]
-        assert delconsdup(a) == [1, 2, 3]
-
-    def test_basic3(self):
-        """Check seq with several dups is correctly processed."""
-        a = [1, 2, 3, 3, 2, 1, 1, 2]
-        assert delconsdup(a) == [1, 2, 3, 2, 1, 2]
-
 class UniqueTest(unittest.TestCase):
     def test_donothing(self):
         a = [1, 2]

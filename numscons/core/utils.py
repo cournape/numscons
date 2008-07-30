@@ -135,21 +135,6 @@ else:
         return t is StringType \
             or (t is InstanceType and isinstance(obj, UserString))
 
-def delconsdup(l):
-    """Returns a sequence with ajdacent dups l removed."""
-    # XXX: straightforward, I didn't any obvious way to make it faster, and we
-    # do not use it for long lists anyway.
-    if len(l) < 2:
-        return l
-    prev = l[0]
-    nl = [prev]
-    for i in l[1:]:
-        if not i == prev:
-            nl.append(i)
-        prev = i
-
-    return nl
-
 def unique(seq):
     """remove duplicate in sequence. Members should be hashable."""
     d = dict([(x, x) for x in seq])
