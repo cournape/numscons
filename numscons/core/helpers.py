@@ -9,7 +9,7 @@ from os.path import join as pjoin, basename
 
 from numscons.core.custom_builders import DistutilsSharedLibrary, NumpyCtypes, \
      DistutilsPythonExtension, DistutilsStaticExtLibrary, NumpyPythonExtension
-from numscons.corfe.initialization import initialize_tools
+from numscons.core.initialization import initialize_tools
 from numscons.core.siteconfig import get_config
 from numscons.core.extension_scons import createStaticExtLibraryBuilder
 from numscons.core.extension import get_pythonlib_dir
