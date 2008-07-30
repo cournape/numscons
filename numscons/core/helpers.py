@@ -192,10 +192,10 @@ def initialize_cc(env, path_list):
 
         if len(env['cc_opt_path']) > 0:
             if built_with_mstools(env):
-                 t = Tool("msvc", toolpath = get_numscons_toolpaths(env))
-                 # We need msvs tool too (before customization !)
-                 Tool('msvs')(env)
-                 path_list.insert(0, env['cc_opt_path'])
+                t = Tool("msvc", toolpath = get_numscons_toolpaths(env))
+                # We need msvs tool too (before customization !)
+                Tool('msvs')(env)
+                path_list.insert(0, env['cc_opt_path'])
             else:
                 cc = get_cc_type(pjoin(env['cc_opt_path'], env['cc_opt']))
                 if cc == 'gcc' and sys.platform == 'win32':
@@ -578,7 +578,7 @@ def customize_pyext(env):
     if is_bootstrapping(env):
         env['NUMPYCPPPATH'] = scons_get_paths(env['include_bootstrap'])
     else:
-	from numpy.distutils.misc_util import get_numpy_include_dirs
+        from numpy.distutils.misc_util import get_numpy_include_dirs
         env['NUMPYCPPPATH'] = get_numpy_include_dirs()
 
 def customize_link_flags(env):
