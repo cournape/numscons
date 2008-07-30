@@ -14,8 +14,8 @@ were when scons was inside numpy repository):
     - solution to handle sdist (source files)
 
 Meta Goals:
-    - 0.9: clean up core and change compiler detection. 
-    - 0.10: Clean up checkers code. Remove duplicated code, clean-up. 
+    - 0.9: clean up core and change compiler detection.
+    - 0.10: Clean up checkers code. Remove duplicated code, clean-up.
     - 0.11: Put documentation in shape. User-doc: customization of
 compiler/options/etc... Dev-doc: basic design, custom builders, checkers code,
 etc...
