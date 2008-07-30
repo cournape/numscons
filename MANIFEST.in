@@ -6,5 +6,5 @@ include setupegg.py
 include setup.py
 include release.py
 include Changelog
-recursive-include numscons/core *.cfg
+recursive-include numscons/core/configurations *.cfg
 recursive-include numscons/checkers *.cfg
