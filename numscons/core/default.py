@@ -1,5 +1,5 @@
 #! /usr/bin/env python
-# Last Change: Sat Jul 05 04:00 PM 2008 J
+# Last Change: Wed Jul 30 02:00 PM 2008 J
 """This module defines the default tools for each platform, as well as the
 default compiler configurations."""
 
@@ -7,11 +7,7 @@ default compiler configurations."""
 # public api for this
 def tool_list(platform):
     """platform should be the value returned by enbv['PLATFORM'], not
-    sys.platform !!!!."""
-    # Here, we set the list of default tools as used by numpy.distutils.scons.
-    # This is ripped of scons, because scons does not provide a way to get
-    # separate default lists for separate tools (e.g linker, C compiler,
-    # etc...)
+    sys.platform. """
 
     if str(platform) == 'win32':
         # prefer Microsoft tools on Windows
@@ -22,22 +18,6 @@ def tool_list(platform):
         assemblers = ['masm', 'nasm', 'gas', '386asm' ]
         fortran_compilers = ['g77', 'ifl', 'cvf', 'f95', 'f90', 'fortran']
         ars = ['mslib', 'ar', 'tlib']
-    elif str(platform) == 'os2':
-        # prefer IBM tools on OS/2
-        linkers = ['ilink', 'gnulink', 'mslink']
-        c_compilers = ['icc', 'gcc', 'msvc', 'cc']
-        cxx_compilers = ['icc', 'g++', 'msvc', 'c++']
-        assemblers = ['nasm', 'masm', 'gas']
-        fortran_compilers = ['ifl', 'g77']
-        ars = ['ar', 'mslib']
-    elif str(platform) == 'irix':
-        # prefer MIPSPro on IRIX
-        linkers = ['sgilink', 'gnulink']
-        c_compilers = ['sgicc', 'gcc', 'cc']
-        cxx_compilers = ['sgic++', 'g++', 'c++']
-        assemblers = ['as', 'gas']
-        fortran_compilers = ['f95', 'f90', 'f77', 'g77', 'fortran']
-        ars = ['sgiar']
     elif str(platform) == 'sunos':
         # prefer Forte tools on SunOS
         linkers = ['sunlink', 'gnulink']
