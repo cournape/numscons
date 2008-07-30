@@ -199,6 +199,7 @@ def _get_numpy_env(args):
     """Call this with args = ARGUMENTS."""
     env = _init_environment(args)
 
+    customize_scons_env(env)
     customize_scons_dirs(env)
 
     # Getting the config options from *.cfg files
@@ -219,21 +220,18 @@ def _get_numpy_env(args):
     # Adding custom builders
     add_custom_builders(env)
 
-    customize_scons_env(env)
-
     return env
 
 def customize_scons_env(env):
     #--------------------------------------------------
     # Customize scons environment from user environment
     #--------------------------------------------------
+    env["ENV"]["PATH"] = os.environ["PATH"]
+
     # Add HOME in the environment: some tools seem to require it (Intel
     # compiler, for licenses stuff)
     if os.environ.has_key('HOME'):
         env['ENV']['HOME'] = os.environ['HOME']
-
-    if sys.platform == "win32":
-        env["ENV"]["PATH"] = os.environ["PATH"]
 
     # XXX: Make up my mind about importing env or not at some point
     if os.environ.has_key('LD_LIBRARY_PATH'):
@@ -335,8 +333,6 @@ def customize_tools(env):
     customize_pyext(env)
 
     finalize_env(env)
-
-    env['ENV']['PATH'] = os.environ['PATH']
 
     apply_compilers_customization(env)
 
