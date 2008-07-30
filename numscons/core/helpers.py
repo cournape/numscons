@@ -172,7 +172,7 @@ def GetNumpyEnvironment(args):
     This environment contains builders for python extensions, ctypes
     extensions, fortran builders, etc... Generally, call it with args =
     ARGUMENTS, which contain the arguments given to the scons process.
-    
+
     This method returns an environment with fully customized flags."""
     env = _get_numpy_env(args)
 
@@ -186,7 +186,7 @@ def initialize_cc(env, path_list):
 
     def set_cc_from_distutils():
         # XXX: To keep backward compatibility with numpy 1.1.1. Can be dropped at
-        # 1.1.2 
+        # 1.1.2
         if env["cc_opt"] == "intelc":
             env["cc_opt"] = "icc"
 
@@ -218,7 +218,7 @@ def initialize_cc(env, path_list):
         t = Tool(FindTool(DEF_C_COMPILERS, env),
                  toolpath = get_numscons_toolpaths(env))
     t(env)
-    
+
     customize_compiler(t.name, env, "C")
 
 def has_f77(env):
