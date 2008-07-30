@@ -3,7 +3,6 @@
 """This initialize a scons environment using info from distutils, and all our
 customization (python extension builders, build_dir, etc...)."""
 from os.path import join as pjoin
-import logging
 
 from numscons.core.custom_builders import DistutilsSharedLibrary, NumpyCtypes, \
      DistutilsPythonExtension, DistutilsStaticExtLibrary, NumpyPythonExtension
@@ -16,12 +15,11 @@ from numscons.core.misc import get_scons_build_dir, \
 from numscons.core.template_generators import generate_from_c_template, \
      generate_from_f_template, generate_from_template_emitter, \
      generate_from_template_scanner
+import numscons.core.trace
 
 from numscons.tools.substinfile import TOOL_SUBST
 
 __all__ = ['GetNumpyEnvironment', 'GetInitEnvironment']
-
-_LOGGER = logging.getLogger('numscons')
 
 def GetNumpyOptions(args):
     """Call this with args=ARGUMENTS to take into account command line args."""
@@ -70,7 +68,7 @@ def GetNumpyOptions(args):
     # Logging option
     opts.Add('log_level',
              '0 means max log, Any positive integer is OK '\
-             '(logging value)', logging.CRITICAL)
+             '(logging value)', numscons.core.trace.CRITICAL)
 
     return opts
 
