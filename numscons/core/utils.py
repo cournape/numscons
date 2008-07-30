@@ -1,5 +1,5 @@
 #! /usr/bin/env python
-# Last Change: Sat Jul 05 04:00 PM 2008 J
+# Last Change: Wed Jul 30 02:00 PM 2008 J
 
 """This module defines various utilities used throughout the scons support
 library."""
@@ -92,28 +92,10 @@ class DefaultDict(dict):
 def flatten(l):
     """Flatten a list."""
     # XXX: needs testing
-    if isinstance(l,list):
-        return sum(map(flatten,l), [])
+    if isinstance(l, list):
+        return sum(map(flatten, l), [])
     else:
         return [l]
-
-def rsplit(s, sep, maxsplit = -1):
-    """Equivalent of rsplit, but works on 2.3."""
-    try:
-        return s.rsplit(sep, maxsplit)
-    except AttributeError:
-        return _rsplit(s, sep, maxsplit)
-
-def _rsplit(s, sep, maxsplit):
-    """Equivalent of rsplit, but works on 2.3."""
-    l = s.split(sep)
-    if len(l) < 2 or maxsplit == 0:
-        return [s]
-    elif maxsplit < 0:
-        return l[-len(l):]
-    else:
-        st = sep.join(l[0:-maxsplit])
-        return [st] + l[-maxsplit:]
 
 class partial:
     def __init__(self, fun, *args, **kwargs):
@@ -130,44 +112,29 @@ class partial:
 
         return self.fun(*(self.pending + args), **kw)
 
-# Copied from scons code...
-import types
-from UserString import UserString
-# Don't "from types import ..." these because we need to get at the
-# types module later to look for UnicodeType.
-InstanceType    = types.InstanceType
-StringType      = types.StringType
-TupleType       = types.TupleType
-if hasattr(types, 'UnicodeType'):
-    UnicodeType = types.UnicodeType
-    def isstring(obj):
-        """Return true if argument is a string."""
-        t = type(obj)
-        return t is StringType \
-            or t is UnicodeType \
-            or (t is InstanceType and isinstance(obj, UserString))
-else:
-    def isstring(obj):
-        """Return true if argument is a string."""
-        t = type(obj)
-        return t is StringType \
-            or (t is InstanceType and isinstance(obj, UserString))
-
-def delconsdup(l):
-    """Returns a sequence with ajdacent dups l removed."""
-    # XXX: straightforward, I didn't any obvious way to make it faster, and we
-    # do not use it for long lists anyway.
-    if len(l) < 2:
-        return l
-    prev = l[0]
-    nl = [prev]
-    for i in l[1:]:
-        if not i == prev:
-            nl.append(i)
-        prev = i
-
-    return nl
-
+# # Copied from scons code...
+# import types
+# from UserString import UserString
+# # Don't "from types import ..." these because we need to get at the
+# # types module later to look for UnicodeType.
+# InstanceType    = types.InstanceType
+# StringType      = types.StringType
+# TupleType       = types.TupleType
+# if hasattr(types, 'UnicodeType'):
+#     UnicodeType = types.UnicodeType
+#     def isstring(obj):
+#         """Return true if argument is a string."""
+#         t = type(obj)
+#         return t is StringType \
+#             or t is UnicodeType \
+#             or (t is InstanceType and isinstance(obj, UserString))
+# else:
+#     def isstring(obj):
+#         """Return true if argument is a string."""
+#         t = type(obj)
+#         return t is StringType \
+#             or (t is InstanceType and isinstance(obj, UserString))
+#
 def unique(seq):
     """remove duplicate in sequence. Members should be hashable."""
     d = dict([(x, x) for x in seq])

@@ -1,17 +1,70 @@
 # This module cannot be imported directly, because it needs scons module.
+import os
 from os.path import join as pjoin
 
 from SCons.Environment import Environment
 
 from numscons.core.misc import get_numscons_toolpaths
+from numscons.core.errors import NumsconsError
+from numscons.core.utils import pkg_to_path
 
 class NumpyEnvironment(Environment):
     """An SCons Environment subclass which knows how to deal with distutils
     idiosyncraties."""
     def __init__(self, *args, **kw):
+        if kw.has_key('tools'):
+            raise NumsconsError("NumpyEnvironment has received a tools "\
+                                "argument.")
+        else:
+            kw['tools'] = []
+
         Environment.__init__(self, *args, **kw)
 
-    def Configure(self, *args, **kw):
+        # Setting dirs according to command line options
+        self['build_dir'] = pjoin(self['build_prefix'], self['src_dir'])
+        self['distutils_installdir'] = pjoin(self['distutils_libdir'],
+                                             pkg_to_path(self['pkg_name']))
+
+        # This will keep our compiler dependent customization (optimization,
+        # warning, etc...)
+        self['NUMPY_CUSTOMIZATION'] = {}
+
+        self._set_sconsign_location()
+        self._customize_scons_env()
+
+    def _set_sconsign_location(self):
+        """Put sconsign file in build dir. This is surprisingly difficult to do
+        because of build_dir interactions."""
+
+        # SConsign needs an absolute path or a path relative to where the
+        # SConstruct file is. We have to find the path of the build dir
+        # relative to the src_dir: we add n .., where n is the number of
+        # occurances of the path separator in the src dir.
+        def get_build_relative_src(srcdir, builddir):
+            n = srcdir.count(os.sep)
+            if len(srcdir) > 0 and not srcdir == '.':
+                n += 1
+            return pjoin(os.sep.join([os.pardir for i in range(n)]), builddir)
+
+        sconsign = pjoin(get_build_relative_src(self['src_dir'],
+                                                self['build_dir']),
+                         'sconsign.dblite')
+        self.SConsignFile(sconsign)
+
+    def _customize_scons_env(self):
+        """Customize scons environment from user environment."""
+        self["ENV"]["PATH"] = os.environ["PATH"]
+
+        # Add HOME in the environment: some tools seem to require it (Intel
+        # compiler, for licenses stuff)
+        if os.environ.has_key('HOME'):
+            self['ENV']['HOME'] = os.environ['HOME']
+
+        # XXX: Make up my mind about importing self or not at some point
+        if os.environ.has_key('LD_LIBRARY_PATH'):
+            self["ENV"]["LD_LIBRARY_PATH"] = os.environ["LD_LIBRARY_PATH"]
+
+    def NumpyConfigure(self, *args, **kw):
         if kw.has_key('conf_dir') or kw.has_key('log_file'):
             # XXX handle this gracefully
             assert 0 == 1
@@ -26,7 +79,8 @@ class NumpyEnvironment(Environment):
             return Environment.Tool(self, toolname,
                     path + get_numscons_toolpaths(self))
         else:
-            return Environment.Tool(self, toolname, get_numscons_toolpaths(self))
+            return Environment.Tool(self, toolname,
+                                    get_numscons_toolpaths(self))
 
     def DistutilsSConscript(self, name):
         """This sets up build directory correctly to play nice with

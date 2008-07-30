@@ -26,7 +26,9 @@ AUTHOR_EMAIL = 'david@ar.media.kyoto-u.ac.jp'
 PACKAGES    = ['numscons', 'numscons.core', 'numscons.checkers',
                'numscons.tools', 'numscons.numdist',
                'numscons.checkers.fortran']
-PACKAGE_DATA = {'numscons.core' : ['compiler.cfg', 'fcompiler.cfg', 'cxxcompiler.cfg'],
+PACKAGE_DATA = {'numscons.core' :
+                    [os.path.join('configurations', i) for i in
+                     ['compiler.cfg', 'fcompiler.cfg', 'cxxcompiler.cfg']],
               'numscons.checkers' : ['perflib.cfg']}
 DATA_DIR    = ['numscons/scons-local']
 

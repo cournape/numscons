@@ -1,5 +1,5 @@
 #! /usr/bin/env python
-# Last Change: Fri Mar 07 02:00 PM 2008 J
+# Last Change: Wed Jul 30 02:00 PM 2008 J
 
 """numscons is a package which enable building python extensions within
 distutils. It is intented as a replacement of numpy.distutils to build numpy
@@ -9,9 +9,6 @@ import core
 from core import *
 __all__ = core.__all__
 
-# XXX those should not be needed by the scons command only...
-from core.extension import get_python_inc, get_pythonlib_dir
-
 # XXX those are needed by the scons command only...
 from core.misc import get_scons_path, get_scons_build_dir, \
                       get_scons_configres_dir, get_scons_configres_filename, \
@@ -19,7 +16,7 @@ from core.misc import get_scons_path, get_scons_build_dir, \
 #from core.libinfo import get_paths as scons_get_paths
 
 # XXX those should not be needed by the scons command only...
-from core.extension import get_python_inc, get_pythonlib_dir
+from core.customization import get_python_inc, get_pythonlib_dir
 
 # Those functions really belong to the public API
 from core.helpers import GetNumpyEnvironment
