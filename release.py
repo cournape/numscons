@@ -25,7 +25,7 @@ AUTHOR      = 'David Cournapeau'
 AUTHOR_EMAIL = 'david@ar.media.kyoto-u.ac.jp'
 PACKAGES    = ['numscons', 'numscons.core', 'numscons.checkers',
                'numscons.tools', 'numscons.numdist',
-               'numscons.checkers.tests', 'numscons.checkers.fortran']
+               'numscons.checkers.fortran']
 PACKAGE_DATA = {'numscons.core' : ['compiler.cfg', 'fcompiler.cfg', 'cxxcompiler.cfg'],
               'numscons.checkers' : ['perflib.cfg']}
 DATA_DIR    = ['numscons/scons-local']
