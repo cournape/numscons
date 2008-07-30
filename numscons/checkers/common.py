@@ -11,6 +11,7 @@ import os
 from copy import copy
 
 from numscons.core.siteconfig import get_config_from_section
+from numscons.core.trace import debug, info, warn
 from numscons.checkers.perflib_info import PerflibInfo
 from numscons.checkers.support import save_and_set, restore, check_symbol
 
@@ -100,6 +101,8 @@ def check_code(context, name, section, opts_factory, headers_to_check,
     if rpath_is_libpath:
         opts['rpath'] = copy(opts['library_dirs'])
 
+    info('\n=====\nPerflib check %s: configuration factory is %s '
+         '(customized ? %d)\n=====' % (name, opts, found))
     # Check whether the header is available (CheckHeader-like checker)
     st = _check_header(context, opts, headers_to_check)
     if not st:

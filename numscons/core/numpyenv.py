@@ -7,6 +7,7 @@ from SCons.Environment import Environment
 from numscons.core.misc import get_numscons_toolpaths
 from numscons.core.errors import NumsconsError
 from numscons.core.utils import pkg_to_path
+from numscons.core.trace import set_logging
 
 class NumpyEnvironment(Environment):
     """An SCons Environment subclass which knows how to deal with distutils
@@ -31,6 +32,7 @@ class NumpyEnvironment(Environment):
 
         self._set_sconsign_location()
         self._customize_scons_env()
+        set_logging(self)
 
     def _set_sconsign_location(self):
         """Put sconsign file in build dir. This is surprisingly difficult to do

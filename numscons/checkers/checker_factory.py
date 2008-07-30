@@ -10,6 +10,7 @@ from copy import copy, deepcopy
 
 from numscons.core.misc import built_with_mstools
 from numscons.core.siteconfig import get_config_from_section
+from numscons.core.trace import debug, info
 
 from numscons.checkers.perflib_info import add_lib_info, MetalibInfo
 from numscons.checkers.perflib import CONFIG, get_perflib_info
@@ -43,14 +44,18 @@ def _check(perflibs, context, libname, check_version, msg_template, test_src,
 
     perflibs should be a list of perflib to check (the names which can be used
     are the keys of CONFIG."""
+    info('Checking for perflibs %s' % str(perflibs))
 
     moreopts = _get_language_opts(context, language)
+    debug('Options for language %s : %s' % (language, moreopts))
     def _check_perflib(pname):
         """pname is the name of the perflib."""
         cache = get_perflib_info(context, pname)
         if not cache:
+            debug('Failed getting perflib info from cache for %s' % pname)
             return 0
         cfgopts = cache.opts_factory[libname]()
+        info('Config options for %s: %s' % (libname, cfgopts))
         if moreopts:
             # More options are necessary to check the code snippet (fortran
             # runtime, etc...), so we create a new BuildConfig which contain
@@ -61,6 +66,7 @@ def _check(perflibs, context, libname, check_version, msg_template, test_src,
         else:
             # Nothing to do, testopts and cfgopts are the same
             testopts = cfgopts
+        info('Final options for %s: %s' % (libname, testopts))
         st = check_include_and_run(context, msg_template % CONFIG[pname].name,
                                    testopts, [], test_src, autoadd)
         if st:
@@ -134,6 +140,8 @@ class CheckerFactory:
 
     def __call__(self, context, autoadd = 1, check_version = 0):
 
+        debug('Calling CheckerFactory (%s)' % self._libname)
+
         # Is customized from user environment ?
         if os.environ.has_key(self._disp) and os.environ[self._disp] == 'None':
             context.Message("Checking %s ... " % self._disp)
@@ -154,8 +162,10 @@ class CheckerFactory:
             # Test if any performance library provides the whished API
             try:
                 pf = self._perflibs[sys.platform]
+                debug('Got optimized perflibs info')
             except KeyError:
                 pf = self._perflibs['default']
+                debug('Got default perflibs info')
 
             if self._check(context, pf, check_version, src, autoadd):
                 return 1

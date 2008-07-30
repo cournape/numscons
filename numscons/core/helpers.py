@@ -15,6 +15,7 @@ from numscons.core.misc import get_scons_build_dir, \
 from numscons.core.template_generators import generate_from_c_template, \
      generate_from_f_template, generate_from_template_emitter, \
      generate_from_template_scanner
+import numscons.core.trace
 
 from numscons.tools.substinfile import TOOL_SUBST
 
@@ -63,6 +64,11 @@ def GetNumpyOptions(args):
                         '0', allowed_values = ('0', '1', '2')))
     opts.Add(BoolOption('bootstrapping',
                         "true if bootrapping numpy, false if not", 0))
+
+    # Logging option
+    opts.Add('log_level',
+             '0 means max log, Any positive integer is OK '\
+             '(logging value)', numscons.core.trace.CRITICAL)
 
     return opts
 
