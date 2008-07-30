@@ -162,7 +162,8 @@ def finalize_env(env):
         env.AppendUnique(CFLAGS = '-mno-cygwin')
 
 def apply_compilers_customization(env):
-    """Apply customization for compilers' flags to the environment."""
+    """Apply customization to compilers' flags from the environment. Also take
+    into account user customization through shell variables."""
     #------------------------------
     # C compiler last customization
     #------------------------------
