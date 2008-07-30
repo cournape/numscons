@@ -23,8 +23,8 @@ class NumpyEnvironment(Environment):
         self.AppendUnique(build_dir = pjoin(self['build_prefix'],
                                            self['src_dir']))
         self.AppendUnique(distutils_installdir =
-                         pjoin(self['distutils_libdir'],
-                               pkg_to_path(self['pkg_name'])))
+                          pjoin(self['distutils_libdir'],
+                                pkg_to_path(self['pkg_name'])))
 
         # This will keep our compiler dependent customization (optimization,
         # warning, etc...)
