@@ -19,7 +19,8 @@ from numscons.core.utils import pkg_to_path, flatten
 from numscons.core.misc import pyplat2sconsplat, \
      get_numscons_toolpaths, iscplusplus, get_pythonlib_name, \
      is_f77_gnu, get_vs_version, built_with_mstools, cc_version, \
-     isfortran, isf2py, scons_get_paths
+     isfortran, isf2py, scons_get_paths, get_scons_build_dir, \
+     get_scons_configres_filename, built_with_mingw
 from numscons.core.compiler_detection import get_cc_type, get_f77_type, \
      get_cxx_type
 
@@ -30,9 +31,6 @@ from numscons.core.template_generators import generate_from_c_template, \
 from numscons.tools.substinfile import TOOL_SUBST
 
 from numscons.numdist import msvc_runtime_library
-
-from misc import get_scons_build_dir, \
-                 get_scons_configres_filename, built_with_mingw
 
 __all__ = ['GetNumpyEnvironment', 'GetInitEnvironment']
 
