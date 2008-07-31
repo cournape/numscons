@@ -23,8 +23,12 @@ class NumpyEnvironment(Environment):
 
         # Setting dirs according to command line options
         self['build_dir'] = pjoin(self['build_prefix'], pkg_to_path(self['pkg_name']))
-        self['distutils_installdir'] = pjoin(self['distutils_libdir'],
-                                             pkg_to_path(self['pkg_name']))
+
+        # Set directory where to "install" built C extensions
+        if self["inplace"]:
+            self['distutils_installdir'] = pjoin(str(self.fs.Top), self["src_dir"])
+        else:
+            self['distutils_installdir'] = pjoin(self['distutils_libdir'], pkg_to_path(self['pkg_name']))
 
         # This will keep our compiler dependent customization (optimization,
         # warning, etc...)
