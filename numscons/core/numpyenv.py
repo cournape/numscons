@@ -22,7 +22,7 @@ class NumpyEnvironment(Environment):
         Environment.__init__(self, *args, **kw)
 
         # Setting dirs according to command line options
-        self['build_dir'] = pjoin(self['build_prefix'], self['src_dir'])
+        self['build_dir'] = pjoin(self['build_prefix'], pkg_to_path(self['pkg_name']))
         self['distutils_installdir'] = pjoin(self['distutils_libdir'],
                                              pkg_to_path(self['pkg_name']))
 

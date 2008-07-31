@@ -1,0 +1,33 @@
+.. vim:syntax=rest
+
+Some notes which may be useful when I will put real docs in shape.
+
+Build directory
+===============
+
+Everything scons produces is put in a build directory (Using VariantDir from
+scons). This include configuration code snippets, sconsign database and of
+course built code. The build directory for each package is put in a
+subdirectory of the directory "build/scons" (at the same level as the caller
+scons script), so that it does not interfer with distutils (which puts its
+thing into build itself).
+
+Because numscons is driven by distutils, in particular everything is installed
+by distutils, numscons has to put generated code in a place where distutils
+expects it: the extensions built by numscons are copied into where distutils
+look for them (in a subdirectory of build/lib.*), using the scons Install
+builder (it is done by default by any Distutils* numscons builders).
+
+The distutils build directory is not a reproduction of the source tree, but reflects the package name.
+
+root\setup.py -> is set up with Configuration("foo")
+     pkg1\setup.py -> is setup with Configuration ("bar")
+     pkg2\subpkg1\setup.py -> is setup with Configuration ("foobar")
+         \subpkg2\setup.py -> is setup with Configuration ("barfoo")
+
+distutils will generate
+
+root\build\lib.$arch\foo
+                    \foo\bar\
+                    \foo\bar\foobar
+                    \foo\bar\barfoo
