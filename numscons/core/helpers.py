@@ -46,6 +46,8 @@ def GetNumpyOptions(args):
              "include directories for boostraping numpy (if you do not know" \
              " what that means, you don't need it)" ,
              '')
+    opts.Add(BoolOption('inplace',
+                        "true if building in place numpy, false if not", 0))
 
     # Add compiler related info
     opts.Add('cc_opt', 'name of C compiler', '')
