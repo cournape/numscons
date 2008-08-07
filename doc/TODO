@@ -5,13 +5,13 @@ Basic tasks
 
 Then, those are the old remaining things to do (once we get to the point we
 were when scons was inside numpy repository):
-    - clean the code of numpyenv; in perticular: builder creation (should be
-      done through tools), rename functions, and set the order right (0.7*
-      serie).
-    - handle inplace
-    - doc
-    - setuptools integration
+    - clean up checkers code + fortran detection
+    - clean site.cfg handling
+    - Real Ctypes builder
+    - Handling command line customization at the same location (CFLAGS and co)
+    - doc: user and dev-oriented
     - solution to handle sdist (source files)
+    - setuptools integration
 
 Meta Goals:
     - 0.9: clean up core and change compiler detection. Add log system + fake
