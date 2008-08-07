@@ -64,7 +64,7 @@ def is_sunfortran(path):
     """Return True if the compiler in path is sun fortran compiler."""
     return _is_compiler(path, ['-V'], parse_sunfortran)
 
-def is_icc(path):
+def is_icc(env, path):
     """Return True if the compiler in path is Intel C compiler."""
     return _is_compiler(path, ['-V'], parse_icc)
 
@@ -76,40 +76,74 @@ def is_gcc(path):
     """Return True if the compiler in path is GNU compiler."""
     return _is_compiler(path, ['-v'], parse_gnu)
 
-def get_cc_type(path):
-    if is_gcc(path)[0]:
-        return "gcc"
-    elif is_suncc(path)[0]:
-        return "suncc"
-    elif is_icc(path)[0]:
-        return "icc"
-    raise UnknownCompiler("Unknown C compiler %s" % path)
-
-def get_cxx_type(path):
-    if is_gcc(path)[0]:
-        return "g++"
-    elif is_suncxx(path)[0]:
-        return "suncc"
-    elif is_icc(path)[0]:
-        return "icc"
-    raise UnknownCompiler("Unknown CXX compiler %s" % path)
-
-def get_f77_type(path):
+def is_g77(path):
+    """Return True if the compiler in path is GNU F77 compiler."""
     st, v = is_gcc(path)
     if st:
         try:
             major = int(v.split(".")[0])
-            if major < 4:
-                return "g77"
-            else:
-                return "gfortran"
+            return major < 4, v
         except ValueError:
             raise UnknownCompiler("Could not parse version %v" % v)
-    elif is_sunfortran(path)[0]:
-        return "sunf77"
-    elif is_ifort(path)[0]:
-        return "ifort"
-    raise UnknownCompiler("Unknown F77 compiler %s" % path)
+    else:
+        return st, v
+
+def is_gfortran(path):
+    """Return True if the compiler in path is GNU F77/F90/F95 compiler."""
+    st, v = is_gcc(path)
+    if st:
+        try:
+            major = int(v.split(".")[0])
+            return major >= 4, v
+        except ValueError:
+            raise UnknownCompiler("Could not parse version %v" % v)
+    else:
+        return st, v
+
+# XXX: support default compiler for platforms where it makes sense (unix)
+def get_cc_type(env, path):
+    # If not cached, detect type of CC, otherwise just return the cached value
+    if not env.has_key("NUMPY_CC_TYPE"):
+        if is_gcc(path)[0]:
+            type = "gcc"
+        elif is_suncc(path)[0]:
+            type = "suncc"
+        elif is_icc(path)[0]:
+            type = "icc"
+        else:
+            raise UnknownCompiler("Unknown C compiler %s" % path)
+        env["NUMPY_CC_TYPE"] = type
+    return env["NUMPY_CC_TYPE"]
+
+def get_cxx_type(env, path):
+    # If not cached, detect type of CXX, otherwise just return the cached value
+    if not env.has_key("NUMPY_CXX_TYPE"):
+        if is_gcc(path)[0]:
+            type = "g++"
+        elif is_suncxx(path)[0]:
+            type = "suncc"
+        elif is_icc(path)[0]:
+            type = "icc"
+        else:
+            raise UnknownCompiler("Unknown CXX compiler %s" % path)
+        env["NUMPY_CXX_TYPE"] = type
+    return env["NUMPY_CXX_TYPE"]
+
+def get_f77_type(env, path):
+    # If not cached, detect type of F77, otherwise just return the cached value
+    if not env.has_key("NUMPY_F77_TYPE"):
+        if is_g77(path)[0]:
+            type =  "g77"
+        elif is_gfortran(path)[0]:
+            type =  "gfortran"
+        elif is_sunfortran(path)[0]:
+            type =  "sunf77"
+        elif is_ifort(path)[0]:
+            type =  "ifort"
+        else:
+            raise UnknownCompiler("Unknown F77 compiler %s" % path)
+        env["NUMPY_F77_TYPE"] = type
+    return env["NUMPY_F77_TYPE"]
 
 if __name__ == "__main__":
     import sys
@@ -119,6 +153,6 @@ if __name__ == "__main__":
 
     for f in [get_cc_type, get_cxx_type, get_f77_type]:
         try:
-            print f(cc)
+            print f({}, cc)
         except UnknownCompiler, e:
             print e

@@ -55,7 +55,7 @@ def initialize_cc(env, path_list):
                 Tool('msvs')(env)
                 path_list.insert(0, env['cc_opt_path'])
             else:
-                cc = get_cc_type(pjoin(env['cc_opt_path'], env['cc_opt']))
+                cc = get_cc_type(env, pjoin(env['cc_opt_path'], env['cc_opt']))
                 info('Detecting CC type: %s' % cc)
                 if cc == 'gcc' and sys.platform == 'win32':
                     cc = 'mingw'
@@ -96,13 +96,13 @@ def initialize_f77(env, path_list):
         if len(env['f77_opt']) > 0:
             debug('Setting F77 from distutils: %s' % env['f77_opt'])
             if len(env['f77_opt_path']) > 0:
-                f77 = get_f77_type(pjoin(env['f77_opt_path'], env['f77_opt']))
+                f77 = get_f77_type(env, pjoin(env['f77_opt_path'], env['f77_opt']))
                 info('Detecting F77 type: %s' % f77)
                 t = Tool(f77,
                          toolpath = get_numscons_toolpaths(env))
                 path_list.insert(0, env['f77_opt_path'])
             else:
-                f77 = get_f77_type(env['f77_opt'])
+                f77 = get_f77_type(env, env['f77_opt'])
                 info('Detecting F77 type: %s' % f77)
                 t = Tool(f77, toolpath = get_numscons_toolpaths(env))
         else:
@@ -135,7 +135,7 @@ def initialize_cxx(env, path_list):
                     info("Detected CXX type: msvc")
                     # We need msvs tool too (before customization !)
                 else:
-                    cxx = get_cxx_type(pjoin(env['cxx_opt_path'],
+                    cxx = get_cxx_type(env, pjoin(env['cxx_opt_path'],
                                              env['cxx_opt']))
                     info("Detected CXX type: %s" % cxx)
                     t = Tool(cxx, toolpath = get_numscons_toolpaths(env))
