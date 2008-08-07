@@ -55,7 +55,7 @@ class test_gnu_to_scons_flags(unittest.TestCase):
 		flags = gnu_to_scons_flags(cygwin_g77_link_expected)
 		assert cygwin_g77_link_parsed == flags
 
-class test_find_libs_paths(unittest.TestCase):
-	def test1(self):
-		paths = g77_link_parsed['LIBPATH']
-		print find_libs_paths(['g2c'], paths)
+#class test_find_libs_paths(unittest.TestCase):
+#	def test1(self):
+#		paths = g77_link_parsed['LIBPATH']
+#		print find_libs_paths(['g2c'], paths)

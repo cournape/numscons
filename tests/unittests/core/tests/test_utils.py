@@ -6,7 +6,7 @@ import os
 import unittest
 from copy import deepcopy
 
-from numscons.core.utils import pkg_to_path, _rsplit, DefaultDict, delconsdup
+from numscons.core.utils import pkg_to_path, DefaultDict
 from numscons.core.utils import unique
 
 class PkgToPathTester(unittest.TestCase):
