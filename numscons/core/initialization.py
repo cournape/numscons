@@ -21,7 +21,8 @@ DEF_LINKERS, DEF_C_COMPILERS, DEF_CXX_COMPILERS, DEF_ASSEMBLERS, \
 DEF_FORTRAN_COMPILERS, DEF_ARS, DEF_OTHER_TOOLS = tool_list(pyplat2sconsplat())
 
 def configure_compiler(name, env, lang):
-    """Customize env options related to the given tool and language."""
+    """Customize compilers flags using the .cfg compiler configuration
+    files."""
     if lang == "C":
         ver = cc_version(env)
         if ver:
@@ -36,84 +37,76 @@ def configure_compiler(name, env, lang):
 
 def initialize_cc(env):
     """Initialize C compiler from distutils info."""
-    from SCons.Tool import Tool, FindTool
-
     def set_cc_from_distutils():
-        # XXX: To keep backward compatibility with numpy 1.1.1. Can be dropped
-        # at 1.1.2
-        if env["cc_opt"] == "intelc":
-            env["cc_opt"] = "icc"
-
+        name = None
         if len(env['cc_opt_path']) > 0:
             debug('Setting cc_opt_path from distutils (%s).' % env['cc_opt_path'])
             if built_with_mstools(env):
                 info('Detecting ms build.')
-                t = Tool("msvc", toolpath = get_numscons_toolpaths(env))
+                name = "msvc"
                 # We need msvs tool too (before customization !)
-                Tool('msvs')(env)
+                env.Tool('msvs')
+                env.Tool("msvc")
             else:
-                cc = get_cc_type(env, pjoin(env['cc_opt_path'], env['cc_opt']))
-                info('Detecting CC type: %s' % cc)
-                if cc == 'gcc' and sys.platform == 'win32':
-                    cc = 'mingw'
+                name = get_cc_type(env, pjoin(env['cc_opt_path'], env['cc_opt']))
+                info('Detecting CC type: %s' % name)
+                if name == 'gcc' and sys.platform == 'win32':
+                    name = 'mingw'
                     debug('Changing cc => mingw')
-                t = Tool(cc, toolpath = get_numscons_toolpaths(env))
+                env.Tool(name)
         else:
             debug('Setting wo cc_opt_path')
             # Do not care about PATH info because none given from scons
             # distutils command
             try:
-                t = Tool(env['cc_opt'], toolpath = get_numscons_toolpaths(env))
+                name = env['cc_opt']
+                env.Tool(name)
             except ImportError:
                 raise UnknownCompiler(env['cc_opt'])
 
-        return t
+        return name
 
     if len(env['cc_opt']) > 0:
         debug('Setting cc_opt from distutils.')
-        t = set_cc_from_distutils()
+        name = set_cc_from_distutils()
     else:
         debug('Setting cc_opt from default list.')
-        t = Tool(FindTool(DEF_C_COMPILERS, env),
-                 toolpath = get_numscons_toolpaths(env))
+        name = FindTool(DEF_C_COMPILERS, env)
+        env.Tool(name)
 
-    warn('Setting for C tool: %s' % t.name)
-    t(env)
-
-    configure_compiler(t.name, env, "C")
+    warn('Setting for C tool: %s' % name)
+    configure_compiler(name, env, "C")
 
 def initialize_f77(env):
     """Initialize F77 compiler from distutils info."""
     from SCons.Tool import Tool, FindTool
 
     def set_f77_from_distutils():
-        t = None
+        name = None
         env.AppendUnique(F77FILESUFFIXES = ['.f'])
         if len(env['f77_opt']) > 0:
             debug('Setting F77 from distutils: %s' % env['f77_opt'])
             if len(env['f77_opt_path']) > 0:
-                f77 = get_f77_type(env, pjoin(env['f77_opt_path'], env['f77_opt']))
-                info('Detecting F77 type: %s' % f77)
-                t = Tool(f77,
-                         toolpath = get_numscons_toolpaths(env))
+                name = get_f77_type(env, pjoin(env['f77_opt_path'], env['f77_opt']))
+                info('Detecting F77 type: %s' % name)
+                env.Tool(name)
             else:
-                f77 = get_f77_type(env, env['f77_opt'])
-                info('Detecting F77 type: %s' % f77)
-                t = Tool(f77, toolpath = get_numscons_toolpaths(env))
+                name = get_f77_type(env, env['f77_opt'])
+                info('Detecting F77 type: %s' % name)
+                env.Tool(name)
         else:
             debug('Setting F77 from default list')
-            def_fcompiler =  FindTool(DEF_FORTRAN_COMPILERS, env)
-            debug('Found: %s' % def_fcompiler)
-            if def_fcompiler:
-                t = Tool(def_fcompiler, toolpath = get_numscons_toolpaths(env))
+            name =  FindTool(DEF_FORTRAN_COMPILERS, env)
+            debug('Found: %s' % name)
+            if name:
+                env.Tool(name)
 
-        return t
+        return name
 
-    t = set_f77_from_distutils()
-    if t:
-        warn("Setting for F77 tool: %s" % t.name)
-        t(env)
-        configure_compiler(t.name, env, "F77")
+    name = set_f77_from_distutils()
+    if name:
+        warn("Setting for F77 tool: %s" % name)
+        configure_compiler(name, env, "F77")
     else:
         warn("Found no F77 tool")
 
@@ -122,30 +115,29 @@ def initialize_cxx(env):
     from SCons.Tool import Tool, FindTool
 
     def set_cxx_from_distutils():
-        t = None
+        name = None
         if len(env['cxx_opt']) > 0:
             if len(env['cxx_opt_path']) > 0:
                 if built_with_mstools(env):
-                    t = Tool("msvc", toolpath = get_numscons_toolpaths(env))
+                    name = "msvc"
+                    env.Tool(name)
                     info("Detected CXX type: msvc")
                     # We need msvs tool too (before customization !)
                 else:
-                    cxx = get_cxx_type(env, pjoin(env['cxx_opt_path'],
+                    name = get_cxx_type(env, pjoin(env['cxx_opt_path'],
                                              env['cxx_opt']))
-                    info("Detected CXX type: %s" % cxx)
-                    t = Tool(cxx, toolpath = get_numscons_toolpaths(env))
+                    info("Detected CXX type: %s" % name)
+                    env.Tool(name)
         else:
-            def_cxxcompiler =  FindTool(DEF_CXX_COMPILERS, env)
-            if def_cxxcompiler:
-                t = Tool(def_cxxcompiler,
-                         toolpath = get_numscons_toolpaths(env))
-        return t
+            name =  FindTool(DEF_CXX_COMPILERS, env)
+            if name:
+                env.Tool(name)
+        return name
 
-    t = set_cxx_from_distutils()
-    if t:
-        warn("Setting for CXX tool: %s" % t.name)
-        t(env)
-        configure_compiler(t.name, env, "CXX")
+    name = set_cxx_from_distutils()
+    if name:
+        warn("Setting for CXX tool: %s" % name)
+        configure_compiler(name, env, "CXX")
         env['CXXFILESUFFIX'] = '.cxx'
     else:
         warn("Found no CXX tool: %s")
@@ -173,7 +165,7 @@ def initialize_tools(env):
     if not built_with_mingw(env):
         for i in [DEF_LINKERS, DEF_ASSEMBLERS, DEF_ARS]:
             t = FindTool(i, env) or i[0]
-            Tool(t)(env)
+            env.Tool(t)
     else:
         try:
             t = FindTool(['g++'], env)
