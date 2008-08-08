@@ -1,7 +1,15 @@
+"""This module implements detection of compilers types from their command
+line."""
 import re
 
 from numscons.core.utils import popen_wrapper
 from numscons.core.errors import UnknownCompiler
+
+# How to detect a new compiler:
+#   - implements a function is_*, which takes the (full) path of the compiler,
+#   and returns a tuple (st, version), where st is a boolean set to True is the
+#   given compiler is of the expected type, and version a string.
+#   - the function is_ can use the function _parse
 
 GNUCC = [re.compile('gcc version ([0-9-.]+)')]
 ICC = [re.compile(r'Intel.*?C Compiler.*?Version ([0-9-.]+)')]
