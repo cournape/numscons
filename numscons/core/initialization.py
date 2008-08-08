@@ -22,8 +22,6 @@ DEF_FORTRAN_COMPILERS, DEF_ARS, DEF_OTHER_TOOLS = tool_list(pyplat2sconsplat())
 
 def configure_compiler(name, env, lang):
     """Customize env options related to the given tool and language."""
-    # XXX: we have to fix how to detect compilers/version instead of hack after
-    # hack...
     if lang == "C":
         ver = cc_version(env)
         if ver:
@@ -36,7 +34,7 @@ def configure_compiler(name, env, lang):
         cfg = CompilerConfig()
     env["NUMPY_CUSTOMIZATION"][lang] = cfg
 
-def initialize_cc(env, path_list):
+def initialize_cc(env):
     """Initialize C compiler from distutils info."""
     from SCons.Tool import Tool, FindTool
 
@@ -53,7 +51,6 @@ def initialize_cc(env, path_list):
                 t = Tool("msvc", toolpath = get_numscons_toolpaths(env))
                 # We need msvs tool too (before customization !)
                 Tool('msvs')(env)
-                path_list.insert(0, env['cc_opt_path'])
             else:
                 cc = get_cc_type(env, pjoin(env['cc_opt_path'], env['cc_opt']))
                 info('Detecting CC type: %s' % cc)
@@ -61,7 +58,6 @@ def initialize_cc(env, path_list):
                     cc = 'mingw'
                     debug('Changing cc => mingw')
                 t = Tool(cc, toolpath = get_numscons_toolpaths(env))
-                path_list.insert(0, env['cc_opt_path'])
         else:
             debug('Setting wo cc_opt_path')
             # Do not care about PATH info because none given from scons
@@ -86,7 +82,7 @@ def initialize_cc(env, path_list):
 
     configure_compiler(t.name, env, "C")
 
-def initialize_f77(env, path_list):
+def initialize_f77(env):
     """Initialize F77 compiler from distutils info."""
     from SCons.Tool import Tool, FindTool
 
@@ -100,7 +96,6 @@ def initialize_f77(env, path_list):
                 info('Detecting F77 type: %s' % f77)
                 t = Tool(f77,
                          toolpath = get_numscons_toolpaths(env))
-                path_list.insert(0, env['f77_opt_path'])
             else:
                 f77 = get_f77_type(env, env['f77_opt'])
                 info('Detecting F77 type: %s' % f77)
@@ -122,7 +117,7 @@ def initialize_f77(env, path_list):
     else:
         warn("Found no F77 tool")
 
-def initialize_cxx(env, path_list):
+def initialize_cxx(env):
     """Initialize C++ compiler from distutils info."""
     from SCons.Tool import Tool, FindTool
 
@@ -139,7 +134,6 @@ def initialize_cxx(env, path_list):
                                              env['cxx_opt']))
                     info("Detected CXX type: %s" % cxx)
                     t = Tool(cxx, toolpath = get_numscons_toolpaths(env))
-                    path_list.insert(0, env['cxx_opt_path'])
         else:
             def_cxxcompiler =  FindTool(DEF_CXX_COMPILERS, env)
             if def_cxxcompiler:
@@ -164,17 +158,14 @@ def initialize_cxx(env, path_list):
 def initialize_tools(env):
     from SCons.Tool import Tool, FindTool
 
-    # List of supplemental paths to take into account
-    path_list = []
-
     # Initialize CC tool from distutils info
-    initialize_cc(env, path_list)
+    initialize_cc(env)
 
     # Initialize F77 tool from distutils info
-    initialize_f77(env, path_list)
+    initialize_f77(env)
 
     # Initialize CXX tool from distutils info
-    initialize_cxx(env, path_list)
+    initialize_cxx(env)
 
     # Adding default tools for the one we do not customize: mingw is special
     # according to scons, don't ask me why, but this does not work as expected
