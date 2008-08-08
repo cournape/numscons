@@ -64,7 +64,7 @@ def is_sunfortran(path):
     """Return True if the compiler in path is sun fortran compiler."""
     return _is_compiler(path, ['-V'], parse_sunfortran)
 
-def is_icc(env, path):
+def is_icc(path):
     """Return True if the compiler in path is Intel C compiler."""
     return _is_compiler(path, ['-V'], parse_icc)
 
