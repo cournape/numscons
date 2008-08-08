@@ -7,12 +7,10 @@ import re
 from os.path import join as pjoin, dirname as pdirname, basename as pbasename
 
 import numscons
-from numscons.core.utils import popen_wrapper
 
 # XXX: this is ugly, better find the mathlibs with a checker 
 # XXX: this had nothing to do here, too...
 def scons_get_paths(paths):
-    import os
     return paths.split(os.pathsep)
 
 def get_scons_path():

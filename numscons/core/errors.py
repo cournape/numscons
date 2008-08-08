@@ -3,3 +3,6 @@ class NumsconsError(Exception):
 
 class UnknownCompiler(NumsconsError):
     pass
+
+class InternalError(NumsconsError):
+    pass

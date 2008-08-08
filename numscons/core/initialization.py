@@ -8,7 +8,7 @@ from os.path import join as pjoin
 import sys
 
 from numscons.core.misc import built_with_mstools, built_with_mingw, \
-    get_numscons_toolpaths, pyplat2sconsplat, cc_version, iscplusplus
+    pyplat2sconsplat, cc_version, iscplusplus
 from numscons.core.compiler_detection import get_cc_type, get_f77_type, \
     get_cxx_type
 from numscons.core.compiler_config import get_config as get_compiler_config, \
@@ -16,6 +16,7 @@ from numscons.core.compiler_config import get_config as get_compiler_config, \
 from numscons.core.default import tool_list
 from numscons.core.allow_undefined import get_darwin_allow_undefined
 from numscons.core.trace import warn, debug, info
+from numscons.core.errors import UnknownCompiler
 
 DEF_LINKERS, DEF_C_COMPILERS, DEF_CXX_COMPILERS, DEF_ASSEMBLERS, \
 DEF_FORTRAN_COMPILERS, DEF_ARS, DEF_OTHER_TOOLS = tool_list(pyplat2sconsplat())
@@ -37,6 +38,7 @@ def configure_compiler(name, env, lang):
 
 def initialize_cc(env):
     """Initialize C compiler from distutils info."""
+    from SCons.Tool import FindTool
     def set_cc_from_distutils():
         if len(env['cc_opt_path']) > 0:
             debug('Setting cc_opt_path from distutils (%s).' % env['cc_opt_path'])
@@ -77,8 +79,7 @@ def initialize_cc(env):
 
 def initialize_f77(env):
     """Initialize F77 compiler from distutils info."""
-    from SCons.Tool import Tool, FindTool
-
+    from SCons.Tool import FindTool
     def set_f77_from_distutils():
         env.AppendUnique(F77FILESUFFIXES = ['.f'])
         if len(env['f77_opt']) > 0:
@@ -109,8 +110,7 @@ def initialize_f77(env):
 
 def initialize_cxx(env):
     """Initialize C++ compiler from distutils info."""
-    from SCons.Tool import Tool, FindTool
-
+    from SCons.Tool import FindTool
     def set_cxx_from_distutils():
         if len(env['cxx_opt']) > 0:
             if len(env['cxx_opt_path']) > 0:
@@ -146,7 +146,7 @@ def initialize_cxx(env):
             del env['CXX']
 
 def initialize_tools(env):
-    from SCons.Tool import Tool, FindTool
+    from SCons.Tool import FindTool
 
     # Initialize CC tool from distutils info
     initialize_cc(env)

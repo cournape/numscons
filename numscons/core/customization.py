@@ -1,12 +1,13 @@
 import os
 from os.path import join as pjoin
 import sys
-from distutils.sysconfig import get_config_var, get_python_version, get_python_inc
+from distutils.sysconfig import get_config_var
 
 from numscons.core.utils import flatten
 from numscons.core.misc import get_numscons_toolpaths, get_pythonlib_name, \
      is_f77_gnu, get_vs_version, built_with_mstools, \
      isfortran, isf2py, scons_get_paths, built_with_mingw
+from numscons.core.errors import InternalError
 from numscons.numdist import msvc_runtime_library
 
 def get_pythonlib_dir():

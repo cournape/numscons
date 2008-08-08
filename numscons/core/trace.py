@@ -1,5 +1,7 @@
 import logging
 
+from numscons.core.errors import NumsconsError
+
 CRITICAL = logging.CRITICAL
 
 def set_logging(env):
@@ -10,7 +12,7 @@ def set_logging(env):
             try:
                 level = int(level)
             except ValueError:
-                raise NumsconsException(
+                raise NumsconsError(
                     "level is %s (type %s), but should be an integer or in %s" \
                     % (level, type(level), vlevels))
 
