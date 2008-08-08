@@ -1,5 +1,6 @@
+"""This module handle platform specific link options to allow undefined symbols
+in shared libraries and dynamically loaded libraries."""
 import os
-
 from subprocess import Popen, PIPE
 
 def get_darwin_version():
@@ -33,7 +34,8 @@ def get_darwin_allow_undefined():
                 deptarget = os.environ['MACOSX_DEPLOYMENT_TARGET']
                 ma, mi = deptarget.split(".")
                 if mi < 3:
-                    flag = ['-Wl,-flat_namespace', '-Wl,-undefined', '-Wl,suppress']
+                    flag = ['-Wl,-flat_namespace', '-Wl,-undefined', 
+			    '-Wl,suppress']
                 else:
                     flag = ['-Wl,-undefined', '-Wl,dynamic_lookup']
             except KeyError:
