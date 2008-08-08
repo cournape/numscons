@@ -38,28 +38,26 @@ def configure_compiler(name, env, lang):
 def initialize_cc(env):
     """Initialize C compiler from distutils info."""
     def set_cc_from_distutils():
-        name = None
         if len(env['cc_opt_path']) > 0:
             debug('Setting cc_opt_path from distutils (%s).' % env['cc_opt_path'])
-            if built_with_mstools(env):
-                info('Detecting ms build.')
-                name = "msvc"
-                # We need msvs tool too (before customization !)
-                env.Tool('msvs')
-                env.Tool("msvc")
-            else:
-                name = get_cc_type(env, pjoin(env['cc_opt_path'], env['cc_opt']))
-                info('Detecting CC type: %s' % name)
-                if name == 'gcc' and sys.platform == 'win32':
-                    name = 'mingw'
-                    debug('Changing cc => mingw')
-                env.Tool(name)
+            cc = pjoin(env["cc_opt_path"], env["cc_opt"])
         else:
             debug('Setting wo cc_opt_path')
-            # Do not care about PATH info because none given from scons
-            # distutils command
+            cc = env["cc_opt"]
+
+        if built_with_mstools(env):
+            info('Detecting ms build.')
+            name = "msvc"
+            # We need msvs tool too (before customization !)
+            env.Tool('msvs')
+        else:
+            name = get_cc_type(env, cc)
+            if name == 'gcc' and sys.platform == 'win32':
+                name = 'mingw'
+                debug('Changing cc => mingw')
+
+            info('Detected CC type: %s' % name)
             try:
-                name = env['cc_opt']
                 env.Tool(name)
             except ImportError:
                 raise UnknownCompiler(env['cc_opt'])
@@ -82,18 +80,17 @@ def initialize_f77(env):
     from SCons.Tool import Tool, FindTool
 
     def set_f77_from_distutils():
-        name = None
         env.AppendUnique(F77FILESUFFIXES = ['.f'])
         if len(env['f77_opt']) > 0:
             debug('Setting F77 from distutils: %s' % env['f77_opt'])
             if len(env['f77_opt_path']) > 0:
-                name = get_f77_type(env, pjoin(env['f77_opt_path'], env['f77_opt']))
-                info('Detecting F77 type: %s' % name)
-                env.Tool(name)
+                f77 = pjoin(env['f77_opt_path'], env['f77_opt'])
             else:
-                name = get_f77_type(env, env['f77_opt'])
-                info('Detecting F77 type: %s' % name)
-                env.Tool(name)
+                f77 = env['f77_opt']
+
+            name = get_f77_type(env, f77)
+            info('Detecting F77 type: %s' % name)
+            env.Tool(name)
         else:
             debug('Setting F77 from default list')
             name =  FindTool(DEF_FORTRAN_COMPILERS, env)
@@ -115,21 +112,22 @@ def initialize_cxx(env):
     from SCons.Tool import Tool, FindTool
 
     def set_cxx_from_distutils():
-        name = None
         if len(env['cxx_opt']) > 0:
             if len(env['cxx_opt_path']) > 0:
-                if built_with_mstools(env):
-                    name = "msvc"
-                    env.Tool(name)
-                    info("Detected CXX type: msvc")
-                    # We need msvs tool too (before customization !)
-                else:
-                    name = get_cxx_type(env, pjoin(env['cxx_opt_path'],
-                                             env['cxx_opt']))
-                    info("Detected CXX type: %s" % name)
-                    env.Tool(name)
+                cxx = pjoin(env['cxx_opt_path'], env['cxx_opt'])
+            else:
+                cxx = env['cxx_opt']
+
+            if built_with_mstools(env):
+                name = "msvc"
+                env.Tool(name)
+            else:
+                name = get_cxx_type(env, cxx)
+            info("Detected CXX type: %s" % name)
+            env.Tool(name)
         else:
             name =  FindTool(DEF_CXX_COMPILERS, env)
+            info("Detected CXX type: %s" % name)
             if name:
                 env.Tool(name)
         return name
