@@ -16,7 +16,7 @@ from core.misc import get_scons_path, get_scons_build_dir, \
 #from core.libinfo import get_paths as scons_get_paths
 
 # XXX those should not be needed by the scons command only...
-from core.customization import get_python_inc, get_pythonlib_dir
+from core.customization import get_pythonlib_dir
 
 # Those functions really belong to the public API
 from core.helpers import GetNumpyEnvironment
