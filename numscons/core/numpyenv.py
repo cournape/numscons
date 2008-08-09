@@ -1,10 +1,11 @@
 # This module cannot be imported directly, because it needs scons module.
 import os
 from os.path import join as pjoin
+import new
 
 from SCons.Environment import Environment
 
-from numscons.core.misc import get_numscons_toolpaths
+from numscons.core.misc import get_numscons_toolpaths, get_last_error_from_config
 from numscons.core.errors import NumsconsError
 from numscons.core.utils import pkg_to_path
 from numscons.core.trace import set_logging
@@ -77,7 +78,15 @@ class NumpyEnvironment(Environment):
         else:
             kw['conf_dir'] = 'sconf'
             kw['log_file'] = 'config.log'
-        return Environment.Configure(self, *args, **kw)
+        config = Environment.Configure(self, *args, **kw)
+
+        def GetLastError(self):
+            self.logstream.flush()
+            errlines = open(str(self.logfile)).readlines()
+            return get_last_error_from_config(errlines)
+
+        config.GetLastError = new.instancemethod(GetLastError, config)
+        return config
 
     def Tool(self, toolname, path = None):
         """Like SCons.Tool, but knows about numscons specific toolpaths."""

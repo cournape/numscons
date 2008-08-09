@@ -180,3 +180,37 @@ def iscplusplus(source):
                 return 1
     return 0
 
+def get_last_error_from_config(lines, ncontexts = 1):
+    """Parse the content the config.log to get the last error only from it."""
+    # Each failed target in config file display its output or command in a list
+    # of strings prefixed by |. So we find all the lines from the end of the
+    # log content up to the before last section with such a prefix. For
+    # example, if the end of the content is this:
+    #
+    # bla bla error N
+    # | bla bla
+    # bla bla error N+1
+    # | bla bla
+    # bla bla
+    #
+    # we want to get only
+    #
+    # bla bla error N+1
+    # | bla bla
+    # bla bla
+    #
+    # One block with | is one context.
+    YOP = re.compile(r"^\s*\|")
+
+    i = len(lines) - 1
+    while not YOP.match(lines[i]):
+        i -= 1
+    for n in range(ncontexts):
+        while YOP.match(lines[i]) and i >= 0:
+            i -= 1
+        while not YOP.match(lines[i]) and i >= 0:
+            i -= 1
+        if i < 0:
+            break
+
+    return lines[i+1:]
