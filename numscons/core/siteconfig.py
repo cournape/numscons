@@ -8,20 +8,21 @@ import ConfigParser
 
 from numscons.core.utils import DefaultDict
 
-# List of options that ConfigOpts can keep. If later additional variables
+# List of options that LibraryOptions can keep. If later additional variables
 # should be added (e.g. cpp flags, etc...), they should be added here.
-_SITE_CONFIG_PATH_FLAGS = ('library_dirs', 'include_dirs')
-_SITE_CONFIG_NONPATH_FLAGS = ('libraries',)
+_SITE_CONFIG_PATH_FLAGS = ('library_dirs', 'include_dirs', 'rpath')
+_SITE_CONFIG_NONPATH_FLAGS = ('libraries', 'cflags', 'libraries', 'linkflags',
+                              'linkflagsend', 'frameworks')
 
 _SITE_OPTS_FLAGS = _SITE_CONFIG_PATH_FLAGS + _SITE_CONFIG_NONPATH_FLAGS
 
-class ConfigOpts(DefaultDict):
+class LibraryOptions(DefaultDict):
     """Small container class to keep all necessary options to build with a
     given library/package, such as cflags, libs, library paths, etc..."""
-    _keys = _SITE_OPTS_FLAGS
+    keys = _SITE_OPTS_FLAGS
     def __init__(self):
-        DefaultDict.__init__(self, self._keys)
-        for k in self._keys:
+        DefaultDict.__init__(self, self.keys)
+        for k in self.keys:
             self[k] = []
 
     def __repr__(self):
@@ -77,9 +78,9 @@ def get_config_from_section(siteconfig, section):
     """For the given siteconfig and section, return the found information.
 
     Returns a tuple (info, found), where:
-        info : ConfigOpts instance
+        info : LibraryOptions instance
         found: True if the section was found, False otherwise."""
-    cfgopts = ConfigOpts()
+    cfgopts = LibraryOptions()
     found = False
     defaults = siteconfig.defaults()
     if len(defaults) > 0:
