@@ -46,7 +46,10 @@ def parse_gnu(string):
 def _is_compiler(path, cmdargs, parser):
     # cmdargs is a list of arguments to get verbose information
     cmd = [path] + cmdargs
-    st, cnt = popen_wrapper(cmd, merge = True, shell = False)
+    try:
+        st, cnt = popen_wrapper(cmd, merge = True, shell = False)
+    except OSError, e:
+	return False, None
     ret, ver = parser(cnt)
     if st == 0 and ret:
         return ret, ver
