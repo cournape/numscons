@@ -4,7 +4,7 @@ env = GetNumpyEnvironment(ARGUMENTS)
 
 # cython tool not loaded by default
 env.Tool("cython")
-#env.DistutilsPythonExtension(source = "yop.py")
+env.DistutilsPythonExtension(source = "yop.py")
 
 # You could build the source file manually too
 # yop = env.Cython("yop.py")
