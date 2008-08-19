@@ -31,6 +31,9 @@ def generate(env):
     c_file.suffix['.pyx'] = cython_suffix_emitter
     c_file.add_action('.pyx', cythonAction)
 
+    c_file.suffix['.py'] = cython_suffix_emitter
+    c_file.add_action('.py', cythonAction)
+
     create_builder(env)
 
 def exists(env):
