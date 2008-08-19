@@ -3,14 +3,18 @@ import SCons
 from SCons.Builder import Builder
 from SCons.Action import Action
 
-cythonAction = Action("$CYTHONCOM", "$CYTHONCOMSTR")
+def cython_action(target, source, env):
+    from Cython.Compiler.Main import compile as cython_compile
+    res = cython_compile(str(source[0]))
+
+cythonAction = Action(cython_action, "$CYTHONCOMSTR")
 
 def create_builder(env):
     try:
         cython = env['BUILDERS']['Cython']
     except KeyError:
         cython = SCons.Builder.Builder(
-                  action = "$CYTHONCOM",
+                  action = cythonAction,
                   emitter = {},
                   suffix = cython_suffix_emitter,
                   single_source = 1)
@@ -37,4 +41,8 @@ def generate(env):
     create_builder(env)
 
 def exists(env):
-    return env.Detect(["cython"])
+    try:
+        import Cython
+        return True
+    except ImportError:
+        return False
