@@ -281,10 +281,21 @@ char %s();""" % function_name
         context.Display("Cannot check for %s(): %s\n" % (function_name, msg))
         return msg
 
+    # Note om the _MSC_VER part:
+    #    MSVC (and other compilers as well, actually) have the concept of
+    #    intrisincs. An intrisinc replaces any function call, and this breaks
+    #    this test. So we force MS compiler to make a function call - in the
+    #    test only.  Useful to test for some functions when built with
+    #    optimization on, to avoid build error because the intrisinc and our
+    #    'fake' test declaration do not match.
     text = """
 %(include)s
 #include <assert.h>
 %(hdr)s
+
+#ifdef _MSC_VER
+#pragma function(%(name)s)
+#endif")
 
 int main() {
 #if defined (__stub_%(name)s) || defined (__stub___%(name)s)
