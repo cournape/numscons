@@ -211,6 +211,57 @@ int main() {
                  function_name)
     return ret
 
+def CheckFuncsAtOnce(context, function_names, header = None, language = None):
+    lang, suffix, msg = _lang2suffix(language)
+
+    if context.headerfilename:
+        includetext = '#include "%s"' % context.headerfilename
+    else:
+        includetext = ''
+
+    if not header:
+        header = ['#ifdef __cplusplus']
+        header.append('extern "C" {')
+        header.append('#endif')
+        for f in function_names:
+            header.append("\tchar %s();" % f)
+        header.append('#ifdef __cplusplus')
+        header.append('};')
+        header.append('#endif')
+        header = "\n".join(header)
+
+    tmp = []
+    for f in function_names:
+        tmp.append("\t%s();" % f)
+
+    body = """
+%(include)s
+#include <assert.h>
+%(hdr)s
+
+int main(void)
+{
+%(tmp)s
+    return 0;
+}
+""" % {'tmp' : "\n".join(tmp), 'include': includetext, 'hdr': header }
+
+    context.Display("Checking for %s functions %s... " % (lang,
+                    ", ".join(function_names)))
+
+    ret = context.BuildProg(body, suffix)
+
+    if ret:
+        context.Display("no\n")
+        _LogFailed(context, body, ret)
+    else:
+        for k in function_names:
+            _Have(context, "HAVE_%s" % k, 1,
+                  "Define to 1 if you have the `%s' function." % k)
+        context.Display("yes\n")
+
+    return ret
+
 
 def CheckHeader(context, header_name, header = None, language = None,
                                                         include_quotes = None):
