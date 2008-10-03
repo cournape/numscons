@@ -33,7 +33,7 @@
 
 from __future__ import nested_scopes
 
-__revision__ = "src/script/scons-time.py 3057 2008/06/09 22:21:00 knight"
+__revision__ = "src/script/scons-time.py 3363 2008/09/06 07:34:10 scons"
 
 import getopt
 import glob
