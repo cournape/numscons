@@ -402,6 +402,7 @@ class SConfBase:
         # add default tests
         default_tests = {
                  'CheckFunc'          : CheckFunc,
+                 'CheckFuncsAtOnce'   : CheckFuncsAtOnce,
                  'CheckType'          : CheckType,
                  'CheckTypeSize'      : CheckTypeSize,
                  'CheckDeclaration'   : CheckDeclaration,
@@ -873,6 +874,13 @@ def SConf(*args, **kw):
 
 def CheckFunc(context, function_name, header = None, language = None):
     res = SCons.Conftest.CheckFunc(context, function_name, header = header, language = language)
+    context.did_show_result = 1
+    return not res
+
+def CheckFuncsAtOnce(context, function_names, header = None, language = None):
+    res = SCons.Conftest.CheckFuncsAtOnce(context, function_names,
+                                          header = header,
+                                          language = language)
     context.did_show_result = 1
     return not res
 
