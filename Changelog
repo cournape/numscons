@@ -1,3 +1,7 @@
+Thu, 23 Oct 2008 23:53:01 +0900
+	* Merge branch for CheckFuncsAtOnce
+	* 0.9.3 release
+
 Fri, 03 Oct 2008 15:24:47 +0900
 	* Update to scons 1.0.1 (still one custom patch for variant_dir and
 	configure handling, though)
