@@ -1,5 +1,5 @@
 #! /usr/bin/env python
-# Last Change: Wed Jul 30 06:00 PM 2008 J
+# Last Change: Tue Oct 28 02:00 PM 2008 J
 
 """This module defines checkers for performances libs providing standard API,
 such as MKL (Intel), ATLAS, Sunperf (solaris and linux), Accelerate (Mac OS X),
@@ -20,7 +20,8 @@ from numscons.checkers.version_checkers import atlas_version_checker, \
 from numscons.checkers.misc import get_sunperf_link_options
 
 __all__ = ['IsMKL', 'IsATLAS', 'IsVeclib', 'IsAccelerate', 'IsSunperf',
-           'GetMKLVersion', 'GetATLASVersion', 'IsFFTW2', 'IsFFTW3']
+           'GetMKLVersion', 'GetATLASVersion', 'IsFFTW2', 'IsFFTW3',
+           'CheckFFTW2', 'CheckFFTW3', 'CheckMKL']
 
 def _check(context, cfg, check_version, version_checker, autoadd):
     return check_code(context, cfg.name, cfg.section, cfg.opts_factory,
