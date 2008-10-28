@@ -120,7 +120,7 @@ CheckGenericLapack = CheckPerflibFactory('GenericLapack').checker
 CheckFFTW3 = CheckPerflibFactory('FFTW3').checker
 IsFFTW3 = IsFactory('FFTW3').func
 
-CheckFFTW2 = CheckPerflibFactory('FFTW3').checker
+CheckFFTW2 = CheckPerflibFactory('FFTW2').checker
 IsFFTW2 = IsFactory('FFTW2').func
 
 #------
