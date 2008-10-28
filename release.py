@@ -16,9 +16,9 @@ Operating System :: MacOS
 
 NAME        = 'numscons'
 MAJOR       = 0
-MINOR       = 9
-MICRO       = 4
-DEV         = False
+MINOR       = 10
+MICRO       = 0
+DEV         = True
 DESCRIPTION = 'Enable to use scons within distutils to build extensions'
 CLASSIFIERS = filter(None, CLASSIFIERS.split('\n'))
 AUTHOR      = 'David Cournapeau'
