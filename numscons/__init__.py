@@ -29,6 +29,13 @@ def get_version():
     import version
     return version.VERSION
 
+import version as _ver
+version_info = _ver.VERSION.split('.')
+if _ver.DEV:
+    version_info += ["dev"]
+else:
+    version_info += ["final"]
+
 def is_dev_version():
     import version
     return version.DEV
