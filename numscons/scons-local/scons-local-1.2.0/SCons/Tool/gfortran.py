@@ -35,13 +35,14 @@ selection method.
 __revision__ = "src/engine/SCons/Tool/gfortran.py 3842 2008/12/20 22:59:52 scons"
 
 import SCons.Util
-
-import fortran
+from FortranCommon import add_all_to_env
 
 def generate(env):
     """Add Builders and construction variables for gfortran to an
     Environment."""
-    fortran.generate(env)
+    #fortran.generate(env)
+
+    add_all_to_env(env)
 
     for dialect in ['F77', 'F90', 'FORTRAN', 'F95']:
         env['%s' % dialect] = 'gfortran'
