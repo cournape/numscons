@@ -23,9 +23,9 @@ __all__ = ['GetNumpyEnvironment', 'GetInitEnvironment']
 
 def GetNumpyOptions(args):
     """Call this with args=ARGUMENTS to take into account command line args."""
-    from SCons.Options import Options, EnumOption, BoolOption
+    from SCons.Variables import Variables, EnumVariable, BoolVariable
 
-    opts = Options(None, args)
+    opts = Variables(None, args)
 
     opts.Add('scons_tool_path',
              'comma-separated list of directories to look '\
@@ -46,7 +46,7 @@ def GetNumpyOptions(args):
              "include directories for boostraping numpy (if you do not know" \
              " what that means, you don't need it)" ,
              '')
-    opts.Add(BoolOption('inplace',
+    opts.Add(BoolVariable('inplace',
                         "true if building in place numpy, false if not", 0))
 
     # Add compiler related info
@@ -60,11 +60,11 @@ def GetNumpyOptions(args):
     opts.Add('cxx_opt_path', 'path of the C compiler set in cc_opt', '')
 
     # Silent mode
-    opts.Add(EnumOption('silent',
+    opts.Add(EnumVariable('silent',
                         '0 means max verbose, 1 less verbose, and 2 '\
                         'almost nothing',
                         '0', allowed_values = ('0', '1', '2')))
-    opts.Add(BoolOption('bootstrapping',
+    opts.Add(BoolVariable('bootstrapping',
                         "true if bootrapping numpy, false if not", 0))
 
     # Logging option
