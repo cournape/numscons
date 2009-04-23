@@ -21,7 +21,7 @@
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #
 
-__revision__ = "src/engine/SCons/Script/Interactive.py 3363 2008/09/06 07:34:10 scons"
+__revision__ = "src/engine/SCons/Script/Interactive.py 3842 2008/12/20 22:59:52 scons"
 
 __doc__ = """
 SCons interactive mode
@@ -98,8 +98,6 @@ try:
 except ImportError:
     pass
 
-from SCons.Debug import Trace
-
 class SConsInteractiveCmd(cmd.Cmd):
     """\
     build [TARGETS]         Build the specified TARGETS and their dependencies.
@@ -163,6 +161,7 @@ class SConsInteractiveCmd(cmd.Cmd):
         build [TARGETS]         Build the specified TARGETS and their
                                 dependencies.  'b' is a synonym.
         """
+        import SCons.Node
         import SCons.SConsign
         import SCons.Script.Main
 
@@ -259,6 +258,12 @@ class SConsInteractiveCmd(cmd.Cmd):
             # node.set_state() to reset it manually
             node.set_state(SCons.Node.no_state)
             node.implicit = None
+
+            # Debug:  Uncomment to verify that all Taskmaster reference
+            # counts have been reset to zero.
+            #if node.ref_count != 0:
+            #    from SCons.Debug import Trace
+            #    Trace('node %s, ref_count %s !!!\n' % (node, node.ref_count))
 
         SCons.SConsign.Reset()
         SCons.Script.Main.progress_display("scons: done clearing node information.")

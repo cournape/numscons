@@ -142,6 +142,101 @@ int main() {
     _YesNoResult(context, ret, None, text)
     return ret
 
+def CheckCC(context):
+    """
+    Configure check for a working C compiler.
+
+    This checks whether the C compiler, as defined in the $CC construction
+    variable, can compile a C source file. It uses the current $CCCOM value
+    too, so that it can test against non working flags.
+
+    """
+    context.Display("Checking whether the C compiler works")
+    text = """
+int main()
+{
+    return 0;
+}
+"""
+    ret = _check_empty_program(context, 'CC', text, 'C')
+    _YesNoResult(context, ret, None, text)
+    return ret
+
+def CheckSHCC(context):
+    """
+    Configure check for a working shared C compiler.
+
+    This checks whether the C compiler, as defined in the $SHCC construction
+    variable, can compile a C source file. It uses the current $SHCCCOM value
+    too, so that it can test against non working flags.
+
+    """
+    context.Display("Checking whether the (shared) C compiler works")
+    text = """
+int foo()
+{
+    return 0;
+}
+"""
+    ret = _check_empty_program(context, 'SHCC', text, 'C', use_shared = True)
+    _YesNoResult(context, ret, None, text)
+    return ret
+
+def CheckCXX(context):
+    """
+    Configure check for a working CXX compiler.
+
+    This checks whether the CXX compiler, as defined in the $CXX construction
+    variable, can compile a CXX source file. It uses the current $CXXCOM value
+    too, so that it can test against non working flags.
+
+    """
+    context.Display("Checking whether the C++ compiler works")
+    text = """
+int main()
+{
+    return 0;
+}
+"""
+    ret = _check_empty_program(context, 'CXX', text, 'C++')
+    _YesNoResult(context, ret, None, text)
+    return ret
+
+def CheckSHCXX(context):
+    """
+    Configure check for a working shared CXX compiler.
+
+    This checks whether the CXX compiler, as defined in the $SHCXX construction
+    variable, can compile a CXX source file. It uses the current $SHCXXCOM value
+    too, so that it can test against non working flags.
+
+    """
+    context.Display("Checking whether the (shared) C++ compiler works")
+    text = """
+int main()
+{
+    return 0;
+}
+"""
+    ret = _check_empty_program(context, 'SHCXX', text, 'C++', use_shared = True)
+    _YesNoResult(context, ret, None, text)
+    return ret
+
+def _check_empty_program(context, comp, text, language, use_shared = False):
+    """Return 0 on success, 1 otherwise."""
+    if not context.env.has_key(comp) or not context.env[comp]:
+        # The compiler construction variable is not set or empty
+        return 1
+
+    lang, suffix, msg = _lang2suffix(language)
+    if msg:
+        return 1
+
+    if use_shared:
+        return context.CompileSharedObject(text, suffix)
+    else:
+        return context.CompileProg(text, suffix)
+
 
 def CheckFunc(context, function_name, header = None, language = None):
     """
@@ -186,21 +281,10 @@ char %s();""" % function_name
         context.Display("Cannot check for %s(): %s\n" % (function_name, msg))
         return msg
 
-    # Note om the _MSC_VER part:
-    #    MSVC (and other compilers as well, actually) have the concept of
-    #    intrisincs. An intrisinc replaces any function call, and this breaks
-    #    this test. So we force MS compiler to make a function call - in the
-    #    test only.  Useful to test for some functions when built with
-    #    optimization on, to avoid build error because the intrisinc and our
-    #    'fake' test declaration do not match.
     text = """
 %(include)s
 #include <assert.h>
 %(hdr)s
-
-#ifdef _MSC_VER
-#pragma function(%(name)s)
-#endif")
 
 int main() {
 #if defined (__stub_%(name)s) || defined (__stub___%(name)s)
@@ -220,57 +304,6 @@ int main() {
     _YesNoResult(context, ret, "HAVE_" + function_name, text,
                  "Define to 1 if the system has the function `%s'." %\
                  function_name)
-    return ret
-
-def CheckFuncsAtOnce(context, function_names, header = None, language = None):
-    lang, suffix, msg = _lang2suffix(language)
-
-    if context.headerfilename:
-        includetext = '#include "%s"' % context.headerfilename
-    else:
-        includetext = ''
-
-    if not header:
-        header = ['#ifdef __cplusplus']
-        header.append('extern "C" {')
-        header.append('#endif')
-        for f in function_names:
-            header.append("\tchar %s();" % f)
-        header.append('#ifdef __cplusplus')
-        header.append('};')
-        header.append('#endif')
-        header = "\n".join(header)
-
-    tmp = []
-    for f in function_names:
-        tmp.append("\t%s();" % f)
-
-    body = """
-%(include)s
-#include <assert.h>
-%(hdr)s
-
-int main(void)
-{
-%(tmp)s
-    return 0;
-}
-""" % {'tmp' : "\n".join(tmp), 'include': includetext, 'hdr': header }
-
-    context.Display("Checking for %s functions %s... " % (lang,
-                    ", ".join(function_names)))
-
-    ret = context.BuildProg(body, suffix)
-
-    if ret:
-        context.Display("no\n")
-        _LogFailed(context, body, ret)
-    else:
-        for k in function_names:
-            _Have(context, "HAVE_%s" % k, 1,
-                  "Define to 1 if you have the `%s' function." % k)
-        context.Display("yes\n")
-
     return ret
 
 

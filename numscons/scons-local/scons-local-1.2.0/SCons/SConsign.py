@@ -27,9 +27,7 @@ Writing and reading information to the .sconsign file or files.
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #
 
-__revision__ = "src/engine/SCons/SConsign.py 3363 2008/09/06 07:34:10 scons"
-
-import SCons.compat
+__revision__ = "src/engine/SCons/SConsign.py 3842 2008/12/20 22:59:52 scons"
 
 import cPickle
 import os

@@ -50,13 +50,12 @@ Usage example:
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #
 
-__revision__ = "src/engine/SCons/Variables/PackageVariable.py 3363 2008/09/06 07:34:10 scons"
+__revision__ = "src/engine/SCons/Variables/PackageVariable.py 3842 2008/12/20 22:59:52 scons"
 
 __all__ = ['PackageVariable',]
 
 import string
 
-import SCons.compat
 import SCons.Errors
 
 __enable_strings  = ('1', 'yes', 'true',  'on', 'enable', 'search')

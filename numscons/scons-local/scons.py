@@ -24,15 +24,15 @@
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #
 
-__revision__ = "src/script/scons.py 3363 2008/09/06 07:34:10 scons"
+__revision__ = "src/script/scons.py 3842 2008/12/20 22:59:52 scons"
 
-__version__ = "1.0.1"
+__version__ = "1.2.0"
 
-__build__ = "r3363"
+__build__ = "r3842"
 
 __buildsys__ = "scons-dev"
 
-__date__ = "2008/09/06 07:34:10"
+__date__ = "2008/12/20 22:59:52"
 
 __developer__ = "scons"
 
@@ -66,9 +66,12 @@ libs = []
 if os.environ.has_key("SCONS_LIB_DIR"):
     libs.append(os.environ["SCONS_LIB_DIR"])
 
-local = 'scons-local-' + __version__
+local_version = 'scons-local-' + __version__
+local = 'scons-local'
 if script_dir:
+    local_version = os.path.join(script_dir, local_version)
     local = os.path.join(script_dir, local)
+libs.append(os.path.abspath(local_version))
 libs.append(os.path.abspath(local))
 
 scons_version = 'scons-%s' % __version__
@@ -137,14 +140,12 @@ else:
     except AttributeError:
         pass
     else:
-        while libpath:
-            libpath, tail = os.path.split(libpath)
-            if tail[:6] == "python":
-                break
-        if libpath:
-            # Python library is in /usr/libfoo/python*;
-            # check /usr/libfoo/scons*.
-            prefs.append(libpath)
+        # Split /usr/libfoo/python*/os.py to /usr/libfoo/python*.
+        libpath, tail = os.path.split(libpath)
+        # Split /usr/libfoo/python* to /usr/libfoo
+        libpath, tail = os.path.split(libpath)
+        # Check /usr/libfoo/scons*.
+        prefs.append(libpath)
 
 # Look first for 'scons-__version__' in all of our preference libs,
 # then for 'scons'.
@@ -159,4 +160,6 @@ sys.path = libs + sys.path
 
 if __name__ == "__main__":
     import SCons.Script
+    # this does all the work, and calls sys.exit
+    # with the proper exit status when done.
     SCons.Script.main()

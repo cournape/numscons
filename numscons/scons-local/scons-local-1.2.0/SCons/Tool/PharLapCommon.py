@@ -29,7 +29,7 @@ Phar Lap ETS tool chain.  Right now, this is linkloc and
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #
 
-__revision__ = "src/engine/SCons/Tool/PharLapCommon.py 3363 2008/09/06 07:34:10 scons"
+__revision__ = "src/engine/SCons/Tool/PharLapCommon.py 3842 2008/12/20 22:59:52 scons"
 
 import os
 import os.path

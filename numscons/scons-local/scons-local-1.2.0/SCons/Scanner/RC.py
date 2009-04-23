@@ -1,10 +1,7 @@
-"""SCons.Tool.sgilink
+"""SCons.Scanner.RC
 
-Tool-specific initialization for the SGI MIPSPro linker on SGI.
-
-There normally shouldn't be any need to import this module directly.
-It will usually be imported through the generic SCons.Tool.Tool()
-selection method.
+This module implements the depenency scanner for RC (Interface
+Definition Language) files.
 
 """
 
@@ -31,27 +28,22 @@ selection method.
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #
 
-__revision__ = "src/engine/SCons/Tool/sgilink.py 3842 2008/12/20 22:59:52 scons"
+__revision__ = "src/engine/SCons/Scanner/RC.py 3842 2008/12/20 22:59:52 scons"
 
-import SCons.Util
+import SCons.Node.FS
+import SCons.Scanner
+import re
 
-import link
-
-linkers = ['CC', 'cc']
-
-def generate(env):
-    """Add Builders and construction variables for MIPSPro to an Environment."""
-    link.generate(env)
+def RCScan():
+    """Return a prototype Scanner instance for scanning RC source files"""
+ 
+    res_re= r'^(?:\s*#\s*(?:include)|' \
+            '.*?\s+(?:ICON|BITMAP|CURSOR|HTML|FONT|MESSAGETABLE|TYPELIB|REGISTRY|D3DFX)' \
+            '\s*.*?)' \
+            '\s*(<|"| )([^>"\s]+)(?:[>" ])*$'
+    resScanner = SCons.Scanner.ClassicCPP( "ResourceScanner",
+                                           "$RCSUFFIXES",
+                                           "CPPPATH",
+                                           res_re )
     
-    env['LINK'] = env.Detect(linkers) or 'cc'
-    env['SHLINKFLAGS'] = SCons.Util.CLVar('$LINKFLAGS -shared')
-
-    # __RPATH is set to $_RPATH in the platform specification if that
-    # platform supports it.
-    env.Append(LINKFLAGS=['$__RPATH'])
-    env['RPATHPREFIX'] = '-rpath '
-    env['RPATHSUFFIX'] = ''
-    env['_RPATH'] = '${_concat(RPATHPREFIX, RPATH, RPATHSUFFIX, __env__)}'
-
-def exists(env):
-    return env.Detect(linkers)
+    return resScanner
