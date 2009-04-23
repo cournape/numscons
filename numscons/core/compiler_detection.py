@@ -120,7 +120,7 @@ def get_cc_type(env, path):
         elif is_suncc(path)[0]:
             type = "suncc"
         elif is_icc(path)[0]:
-            type = "icc"
+            type = "intelc"
         else:
             raise UnknownCompiler("Unknown C compiler %s" % path)
         env["NUMPY_CC_TYPE"] = type
@@ -134,7 +134,7 @@ def get_cxx_type(env, path):
         elif is_suncxx(path)[0]:
             type = "suncc"
         elif is_icc(path)[0]:
-            type = "icc"
+            type = "intelc"
         else:
             raise UnknownCompiler("Unknown CXX compiler %s" % path)
         env["NUMPY_CXX_TYPE"] = type
