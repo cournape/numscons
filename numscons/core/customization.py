@@ -29,9 +29,9 @@ def customize_tools(env):
 
     finalize_env(env)
 
-    apply_compilers_customization(env)
-
     customize_link_flags(env)
+
+    apply_compilers_customization(env)
 
 def customize_pyext(env):
     from SCons.Tool import Tool
@@ -208,3 +208,6 @@ def apply_compilers_customization(env):
 
     if 'LDFLAGS' in os.environ:
         env.Prepend(LINKFLAGS = os.environ['LDFLAGS'])
+
+    if 'LINKFLAGSEND' in os.environ:
+        env.Prepend(LINKFLAGSEND = os.environ['LINKFLAGSEND'])
