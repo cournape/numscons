@@ -87,6 +87,32 @@ def createPythonExtensionBuilder(env):
 
     return pyext
 
+def createPythonStaticExtensionBuilder(env):
+    """This is a utility function that creates the PythonStaticExtension
+    Builder in an Environment if it is not there already.
+
+    If it is already there, we return the existing one.
+    """
+
+    try:
+        pyext = env['BUILDERS']['PythonStaticExtension']
+    except KeyError:
+        import SCons.Action
+        import SCons.Defaults
+        action = SCons.Action.Action("$PYEXTSTATICLINKCOM", "$PYEXTSTATICLINKCOMSTR")
+        action_list = [ SCons.Defaults.SharedCheck,
+                        action]
+        pyext = SCons.Builder.Builder(action = action_list,
+                                      emitter = "$LIBEMITTER",
+                                      prefix = '$PYEXTSTATICPREFIX',
+                                      suffix = '$PYEXTSTATICSUFFIX',
+                                      target_scanner = ProgramScanner,
+                                      src_suffix = '$PYEXTOBJSUFFIX',
+                                      src_builder = 'PythonObject')
+        env['BUILDERS']['PythonStaticExtension'] = pyext
+
+    return pyext
+
 def pyext_coms(platform):
     """Return PYEXTCCCOM, PYEXTCXXCOM and PYEXTLINKCOM for the given
     platform."""
@@ -100,6 +126,7 @@ def pyext_coms(platform):
         pyext_linkcom = '${TEMPFILE("$PYEXTLINK $PYEXTLINKFLAGS '\
                         '/OUT:$TARGET.windows $( $_LIBDIRFLAGS $) '\
                         '$_LIBFLAGS $_PYEXTRUNTIME $SOURCES.windows")}'
+        pystaticext_linkcom = "NOTSUPPORTEDONWINDOWS"
     else:
         pyext_cccom = "$PYEXTCC -o $TARGET -c $PYEXTCCSHARED "\
                       "$PYEXTCFLAGS $PYEXTCCFLAGS $_PYEXTCPPINCFLAGS "\
@@ -109,11 +136,13 @@ def pyext_coms(platform):
                        "$_CCCOMCOM $SOURCES"
         pyext_linkcom = "$PYEXTLINK -o $TARGET $PYEXTLINKFLAGS "\
                         "$SOURCES $_LIBDIRFLAGS $_LIBFLAGS $_PYEXTRUNTIME"
+        pyext_staticlinkcom = "$PYEXTSTATICLINK $PYEXTSTATICLINKFLAGS $TARGET " \
+                        "$SOURCES" 
 
     if platform == 'darwin':
         pyext_linkcom += ' $_FRAMEWORKPATH $_FRAMEWORKS $FRAMEWORKSFLAGS'
 
-    return pyext_cccom, pyext_cxxcom, pyext_linkcom
+    return pyext_cccom, pyext_cxxcom, pyext_linkcom, pyext_staticlinkcom
 
 def set_basic_vars(env):
     # Set construction variables which are independant on whether we are using
@@ -132,13 +161,14 @@ def set_basic_vars(env):
     # XXX: This won't work in all cases (using mingw, for example). To make
     # this work, we need to know whether PYEXTCC accepts /c and /Fo or -c -o.
     # This is difficult with the current way tools work in scons.
-    pycc, pycxx, pylink = pyext_coms(sys.platform)
+    pycc, pycxx, pylink, pystaticlink = pyext_coms(sys.platform)
                             
     env['PYEXTLINKFLAGSEND'] = SCons.Util.CLVar('$LINKFLAGSEND')
 
     env['PYEXTCCCOM'] = pycc
     env['PYEXTCXXCOM'] = pycxx
     env['PYEXTLINKCOM'] = pylink
+    env['PYEXTSTATICLINKCOM'] = pystaticlink
 
 def _set_configuration_nodistutils(env):
     # Set env variables to sensible values when not using distutils
@@ -148,8 +178,12 @@ def _set_configuration_nodistutils(env):
                'PYEXTCXX' : '$SHCXX',
                'PYEXTCXXFLAGS' : '$SHCXXFLAGS',
                'PYEXTLINK' : '$LDMODULE',
+               'PYEXTSTATICLINK' : '$AR',
+               'PYEXTSTATICLINKFLAGS' : '$ARFLAGS',
                'PYEXTSUFFIX' : '$LDMODULESUFFIX',
-               'PYEXTPREFIX' : ''}
+               'PYEXTPREFIX' : '',
+               'PYEXTSTATICSUFFIX' : '$LIBSUFFIX',
+               'PYEXTSTATICPREFIX' : '$LIBPREFIX'}
 
     if sys.platform == 'darwin':
         def_cfg['PYEXTSUFFIX'] = '.so'
@@ -222,6 +256,8 @@ def generate(env):
 
     # Create the PythonExtension builder
     createPythonExtensionBuilder(env)
+
+    createPythonStaticExtensionBuilder(env)
 
 def exists(env):
     try:
