@@ -67,6 +67,8 @@ def GetNumpyOptions(args):
     opts.Add(BoolVariable('bootstrapping',
                         "true if bootrapping numpy, false if not", 0))
 
+    opts.Add(BoolVariable('python_build_static',
+                        "true if building static extensions, false if not", 0))
     # Logging option
     opts.Add('log_level',
              '0 means max log, Any positive integer is OK '\

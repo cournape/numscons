@@ -10,7 +10,11 @@ def DistutilsSharedLibrary(env, *args, **kw):
 def DistutilsPythonExtension(env, *args, **kw):
     """this builder is the same than pythonextension, except for the fact that
     it put the target into where distutils expects it."""
-    lib = env.PythonExtension(*args, **kw)
+    builder = env.PythonExtension
+    if env['python_build_static']:
+        builder = env.PythonStaticExtension
+
+    lib = builder(*args, **kw)
     inst_lib = env.Install("$distutils_installdir", lib)
     return lib, inst_lib
 
@@ -27,10 +31,15 @@ def NumpyPythonExtension(env, *args, **kw):
     else:
         py_cpppath = env['PYEXTCPPPATH']
 
+    builder = env.PythonExtension
+    if kw.has_key('python_build_static'):
+        if kw['python_build_static']:
+            builder = env.PythonStaticExtension
+
     oldval = copy.copy(py_cpppath)
     try:
         kw['PYEXTCPPPATH'] = npy_cpppath + py_cpppath
-        lib = env.PythonExtension(*args, **kw)
+        lib = builder(*args, **kw)
     finally:
         kw['PYEXTCPPPATH'] = oldval
 
