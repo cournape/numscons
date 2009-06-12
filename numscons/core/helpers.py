@@ -42,6 +42,10 @@ def GetNumpyOptions(args):
              'build dir for libraries of distutils (NOT including '\
              'the package name)',
              pjoin('build', 'lib'))
+    opts.Add('distutils_clibdir',
+             'build dir for pure C libraries (clib), NOT including '\
+             'the package name)',
+             pjoin('build', 'lib'))
     opts.Add('include_bootstrap',
              "include directories for boostraping numpy (if you do not know" \
              " what that means, you don't need it)" ,

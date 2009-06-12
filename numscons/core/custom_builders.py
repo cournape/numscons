@@ -39,9 +39,9 @@ def NumpyPythonExtension(env, *args, **kw):
 
 def DistutilsStaticExtLibrary(env, *args, **kw):
     """This builder is the same as StaticExtLibrary, except for the fact that
-    it put the target into where distutils expects it."""
+    it put the target into where numpy.distutils expects it."""
     lib = env.StaticExtLibrary(*args, **kw)
-    inst_lib = env.Install("$distutils_installdir", lib)
+    inst_lib = env.Install("$distutils_clibdir", lib)
     return lib, inst_lib
 
 def NumpyCtypes(env, target, source, *args, **kw):
