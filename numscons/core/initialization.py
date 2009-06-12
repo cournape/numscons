@@ -61,6 +61,7 @@ def initialize_cc(env):
             info('Detected CC type: %s' % name)
             try:
                 env.Tool(name)
+                env['CC'] = env['cc_opt']
             except ImportError:
                 raise UnknownCompiler(env['cc_opt'])
 

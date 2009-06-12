@@ -1,6 +1,7 @@
 """This module implements detection of compilers types from their command
 line."""
 import re
+import sys
 
 from numscons.core.utils import popen_wrapper
 from numscons.core.errors import UnknownCompiler
@@ -122,7 +123,10 @@ def get_cc_type(env, path):
         elif is_icc(path)[0]:
             type = "intelc"
         else:
-            raise UnknownCompiler("Unknown C compiler %s" % path)
+            if sys.platform != "win32":
+                type = "cc"
+            else:
+                raise UnknownCompiler("Unknown C compiler %s" % path)
         env["NUMPY_CC_TYPE"] = type
     return env["NUMPY_CC_TYPE"]
 
