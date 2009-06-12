@@ -30,7 +30,7 @@ def get_version():
     return version.VERSION
 
 import version as _ver
-version_info = _ver.VERSION.split('.')
+version_info = [int(i) for i in _ver.VERSION.split('.')]
 if _ver.DEV:
     version_info += ["dev"]
 else:
