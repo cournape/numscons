@@ -1,3 +1,8 @@
+Fri, 12 Jun 2009 18:53:38 +0900
+	* Fix version_info to return int instead of strings for version
+	numbers
+	* 0.10.1 release
+
 Fri, 12 Jun 2009 18:34:35 +0900
 	* Update to scons 1.2.0
 	* Fix gfortran tool
