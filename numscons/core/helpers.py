@@ -5,7 +5,8 @@ customization (python extension builders, build_dir, etc...)."""
 from os.path import join as pjoin
 
 from numscons.core.custom_builders import DistutilsSharedLibrary, NumpyCtypes, \
-     DistutilsPythonExtension, DistutilsStaticExtLibrary, NumpyPythonExtension
+     DistutilsPythonExtension, DistutilsStaticExtLibrary, NumpyPythonExtension, \
+     DistutilsInstalledStaticExtLibrary
 from numscons.core.initialization import initialize_tools
 from numscons.core.customization import customize_tools
 from numscons.core.siteconfig import get_config
@@ -46,6 +47,8 @@ def GetNumpyOptions(args):
              'build dir for pure C libraries (clib), NOT including '\
              'the package name)',
              pjoin('build', 'lib'))
+    opts.Add('distutils_install_prefix',
+             'install directory prefix (the one from --prefix)', None)
     opts.Add('include_bootstrap',
              "include directories for boostraping numpy (if you do not know" \
              " what that means, you don't need it)" ,
@@ -210,3 +213,5 @@ def add_custom_builders(env):
 
     createStaticExtLibraryBuilder(env)
     env['BUILDERS']['DistutilsStaticExtLibrary'] = DistutilsStaticExtLibrary
+    env['BUILDERS']['DistutilsInstalledStaticExtLibrary'] = \
+            DistutilsInstalledStaticExtLibrary

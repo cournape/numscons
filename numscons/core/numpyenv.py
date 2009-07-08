@@ -30,6 +30,7 @@ class NumpyEnvironment(Environment):
             self['distutils_installdir'] = pjoin(str(self.fs.Top), self["src_dir"])
         else:
             self['distutils_installdir'] = pjoin(self['distutils_libdir'], pkg_to_path(self['pkg_name']))
+        self["distutils_install_prefix"] = os.path.abspath(pjoin(str(self.fs.Top), self["distutils_install_prefix"]))
 
         # This will keep our compiler dependent customization (optimization,
         # warning, etc...)
