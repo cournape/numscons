@@ -1,4 +1,5 @@
 import copy
+from os.path import join as pjoin
 
 def DistutilsSharedLibrary(env, *args, **kw):
     """This builder is the same as SharedLibrary, except for the fact that
@@ -42,6 +43,22 @@ def DistutilsStaticExtLibrary(env, *args, **kw):
     it put the target into where numpy.distutils expects it."""
     lib = env.StaticExtLibrary(*args, **kw)
     inst_lib = env.Install("$distutils_clibdir", lib)
+    return lib, inst_lib
+
+def DistutilsInstalledStaticExtLibrary(env, *args, **kw):
+    """This builder is the same as StaticExtLibrary, except for the fact that
+    it put the target into where numpy.distutils expects it."""
+    try:
+        install_dir = kw['install_dir']
+        del kw['install_dir']
+    except KeyError:
+        install_dir = '.'
+
+    lib = env.StaticExtLibrary(*args, **kw)
+    inst_lib = env.Install(pjoin("$distutils_clibdir"), lib)
+    inst_lib.extend(
+        env.Install(pjoin("$distutils_installdir", install_dir),
+        lib))
     return lib, inst_lib
 
 def NumpyCtypes(env, target, source, *args, **kw):

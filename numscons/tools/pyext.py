@@ -92,21 +92,21 @@ def pyext_coms(platform):
     platform."""
     if platform == 'win32':
         pyext_cccom = "$PYEXTCC /Fo$TARGET /c $PYEXTCCSHARED "\
-                      "$PYEXTCFLAGS $PYEXTCCFLAGS $_PYEXTCPPINCFLAGS "\
-                      "$_CCCOMCOM $SOURCES"
+                      "$PYEXTCFLAGS $PYEXTCCFLAGS $_CCCOMCOM "\
+                      "$_PYEXTCPPINCFLAGS $SOURCES"
         pyext_cxxcom = "$PYEXTCXX /Fo$TARGET /c $PYEXTCSHARED "\
-                       "$PYEXTCXXFLAGS $PYEXTCCFLAGS $_PYEXTCPPINCFLAGS "\
-                       "$_CCCOMCOM $SOURCES"
+                       "$PYEXTCXXFLAGS $PYEXTCCFLAGS $_CCCOMCOM "\
+                       "$_PYEXTCPPINCFLAGS $SOURCES"
         pyext_linkcom = '${TEMPFILE("$PYEXTLINK $PYEXTLINKFLAGS '\
                         '/OUT:$TARGET.windows $( $_LIBDIRFLAGS $) '\
                         '$_LIBFLAGS $_PYEXTRUNTIME $SOURCES.windows")}'
     else:
         pyext_cccom = "$PYEXTCC -o $TARGET -c $PYEXTCCSHARED "\
-                      "$PYEXTCFLAGS $PYEXTCCFLAGS $_PYEXTCPPINCFLAGS "\
-                      "$_CCCOMCOM $SOURCES"
+                      "$PYEXTCFLAGS $PYEXTCCFLAGS $_CCCOMCOM "\
+                      "$_PYEXTCPPINCFLAGS $SOURCES"
         pyext_cxxcom = "$PYEXTCXX -o $TARGET -c $PYEXTCSHARED "\
-                       "$PYEXTCXXFLAGS $PYEXTCCFLAGS $_PYEXTCPPINCFLAGS "\
-                       "$_CCCOMCOM $SOURCES"
+                       "$PYEXTCXXFLAGS $PYEXTCCFLAGS $_CCCOMCOM "\
+                       "$_PYEXTCPPINCFLAGS $SOURCES"
         pyext_linkcom = "$PYEXTLINK -o $TARGET $PYEXTLINKFLAGS "\
                         "$SOURCES $_LIBDIRFLAGS $_LIBFLAGS $_PYEXTRUNTIME"
 
