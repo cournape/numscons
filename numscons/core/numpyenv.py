@@ -29,8 +29,18 @@ class NumpyEnvironment(Environment):
         if self["inplace"]:
             self['distutils_installdir'] = pjoin(str(self.fs.Top), self["src_dir"])
         else:
+            if not self.has_key('distutils_installdir'):
+                # XXX: compatibility with upstream numpy trunk - this can be
+                # removed once install_clib is merged
+                self["distutils_installdir"] = ''
             self['distutils_installdir'] = pjoin(self['distutils_libdir'], pkg_to_path(self['pkg_name']))
-        self["distutils_install_prefix"] = os.path.abspath(pjoin(str(self.fs.Top), self["distutils_install_prefix"]))
+
+        if not self.has_key('distutils_install_prefix'):
+            # XXX: compatibility with upstream numpy trunk - this can be
+            # removed once install_clib is merged
+            self["distutils_install_prefix"] = ''
+        else:
+            self["distutils_install_prefix"] = os.path.abspath(pjoin(str(self.fs.Top), self["distutils_install_prefix"]))
 
         # This will keep our compiler dependent customization (optimization,
         # warning, etc...)
