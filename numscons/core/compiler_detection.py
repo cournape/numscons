@@ -48,7 +48,8 @@ def _is_compiler(path, cmdargs, parser):
     # cmdargs is a list of arguments to get verbose information
     cmd = [path] + cmdargs
     try:
-        st, cnt = popen_wrapper(cmd, merge = True, shell = False)
+        st, cnt = popen_wrapper(cmd, merge = True, shell = False,
+                                env={'LC_ALL': 'C'})
     except OSError, e:
 	return False, None
     ret, ver = parser(cnt)
