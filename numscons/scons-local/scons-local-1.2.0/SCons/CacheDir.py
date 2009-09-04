@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008 The SCons Foundation
+# Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009 The SCons Foundation
 #
 # Permission is hereby granted, free of charge, to any person obtaining
 # a copy of this software and associated documentation files (the
@@ -21,7 +21,7 @@
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #
 
-__revision__ = "src/engine/SCons/CacheDir.py 3842 2008/12/20 22:59:52 scons"
+__revision__ = "src/engine/SCons/CacheDir.py  2009/09/04 16:33:07 david"
 
 __doc__ = """
 CacheDir support
@@ -190,22 +190,16 @@ class CacheDir:
         if not self.is_enabled():
             return False
 
-        retrieved = False
-
+        env = node.get_build_env()
         if cache_show:
-            if CacheRetrieveSilent(node, [], node.get_build_env(), execute=1) == 0:
+            if CacheRetrieveSilent(node, [], env, execute=1) == 0:
                 node.build(presub=0, execute=0)
-                retrieved = 1
+                return True
         else:
-            if CacheRetrieve(node, [], node.get_build_env(), execute=1) == 0:
-                retrieved = 1
-        if retrieved:
-            # Record build signature information, but don't
-            # push it out to cache.  (We just got it from there!)
-            node.set_state(SCons.Node.executed)
-            SCons.Node.Node.built(node)
+            if CacheRetrieve(node, [], env, execute=1) == 0:
+                return True
 
-        return retrieved
+        return False
 
     def push(self, node):
         if not self.is_enabled():
@@ -215,3 +209,9 @@ class CacheDir:
     def push_if_forced(self, node):
         if cache_force:
             return self.push(node)
+
+# Local Variables:
+# tab-width:4
+# indent-tabs-mode:nil
+# End:
+# vim: set expandtab tabstop=4 shiftwidth=4:

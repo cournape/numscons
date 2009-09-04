@@ -7,7 +7,7 @@ needed by most users.
 """
 
 #
-# Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008 The SCons Foundation
+# Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009 The SCons Foundation
 #
 # Permission is hereby granted, free of charge, to any person obtaining
 # a copy of this software and associated documentation files (the
@@ -29,11 +29,12 @@ needed by most users.
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #
 
-__revision__ = "src/engine/SCons/Debug.py 3842 2008/12/20 22:59:52 scons"
+__revision__ = "src/engine/SCons/Debug.py  2009/09/04 16:33:07 david"
 
 import os
 import string
 import sys
+import time
 
 # Recipe 14.10 from the Python Cookbook.
 try:
@@ -196,14 +197,24 @@ if sys.platform == 'win32':
 else:
     TraceDefault = '/dev/tty'
 
-def Trace(msg, file=None, mode='w'):
+TimeStampDefault = None
+StartTime = time.time()
+PreviousTime = StartTime
+
+def Trace(msg, file=None, mode='w', tstamp=None):
     """Write a trace message to a file.  Whenever a file is specified,
     it becomes the default for the next call to Trace()."""
     global TraceDefault
+    global TimeStamp
+    global PreviousTime
     if file is None:
         file = TraceDefault
     else:
         TraceDefault = file
+    if tstamp is None:
+        tstamp = TimeStampDefault
+    else:
+        TimeStampDefault = tstamp
     try:
         fp = TraceFP[file]
     except KeyError:
@@ -212,5 +223,15 @@ def Trace(msg, file=None, mode='w'):
         except TypeError:
             # Assume we were passed an open file pointer.
             fp = file
+    if tstamp:
+        now = time.time()
+        fp.write('%8.4f %8.4f:  ' % (now - StartTime, now - PreviousTime))
+        PreviousTime = now
     fp.write(msg)
     fp.flush()
+
+# Local Variables:
+# tab-width:4
+# indent-tabs-mode:nil
+# End:
+# vim: set expandtab tabstop=4 shiftwidth=4:

@@ -20,7 +20,7 @@ their own platform definition.
 """
 
 #
-# Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008 The SCons Foundation
+# Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009 The SCons Foundation
 # 
 # Permission is hereby granted, free of charge, to any person obtaining
 # a copy of this software and associated documentation files (the
@@ -42,7 +42,7 @@ their own platform definition.
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #
 
-__revision__ = "src/engine/SCons/Platform/__init__.py 3842 2008/12/20 22:59:52 scons"
+__revision__ = "src/engine/SCons/Platform/__init__.py  2009/09/04 16:33:07 david"
 
 import imp
 import os
@@ -51,6 +51,7 @@ import sys
 import tempfile
 
 import SCons.Errors
+import SCons.Subst
 import SCons.Tool
 
 def platform_default():
@@ -147,8 +148,18 @@ class TempFileMunge:
 
     def __call__(self, target, source, env, for_signature):
         if for_signature:
+            # If we're being called for signature calculation, it's
+            # because we're being called by the string expansion in
+            # Subst.py, which has the logic to strip any $( $) that
+            # may be in the command line we squirreled away.  So we
+            # just return the raw command line and let the upper
+            # string substitution layers do their thing.
             return self.cmd
-        cmd = env.subst_list(self.cmd, 0, target, source)[0]
+
+        # Now we're actually being called because someone is actually
+        # going to try to execute the command, so we have to do our
+        # own expansion.
+        cmd = env.subst_list(self.cmd, SCons.Subst.SUBST_CMD, target, source)[0]
         try:
             maxline = int(env.subst('$MAXLINELENGTH'))
         except ValueError:
@@ -214,3 +225,9 @@ def Platform(name = platform_default()):
     spec = PlatformSpec(name)
     spec.__call__ = module.generate
     return spec
+
+# Local Variables:
+# tab-width:4
+# indent-tabs-mode:nil
+# End:
+# vim: set expandtab tabstop=4 shiftwidth=4:

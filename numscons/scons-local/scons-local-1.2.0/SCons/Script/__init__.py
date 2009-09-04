@@ -12,7 +12,7 @@ it goes here.
 """
 
 #
-# Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008 The SCons Foundation
+# Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009 The SCons Foundation
 #
 # Permission is hereby granted, free of charge, to any person obtaining
 # a copy of this software and associated documentation files (the
@@ -34,7 +34,7 @@ it goes here.
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #
 
-__revision__ = "src/engine/SCons/Script/__init__.py 3842 2008/12/20 22:59:52 scons"
+__revision__ = "src/engine/SCons/Script/__init__.py  2009/09/04 16:33:07 david"
 
 import time
 start_time = time.time()
@@ -406,3 +406,9 @@ SConscript.DefaultTargets = DEFAULT_TARGETS
 # unlikely enough that we're going to leave this as is and cross that
 # bridge if someone actually comes to it.
 Command = _SConscript.DefaultEnvironmentCall('Command', subst=1)
+
+# Local Variables:
+# tab-width:4
+# indent-tabs-mode:nil
+# End:
+# vim: set expandtab tabstop=4 shiftwidth=4:

@@ -4,7 +4,7 @@ Autoconf-like configuration support.
 """
 
 #
-# Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008 The SCons Foundation
+# Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009 The SCons Foundation
 #
 # Permission is hereby granted, free of charge, to any person obtaining
 # a copy of this software and associated documentation files (the
@@ -26,7 +26,7 @@ Autoconf-like configuration support.
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #
 
-__revision__ = "src/engine/SCons/SConf.py 3842 2008/12/20 22:59:52 scons"
+__revision__ = "src/engine/SCons/SConf.py  2009/09/04 16:33:07 david"
 
 import os
 import re
@@ -203,7 +203,7 @@ class Streamer:
         self.s.flush()
         
 
-class SConfBuildTask(SCons.Taskmaster.Task):
+class SConfBuildTask(SCons.Taskmaster.AlwaysTask):
     """
     This is almost the same as SCons.Script.BuildTask. Handles SConfErrors
     correctly and knows about the current cache_mode.
@@ -314,6 +314,17 @@ class SConfBuildTask(SCons.Taskmaster.Task):
             s = sys.stdout = sys.stderr = Streamer(sys.stdout)
             try:
                 env = self.targets[0].get_build_env()
+                if cache_mode == FORCE:
+                    # Set up the Decider() to force rebuilds by saying
+                    # that every source has changed.  Note that we still
+                    # call the environment's underlying source decider so
+                    # that the correct .sconsign info will get calculated
+                    # and keep the build state consistent.
+                    def force_build(dependency, target, prev_ni,
+                                    env_decider=env.decide_source):
+                        env_decider(dependency, target, prev_ni)
+                        return True
+                    env.Decider(force_build)
                 env['PSTDOUT'] = env['PSTDERR'] = s
                 try:
                     sconf.cached = 0
@@ -387,11 +398,11 @@ class SConfBase:
         if not SConfFS:
             SConfFS = SCons.Node.FS.default_fs or \
                       SCons.Node.FS.FS(env.fs.pathTop)
-        if not sconf_global is None:
+        if sconf_global is not None:
             raise (SCons.Errors.UserError,
                    "Only one SConf object may be active at one time")
         self.env = env
-        if log_file != None:
+        if log_file is not None:
             log_file = SConfFS.File(env.subst(log_file))
         self.logfile = log_file
         self.logstream = None
@@ -406,7 +417,6 @@ class SConfBase:
                  'CheckSHCC'          : CheckSHCC,
                  'CheckSHCXX'         : CheckSHCXX,
                  'CheckFunc'          : CheckFunc,
-                 'CheckFuncsAtOnce'   : CheckFuncsAtOnce,
                  'CheckType'          : CheckType,
                  'CheckTypeSize'      : CheckTypeSize,
                  'CheckDeclaration'   : CheckDeclaration,
@@ -419,7 +429,7 @@ class SConfBase:
         self.AddTests(default_tests)
         self.AddTests(custom_tests)
         self.confdir = SConfFS.Dir(env.subst(conf_dir))
-        if not config_h is None:
+        if config_h is not None:
             config_h = SConfFS.File(config_h)
         self.config_h = config_h
         self._startup()
@@ -461,7 +471,7 @@ class SConfBase:
         Tries to build the given nodes immediately. Returns 1 on success,
         0 on error.
         """
-        if self.logstream != None:
+        if self.logstream is not None:
             # override stdout / stderr to write in log file
             oldStdout = sys.stdout
             sys.stdout = self.logstream
@@ -500,7 +510,7 @@ class SConfBase:
             SConfFS.set_max_drift(save_max_drift)
             os.chdir(old_os_dir)
             SConfFS.chdir(old_fs_dir, change_os_dir=0)
-            if self.logstream != None:
+            if self.logstream is not None:
                 # restore stdout / stderr
                 sys.stdout = oldStdout
                 sys.stderr = oldStderr
@@ -549,7 +559,7 @@ class SConfBase:
             self.env['SPAWN'] = self.pspawn_wrapper
             sourcetext = self.env.Value(text)
 
-            if text != None:
+            if text is not None:
                 textFile = self.confdir.File(f + extension)
                 textFileNode = self.env.SConfSourceBuilder(target=textFile,
                                                            source=sourcetext)
@@ -617,9 +627,7 @@ class SConfBase:
             prog = self.lastTarget
             pname = str(prog)
             output = SConfFS.File(pname+'.out')
-            node = self.env.Command(output, prog, 
-                                    [[os.path.join(os.getcwd(), pname), 
-                                      ">", "${TARGET}"] ])
+            node = self.env.Command(output, prog, [ [ pname, ">", "${TARGET}"] ])
             ok = self.BuildNodes(node)
             if ok:
                 outputStr = output.get_contents()
@@ -637,7 +645,7 @@ class SConfBase:
                        "Test called after sconf.Finish()")
             context = CheckContext(self.sconf)
             ret = apply(self.test, (context,) +  args, kw)
-            if not self.sconf.config_h is None:
+            if self.sconf.config_h is not None:
                 self.sconf.config_h_text = self.sconf.config_h_text + context.config_h
             context.Result("error: no result")
             return ret
@@ -677,7 +685,7 @@ class SConfBase:
         self._createDir(self.confdir)
         self.confdir.up().add_ignore( [self.confdir] )
 
-        if self.logfile != None and not dryrun:
+        if self.logfile is not None and not dryrun:
             # truncate logfile, if SConf.Configure is called for the first time
             # in a build
             if _ac_config_logs.has_key(self.logfile):
@@ -716,7 +724,7 @@ class SConfBase:
 
         if not self.active:
             raise SCons.Errors.UserError, "Finish may be called only once!"
-        if self.logstream != None and not dryrun:
+        if self.logstream is not None and not dryrun:
             self.logstream.write("\n")
             self.logstream.close()
             self.logstream = None
@@ -776,8 +784,7 @@ class CheckContext:
 
     def Result(self, res):
         """Inform about the result of the test. res may be an integer or a
-        string. In case of an integer, the written text will be 'ok' or
-        'failed'.
+        string. In case of an integer, the written text will be 'yes' or 'no'.
         The result is only displayed when self.did_show_result is not set.
         """
         if type(res) in BooleanTypes:
@@ -846,6 +853,11 @@ class CheckContext:
         self.env.Append(LIBS = lib_name_list)
         return oldLIBS
 
+    def PrependLIBS(self, lib_name_list):
+        oldLIBS = self.env.get( 'LIBS', [] )
+        self.env.Prepend(LIBS = lib_name_list)
+        return oldLIBS
+
     def SetLIBS(self, val):
         oldLIBS = self.env.get( 'LIBS', [] )
         self.env.Replace(LIBS = val)
@@ -862,7 +874,7 @@ class CheckContext:
         self.Log("scons: Configure: " + msg + "\n")
 
     def Log(self, msg):
-        if self.sconf.logstream != None:
+        if self.sconf.logstream is not None:
             self.sconf.logstream.write(msg)
 
     #### End of stuff used by Conftest.py.
@@ -883,13 +895,6 @@ def SConf(*args, **kw):
 
 def CheckFunc(context, function_name, header = None, language = None):
     res = SCons.Conftest.CheckFunc(context, function_name, header = header, language = language)
-    context.did_show_result = 1
-    return not res
-
-def CheckFuncsAtOnce(context, function_names, header = None, language = None):
-    res = SCons.Conftest.CheckFuncsAtOnce(context, function_names,
-                                          header = header,
-                                          language = language)
     context.did_show_result = 1
     return not res
 
@@ -1020,3 +1025,9 @@ def CheckLibWithHeader(context, libs, header, language,
             call = call, language = language, autoadd = autoadd)
     context.did_show_result = 1
     return not res
+
+# Local Variables:
+# tab-width:4
+# indent-tabs-mode:nil
+# End:
+# vim: set expandtab tabstop=4 shiftwidth=4:

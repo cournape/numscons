@@ -5,7 +5,7 @@ Writing and reading information to the .sconsign file or files.
 """
 
 #
-# Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008 The SCons Foundation
+# Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009 The SCons Foundation
 #
 # Permission is hereby granted, free of charge, to any person obtaining
 # a copy of this software and associated documentation files (the
@@ -27,7 +27,7 @@ Writing and reading information to the .sconsign file or files.
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #
 
-__revision__ = "src/engine/SCons/SConsign.py 3842 2008/12/20 22:59:52 scons"
+__revision__ = "src/engine/SCons/SConsign.py  2009/09/04 16:33:07 david"
 
 import cPickle
 import os
@@ -373,3 +373,9 @@ def File(name, dbm_module=None):
         DB_Name = name
         if not dbm_module is None:
             DB_Module = dbm_module
+
+# Local Variables:
+# tab-width:4
+# indent-tabs-mode:nil
+# End:
+# vim: set expandtab tabstop=4 shiftwidth=4:

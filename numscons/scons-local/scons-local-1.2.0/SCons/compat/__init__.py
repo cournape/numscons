@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008 The SCons Foundation
+# Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009 The SCons Foundation
 #
 # Permission is hereby granted, free of charge, to any person obtaining
 # a copy of this software and associated documentation files (the
@@ -60,7 +60,7 @@ function defined below loads the module as the "real" name (without the
 rest of our code will find our pre-loaded compatibility module.
 """
 
-__revision__ = "src/engine/SCons/compat/__init__.py 3842 2008/12/20 22:59:52 scons"
+__revision__ = "src/engine/SCons/compat/__init__.py  2009/09/04 16:33:07 david"
 
 def import_as(module, name):
     """
@@ -167,6 +167,13 @@ except AttributeError:
     elif 'nt' in _names:
         os.devnull = 'nul'
     os.path.devnull = os.devnull
+try:
+    os.path.lexists
+except AttributeError:
+    # Pre-2.4 Python has no os.path.lexists function
+    def lexists(path):
+        return os.path.exists(path) or os.path.islink(path)
+    os.path.lexists = lexists
 
 import shlex
 try:
@@ -242,3 +249,9 @@ try:
 except ImportError:
     # Pre-1.6 Python has no UserString module.
     import_as('_scons_UserString', 'UserString')
+
+# Local Variables:
+# tab-width:4
+# indent-tabs-mode:nil
+# End:
+# vim: set expandtab tabstop=4 shiftwidth=4:

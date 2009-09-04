@@ -28,7 +28,7 @@ Usage example:
 """
 
 #
-# Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008 The SCons Foundation
+# Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009 The SCons Foundation
 #
 # Permission is hereby granted, free of charge, to any person obtaining
 # a copy of this software and associated documentation files (the
@@ -50,7 +50,7 @@ Usage example:
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #
 
-__revision__ = "src/engine/SCons/Variables/PackageVariable.py 3842 2008/12/20 22:59:52 scons"
+__revision__ = "src/engine/SCons/Variables/PackageVariable.py  2009/09/04 16:33:07 david"
 
 __all__ = ['PackageVariable',]
 
@@ -101,3 +101,9 @@ def PackageVariable(key, help, default, searchfunc=None):
     return (key, help, default,
             lambda k, v, e, f=searchfunc: _validator(k,v,e,f),
             _converter)
+
+# Local Variables:
+# tab-width:4
+# indent-tabs-mode:nil
+# End:
+# vim: set expandtab tabstop=4 shiftwidth=4:

@@ -64,13 +64,19 @@ Autoconf-like configuration support; low level implementation of tests.
 #                       Append "lib_name_list" to the value of LIBS.
 #                       "lib_namelist" is a list of strings.
 #                       Return the value of LIBS before changing it (any type
-#                       can be used, it is passed to SetLIBS() later.
+#                       can be used, it is passed to SetLIBS() later.)
+#
+# context.PrependLIBS(lib_name_list)
+#                       Prepend "lib_name_list" to the value of LIBS.
+#                       "lib_namelist" is a list of strings.
+#                       Return the value of LIBS before changing it (any type
+#                       can be used, it is passed to SetLIBS() later.)
 #
 # context.SetLIBS(value)
 #                       Set LIBS to "value".  The type of "value" is what
 #                       AppendLIBS() returned.
 #                       Return the value of LIBS before changing it (any type
-#                       can be used, it is passed to SetLIBS() later.
+#                       can be used, it is passed to SetLIBS() later.)
 #
 # context.headerfilename
 #                       Name of file to append configure results to, usually
@@ -281,21 +287,10 @@ char %s();""" % function_name
         context.Display("Cannot check for %s(): %s\n" % (function_name, msg))
         return msg
 
-    # Note om the _MSC_VER part:
-    #    MSVC (and other compilers as well, actually) have the concept of
-    #    intrisincs. An intrisinc replaces any function call, and this breaks
-    #    this test. So we force MS compiler to make a function call - in the
-    #    test only.  Useful to test for some functions when built with
-    #    optimization on, to avoid build error because the intrisinc and our
-    #    'fake' test declaration do not match.
     text = """
 %(include)s
 #include <assert.h>
 %(hdr)s
-
-#ifdef _MSC_VER
-#pragma function(%(name)s)
-#endif")
 
 int main() {
 #if defined (__stub_%(name)s) || defined (__stub___%(name)s)
@@ -315,57 +310,6 @@ int main() {
     _YesNoResult(context, ret, "HAVE_" + function_name, text,
                  "Define to 1 if the system has the function `%s'." %\
                  function_name)
-    return ret
-
-def CheckFuncsAtOnce(context, function_names, header = None, language = None):
-    lang, suffix, msg = _lang2suffix(language)
-
-    if context.headerfilename:
-        includetext = '#include "%s"' % context.headerfilename
-    else:
-        includetext = ''
-
-    if not header:
-        header = ['#ifdef __cplusplus']
-        header.append('extern "C" {')
-        header.append('#endif')
-        for f in function_names:
-            header.append("\tchar %s();" % f)
-        header.append('#ifdef __cplusplus')
-        header.append('};')
-        header.append('#endif')
-        header = "\n".join(header)
-
-    tmp = []
-    for f in function_names:
-        tmp.append("\t%s();" % f)
-
-    body = """
-%(include)s
-#include <assert.h>
-%(hdr)s
-
-int main(void)
-{
-%(tmp)s
-    return 0;
-}
-""" % {'tmp' : "\n".join(tmp), 'include': includetext, 'hdr': header }
-
-    context.Display("Checking for %s functions %s... " % (lang,
-                    ", ".join(function_names)))
-
-    ret = context.BuildProg(body, suffix)
-
-    if ret:
-        context.Display("no\n")
-        _LogFailed(context, body, ret)
-    else:
-        for k in function_names:
-            _Have(context, "HAVE_%s" % k, 1,
-                  "Define to 1 if you have the `%s' function." % k)
-        context.Display("yes\n")
-
     return ret
 
 
@@ -634,7 +578,8 @@ int main()
     return st
 
 def CheckLib(context, libs, func_name = None, header = None,
-                 extra_libs = None, call = None, language = None, autoadd = 1):
+             extra_libs = None, call = None, language = None, autoadd = 1,
+             append = True):
     """
     Configure check for a C or C++ libraries "libs".  Searches through
     the list of libraries, until one is found where the test succeeds.
@@ -719,7 +664,10 @@ return 0;
             l = [ lib_name ]
             if extra_libs:
                 l.extend(extra_libs)
-            oldLIBS = context.AppendLIBS(l)
+            if append:
+                oldLIBS = context.AppendLIBS(l)
+            else:
+                oldLIBS = context.PrependLIBS(l)
             sym = "HAVE_LIB" + lib_name
         else:
             oldLIBS = -1
@@ -838,3 +786,9 @@ def _lang2suffix(lang):
 
 
 # vim: set sw=4 et sts=4 tw=79 fo+=l:
+
+# Local Variables:
+# tab-width:4
+# indent-tabs-mode:nil
+# End:
+# vim: set expandtab tabstop=4 shiftwidth=4:

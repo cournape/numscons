@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008 The SCons Foundation
+# Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009 The SCons Foundation
 #
 # Permission is hereby granted, free of charge, to any person obtaining
 # a copy of this software and associated documentation files (the
@@ -21,7 +21,7 @@
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #
 
-__revision__ = "src/engine/SCons/Script/Interactive.py 3842 2008/12/20 22:59:52 scons"
+__revision__ = "src/engine/SCons/Script/Interactive.py  2009/09/04 16:33:07 david"
 
 __doc__ = """
 SCons interactive mode
@@ -354,7 +354,11 @@ class SConsInteractiveCmd(cmd.Cmd):
         if not argv:
             argv = os.environ[self.shell_variable]
         try:
-            p = subprocess.Popen(argv)
+            # Per "[Python-Dev] subprocess insufficiently platform-independent?"
+            # http://mail.python.org/pipermail/python-dev/2008-August/081979.html "+
+            # Doing the right thing with an argument list currently
+            # requires different shell= values on Windows and Linux.
+            p = subprocess.Popen(argv, shell=(sys.platform=='win32'))
         except EnvironmentError, e:
             sys.stderr.write('scons: %s: %s\n' % (argv[0], e.strerror))
         else:
@@ -374,3 +378,9 @@ def interact(fs, parser, options, targets, target_top):
                             targets = targets,
                             target_top = target_top)
     c.cmdloop()
+
+# Local Variables:
+# tab-width:4
+# indent-tabs-mode:nil
+# End:
+# vim: set expandtab tabstop=4 shiftwidth=4:

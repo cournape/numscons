@@ -5,7 +5,7 @@ The Scanner package for the SCons software construction utility.
 """
 
 #
-# Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008 The SCons Foundation
+# Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009 The SCons Foundation
 #
 # Permission is hereby granted, free of charge, to any person obtaining
 # a copy of this software and associated documentation files (the
@@ -27,7 +27,7 @@ The Scanner package for the SCons software construction utility.
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #
 
-__revision__ = "src/engine/SCons/Scanner/__init__.py 3842 2008/12/20 22:59:52 scons"
+__revision__ = "src/engine/SCons/Scanner/__init__.py  2009/09/04 16:33:07 david"
 
 import re
 import string
@@ -347,16 +347,18 @@ class Classic(Current):
         return SCons.Node.FS._my_normcase(include)
 
     def find_include_names(self, node):
-        return self.cre.findall(node.get_contents())
+        return self.cre.findall(node.get_text_contents())
 
     def scan(self, node, path=()):
 
         # cache the includes list in node so we only scan it once:
-        if node.includes != None:
+        if node.includes is not None:
             includes = node.includes
         else:
             includes = self.find_include_names (node)
-            node.includes = includes
+            # Intern the names of the include files. Saves some memory
+            # if the same header is included many times.
+            node.includes = map(SCons.Util.silent_intern, includes)
 
         # This is a hand-coded DSU (decorate-sort-undecorate, or
         # Schwartzian transform) pattern.  The sort key is the raw name
@@ -400,7 +402,14 @@ class ClassicCPP(Classic):
 
         n = SCons.Node.FS.find_file(include[1], paths)
 
-        return n, include[1]
+        i = SCons.Util.silent_intern(include[1])
+        return n, i
 
     def sort_key(self, include):
         return SCons.Node.FS._my_normcase(string.join(include))
+
+# Local Variables:
+# tab-width:4
+# indent-tabs-mode:nil
+# End:
+# vim: set expandtab tabstop=4 shiftwidth=4:

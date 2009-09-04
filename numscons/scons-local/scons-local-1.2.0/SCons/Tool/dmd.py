@@ -32,7 +32,7 @@ Lib tool variables:
 """
 
 #
-# Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008 The SCons Foundation
+# Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009 The SCons Foundation
 #
 # Permission is hereby granted, free of charge, to any person obtaining
 # a copy of this software and associated documentation files (the
@@ -54,7 +54,7 @@ Lib tool variables:
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #
 
-__revision__ = "src/engine/SCons/Tool/dmd.py 3842 2008/12/20 22:59:52 scons"
+__revision__ = "src/engine/SCons/Tool/dmd.py  2009/09/04 16:33:07 david"
 
 import os
 import string
@@ -200,7 +200,7 @@ def generate(env):
                         libs = env['LIBS']
                     except KeyError:
                         libs = []
-                    if 'phobos' not in libs:
+                    if 'phobos' not in libs and 'gphobos' not in libs:
                         if dc is 'dmd':
                             env.Append(LIBS = ['phobos'])
                         elif dc is 'gdmd':
@@ -216,3 +216,9 @@ def generate(env):
 
 def exists(env):
     return env.Detect(['dmd', 'gdmd'])
+
+# Local Variables:
+# tab-width:4
+# indent-tabs-mode:nil
+# End:
+# vim: set expandtab tabstop=4 shiftwidth=4:

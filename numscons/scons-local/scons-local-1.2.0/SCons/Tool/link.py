@@ -9,7 +9,7 @@ selection method.
 """
 
 #
-# Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008 The SCons Foundation
+# Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009 The SCons Foundation
 #
 # Permission is hereby granted, free of charge, to any person obtaining
 # a copy of this software and associated documentation files (the
@@ -31,7 +31,7 @@ selection method.
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #
 
-__revision__ = "src/engine/SCons/Tool/link.py 3842 2008/12/20 22:59:52 scons"
+__revision__ = "src/engine/SCons/Tool/link.py  2009/09/04 16:33:07 david"
 
 import SCons.Defaults
 import SCons.Tool
@@ -51,10 +51,10 @@ def smart_link(source, target, env, for_signature):
         global issued_mixed_link_warning
         if not issued_mixed_link_warning:
             msg = "Using $CXX to link Fortran and C++ code together.\n\t" + \
-              "This may generate a buggy executable if the %s\n\t" + \
+              "This may generate a buggy executable if the '%s'\n\t" + \
               "compiler does not know how to deal with Fortran runtimes."
             SCons.Warnings.warn(SCons.Warnings.FortranCxxMixWarning,
-                                msg % repr(env.subst('$CXX')))
+                                msg % env.subst('$CXX'))
             issued_mixed_link_warning = True
         return '$CXX'
     elif has_fortran:
@@ -99,10 +99,13 @@ def generate(env):
     # setting them the same means that LoadableModule works everywhere.
     SCons.Tool.createLoadableModuleBuilder(env)
     env['LDMODULE'] = '$SHLINK'
+    # don't set up the emitter, cause AppendUnique will generate a list
+    # starting with None :-(
+    env.Append(LDMODULEEMITTER='$SHLIBEMITTER')
     env['LDMODULEPREFIX'] = '$SHLIBPREFIX' 
     env['LDMODULESUFFIX'] = '$SHLIBSUFFIX' 
     env['LDMODULEFLAGS'] = '$SHLINKFLAGS'
-    env['LDMODULECOM'] = '$SHLINKCOM'
+    env['LDMODULECOM'] = '$LDMODULE -o $TARGET $LDMODULEFLAGS $SOURCES $_LIBDIRFLAGS $_LIBFLAGS'
 
 
 
@@ -110,3 +113,9 @@ def exists(env):
     # This module isn't really a Tool on its own, it's common logic for
     # other linkers.
     return None
+
+# Local Variables:
+# tab-width:4
+# indent-tabs-mode:nil
+# End:
+# vim: set expandtab tabstop=4 shiftwidth=4:

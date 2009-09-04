@@ -4,7 +4,7 @@ SCons Packaging Tool.
 """
 
 #
-# Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008 The SCons Foundation
+# Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009 The SCons Foundation
 #
 # Permission is hereby granted, free of charge, to any person obtaining
 # a copy of this software and associated documentation files (the
@@ -26,7 +26,7 @@ SCons Packaging Tool.
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #
 
-__revision__ = "src/engine/SCons/Tool/packaging/__init__.py 3842 2008/12/20 22:59:52 scons"
+__revision__ = "src/engine/SCons/Tool/packaging/__init__.py  2009/09/04 16:33:07 david"
 
 import SCons.Environment
 from SCons.Variables import *
@@ -169,7 +169,9 @@ def Package(env, target=None, source=None, **kw):
         args,varargs,varkw,defaults=getargspec(packager.package)
         if defaults!=None:
             args=args[:-len(defaults)] # throw away arguments with default values
-        map(args.remove, 'env target source'.split())
+        args.remove('env')
+        args.remove('target')
+        args.remove('source')
         # now remove any args for which we have a value in kw.
         #args=[x for x in args if not kw.has_key(x)]
         args=filter(lambda x, kw=kw: not kw.has_key(x), args)
@@ -304,3 +306,9 @@ def stripinstallbuilder(target, source, env):
                 setattr(ss, 'PACKAGING_INSTALL_LOCATION', s.get_path())
 
     return (target, n_source)
+
+# Local Variables:
+# tab-width:4
+# indent-tabs-mode:nil
+# End:
+# vim: set expandtab tabstop=4 shiftwidth=4:

@@ -8,7 +8,7 @@ selection method.
 """
 
 #
-# Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008 The SCons Foundation
+# Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009 The SCons Foundation
 #
 # Permission is hereby granted, free of charge, to any person obtaining
 # a copy of this software and associated documentation files (the
@@ -30,7 +30,8 @@ selection method.
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #
 
-__revision__ = "src/engine/SCons/Platform/os2.py 3842 2008/12/20 22:59:52 scons"
+__revision__ = "src/engine/SCons/Platform/os2.py  2009/09/04 16:33:07 david"
+import win32
 
 def generate(env):
     if not env.has_key('ENV'):
@@ -47,3 +48,11 @@ def generate(env):
     env['SHLIBSUFFIX']    = '.dll'
     env['LIBPREFIXES']    = '$LIBPREFIX'
     env['LIBSUFFIXES']    = [ '$LIBSUFFIX', '$SHLIBSUFFIX' ]
+    env['HOST_OS']        = 'os2'
+    env['HOST_ARCH']      = win32.get_architecture().arch
+
+# Local Variables:
+# tab-width:4
+# indent-tabs-mode:nil
+# End:
+# vim: set expandtab tabstop=4 shiftwidth=4:

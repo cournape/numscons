@@ -5,7 +5,7 @@ This module implements the dependency scanner for LaTeX code.
 """
 
 #
-# Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008 The SCons Foundation
+# Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009 The SCons Foundation
 #
 # Permission is hereby granted, free of charge, to any person obtaining
 # a copy of this software and associated documentation files (the
@@ -27,7 +27,7 @@ This module implements the dependency scanner for LaTeX code.
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #
 
-__revision__ = "src/engine/SCons/Scanner/LaTeX.py 3842 2008/12/20 22:59:52 scons"
+__revision__ = "src/engine/SCons/Scanner/LaTeX.py  2009/09/04 16:33:07 david"
 
 import os.path
 import string
@@ -251,6 +251,9 @@ class LaTeX(SCons.Scanner.Base):
             base, ext = os.path.splitext( filename )
             if ext == "":
                 #TODO(1.5) return [filename + e for e in self.graphics_extensions]
+                #return map(lambda e, f=filename: f+e, self.graphics_extensions + TexGraphics)
+                # use the line above to find dependency for PDF builder when only .eps figure is present
+                # Since it will be found if the user tell scons how to make the pdf figure leave it out for now.
                 return map(lambda e, f=filename: f+e, self.graphics_extensions)
         return [filename]
 
@@ -285,7 +288,7 @@ class LaTeX(SCons.Scanner.Base):
         if node.includes != None:
             includes = node.includes
         else:
-            includes = self.cre.findall(node.get_contents())
+            includes = self.cre.findall(node.get_text_contents())
             # 1. Split comma-separated lines, e.g.
             #      ('bibliography', 'phys,comp')
             #    should become two entries
@@ -332,3 +335,9 @@ class LaTeX(SCons.Scanner.Base):
         nodes.sort()
         nodes = map(lambda pair: pair[1], nodes)
         return nodes
+
+# Local Variables:
+# tab-width:4
+# indent-tabs-mode:nil
+# End:
+# vim: set expandtab tabstop=4 shiftwidth=4:
