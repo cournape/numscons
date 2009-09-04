@@ -11,11 +11,15 @@ def get_darwin_version():
                 "Could not execute sw_vers -productVersion to get version")
 
     verstring = p.stdout.next()
-    a, b, c = verstring.split(".")
+    vn = verstring.split(".")
     try:
-        major = int(a)
-        minor = int(b)
-        micro = int(c)
+        major = int(vn[0])
+        minor = int(vn[1])
+        if len(vn) > 2:
+            micro = int(vn[2])
+        else:
+            # Snow Leopard only return a 2 items tuple
+            micro = 0
 
         return major, minor, micro
     except ValueError:
