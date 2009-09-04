@@ -36,12 +36,12 @@ __revision__ = "src/engine/SCons/Tool/gfortran.py  2009/09/04 16:33:07 david"
 
 import SCons.Util
 
-import fortran
+from FortranCommon import add_all_to_env
 
 def generate(env):
     """Add Builders and construction variables for gfortran to an
     Environment."""
-    fortran.generate(env)
+    add_all_to_env(env)
 
     for dialect in ['F77', 'F90', 'FORTRAN', 'F95']:
         env['%s' % dialect] = 'gfortran'
