@@ -69,5 +69,5 @@ def TOOL_SUBST(env):
         Depends(target, SCons.Node.Python.Value(d))
         return target, source
 
-    subst_action=SCons.Action.Action(subst_in_file, subst_in_file_string)
+    subst_action=SCons.Action.Action(subst_in_file, "$SUBSTVARCOMSTR")
     env['BUILDERS']['SubstInFile'] = Builder(action=subst_action, emitter=subst_emitter)

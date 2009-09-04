@@ -148,6 +148,7 @@ def set_verbosity(env):
 
     if level > 0:
         env['F2PYCOMSTR']           = "F2PY               $SOURCE"
+        env['SUBSTVARCOMSTR']       = "SUBSTVAR           $SOURCE"
 
         env['CCCOMSTR']             = "CC                 $SOURCE"
         env['SHCCCOMSTR']           = "SHCC               $SOURCE"
