@@ -458,27 +458,27 @@ def merge_default_version(env):
     arch = get_default_arch(env)
 
     msvs = get_vs_by_version(version)
-    if msvs is None:
-        return
-    batfilename = msvs.get_batch_file()
+    # if msvs is None:
+    #     return
+    # batfilename = msvs.get_batch_file()
 
-    # XXX: I think this is broken. This will silently set a bogus tool instead
-    # of failing, but there is no other way with the current scons tool
-    # framework
-    if batfilename is not None:
+    # # XXX: I think this is broken. This will silently set a bogus tool instead
+    # # of failing, but there is no other way with the current scons tool
+    # # framework
+    # if batfilename is not None:
 
-        vars = ('LIB', 'LIBPATH', 'PATH', 'INCLUDE')
+    #     vars = ('LIB', 'LIBPATH', 'PATH', 'INCLUDE')
 
-        msvs_list = get_installed_visual_studios()
-        # TODO(1.5):
-        #vscommonvarnames = [ vs.common_tools_var for vs in msvs_list ]
-        vscommonvarnames = map(lambda vs: vs.common_tools_var, msvs_list)
-        nenv = normalize_env(env['ENV'], vscommonvarnames + ['COMSPEC'])
-        output = get_output(batfilename, arch, env=nenv)
-        vars = parse_output(output, vars)
+    #     msvs_list = get_installed_visual_studios()
+    #     # TODO(1.5):
+    #     #vscommonvarnames = [ vs.common_tools_var for vs in msvs_list ]
+    #     vscommonvarnames = map(lambda vs: vs.common_tools_var, msvs_list)
+    #     nenv = normalize_env(env['ENV'], vscommonvarnames + ['COMSPEC'])
+    #     output = get_output(batfilename, arch, env=nenv)
+    #     vars = parse_output(output, vars)
 
-        for k, v in vars.items():
-            env.PrependENVPath(k, v, delete_existing=1)
+    #     for k, v in vars.items():
+    #         env.PrependENVPath(k, v, delete_existing=1)
 
 def query_versions():
     """Query the system to get available versions of VS. A version is
