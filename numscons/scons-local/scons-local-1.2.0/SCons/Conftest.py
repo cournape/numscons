@@ -343,20 +343,28 @@ def CheckFuncsAtOnce(context, function_names, header = None, language = None):
         header = "\n".join(header)
 
     tmp = []
+    pragma = []
     for f in function_names:
         tmp.append("\t%s();" % f)
+        pragma.append("""
+#ifdef _MSC_VER
+#pragma function(%s)
+#endif""" % f)
+    pragmastr = "\n".join(pragma)
 
     body = """
 %(include)s
 #include <assert.h>
 %(hdr)s
+%(pragma)s
 
 int main(void)
 {
 %(tmp)s
     return 0;
 }
-""" % {'tmp' : "\n".join(tmp), 'include': includetext, 'hdr': header }
+""" % {'tmp' : "\n".join(tmp), 'include': includetext, 'hdr': header,
+       'pragma': pragmastr}
 
     context.Display("Checking for %s functions %s... " % (lang,
                     ", ".join(function_names)))
