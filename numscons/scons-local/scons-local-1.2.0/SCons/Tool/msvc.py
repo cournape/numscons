@@ -235,8 +235,8 @@ def generate(env):
     # Set-up ms tools paths for default version
     msvc_setup_env(env)
 
-    import mssdk
-    mssdk.generate(env)
+    #import mssdk
+    #mssdk.generate(env)
 
     env['CFILESUFFIX'] = '.c'
     env['CXXFILESUFFIX'] = '.cc'
