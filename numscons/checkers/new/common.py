@@ -1,4 +1,10 @@
+import os
+import shutil
+
 from copy import deepcopy
+
+from numscons.core.misc import \
+    get_scons_configres_dir
 
 def save_and_set(env, opts, keys=None):
     """Put informations from option configuration into a scons environment, and
@@ -37,3 +43,32 @@ def get_perflib_names(env):
 def set_perflib_names(env, list):
     """Set list of perflibs to test before using generic code (if any)."""
     env['__NUMSCONS']['CONFIGURATION']['PERFLIBS_TO_TEST'] = list
+
+def set_checker_result(env, name, info):
+    """Set config results for the given checker.
+    
+    Arguments
+    ---------
+    name: str
+        name of the checker (Lapack, Blas, etc...)
+    info: object
+        Usually a *Config instance, but can be any object with a str method"""
+    env['__NUMSCONS']['CONFIGURATION']['RESULTS'][name] = info
+
+def write_configuration_results(env):
+    cfg = env['__NUMSCONS']['CONFIGURATION']['RESULTS']
+    config_str = {}
+    for k, i in cfg.items():
+        config_str[k] = str(i)
+
+    # XXX: do it the scons way to put this in the DAG
+    f = open(env['NUMPY_PKG_CONFIG_FILE'], 'w')
+    f.writelines("%s" % str(config_str))
+    f.close()
+
+    target = os.path.join(str(env.fs.Top), get_scons_configres_dir(),
+            env['src_dir'], "__configres.py")
+
+    if not os.path.exists(os.path.dirname(target)):
+        os.makedirs(os.path.dirname(target))
+    shutil.copy(env['NUMPY_PKG_CONFIG_FILE'], target)

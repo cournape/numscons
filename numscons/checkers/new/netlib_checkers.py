@@ -2,7 +2,7 @@ from numscons.checkers.new.perflib_checkers import \
         _check_perflib
 from numscons.checkers.new.common import \
         get_perflib_names, get_initialized_perflib_config, \
-        save_and_set, restore
+        save_and_set, restore, set_checker_result
 
 __all__ = ['CheckF77Lapack', 'CheckF77Blas', 'CheckCblas']
 
@@ -147,6 +147,7 @@ def _check_fortran(context, name, autoadd, test_code_tpl, func):
     if not ret:
         context.Result('no')
     context.Result('yes - %s' % info._msg_name)
+    set_checker_result(context.env, name, info)
     return ret
 
 def _check_c(context, name, autoadd, test_code):
