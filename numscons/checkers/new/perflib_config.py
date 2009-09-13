@@ -1,5 +1,13 @@
 import os
 
+def set_cblas(config, config_info):
+    if config_info['cblas_libraries']:
+        config._interfaces['cblas']['LIBS']  = config_info['cblas_libraries']
+    elif config_info['libraries']:
+        config._interfaces['cblas']['LIBS']  = config_info['libraries']
+
+    _set_common(config._interfaces['cblas'], config_info)
+
 def set_blas(config, config_info):
     if config_info['blas_libraries']:
         config._interfaces['blas']['LIBS']  = config_info['blas_libraries']
@@ -38,8 +46,9 @@ class AtlasConfig:
     def __init__(self, config_info):
         self._msg_name = 'ATLAS'
         self._core = {}
-        self._interfaces = {'blas': {}, 'lapack': {}}
+        self._interfaces = {'blas': {}, 'lapack': {}, 'cblas': {}}
 
+        set_blas(self, config_info)
         set_blas(self, config_info)
         set_lapack(self, config_info)
         set_core(self, config_info)
@@ -68,9 +77,10 @@ class MklConfig:
     def __init__(self, config_info):
         self._msg_name = 'MKL'
         self._core = {}
-        self._interfaces = {'blas': {}, 'lapack': {}}
+        self._interfaces = {'blas': {}, 'lapack': {}, 'cblas': {}}
 
         set_blas(self, config_info)
+        set_cblas(self, config_info)
         set_lapack(self, config_info)
         set_core(self, config_info)
 

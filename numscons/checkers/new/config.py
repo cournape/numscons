@@ -12,8 +12,8 @@ from numscons.core.utils import DefaultDict
 CONFIG_FILE = pjoin(pdirname(__file__), 'numscons.cfg')
 
 class ConfigDict(DefaultDict):
-    __keys = ['libraries', 'blas_libraries', 'lapack_libraries', 'cflags',
-            'ldflags', 'include_dirs', 'library_dirs', 'frameworks']
+    __keys = ['libraries', 'blas_libraries', 'lapack_libraries', 'cblas_libraries',
+            'cflags', 'ldflags', 'include_dirs', 'library_dirs', 'frameworks']
     @classmethod
     def fromcallable(cls, avkeys, default=None):
         raise UnimplementedError()
@@ -31,8 +31,8 @@ def _read_section(section):
 
     config = ConfigDict()
 
-    for o in ['libraries', 'blas_libraries', 'lapack_libraries', 'cflags',
-            'ldflags', 'frameworks']:
+    for o in ['libraries', 'blas_libraries', 'lapack_libraries',
+            'cblas_libraries', 'cflags', 'ldflags', 'frameworks']:
         if parser.has_option(section, o):
             config[o] = parser.get(section, o).split(',')
 
