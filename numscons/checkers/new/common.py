@@ -55,6 +55,11 @@ def set_checker_result(env, name, info):
         Usually a *Config instance, but can be any object with a str method"""
     env['__NUMSCONS']['CONFIGURATION']['RESULTS'][name] = info
 
+def init_environment(env):
+    env['__NUMSCONS']['CONFIGURATION'] = {}
+    env['__NUMSCONS']['CONFIGURATION']['RESULTS'] = {}
+    env['__NUMSCONS']['CONFIGURATION']['PERFLIB_CONFIG'] = {}
+
 def write_configuration_results(env):
     cfg = env['__NUMSCONS']['CONFIGURATION']['RESULTS']
     config_str = {}
