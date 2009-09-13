@@ -72,7 +72,7 @@ class AtlasConfig(_Config):
         self._interfaces = {'blas': {}, 'lapack': {}, 'cblas': {}}
 
         set_blas(self, config_info)
-        set_blas(self, config_info)
+        set_cblas(self, config_info)
         set_lapack(self, config_info)
         set_core(self, config_info)
 
