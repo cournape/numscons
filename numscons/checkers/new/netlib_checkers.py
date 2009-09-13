@@ -147,7 +147,7 @@ def _check_fortran(context, name, autoadd, test_code_tpl, func):
         restore(context.env, saved)
     if not ret:
         context.Result('no')
-    context.Result('yes - %s' % info._msg_name)
+    context.Result('yes - %s' % info.name)
     set_checker_result(context.env, name, info)
     return ret
 
@@ -177,7 +177,7 @@ def _check_c(context, name, autoadd, test_code):
         restore(context.env, saved)
     if not ret:
         context.Result('no')
-    context.Result('yes - %s' % info._msg_name)
+    context.Result('yes - %s' % info.name)
     return ret
 
 def CheckF77Lapack(context, autoadd=1):

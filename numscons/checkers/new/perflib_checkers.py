@@ -3,7 +3,7 @@ from numscons.checkers.new.common import \
 
 # Performance library checks
 def _check_perflib(context, autoadd, info):
-    context.Message("Checking for %s ... " % info._msg_name)
+    context.Message("Checking for %s ... " % info.name)
 
     if info.disabled():
         context.Result('no - disabled from user environment')

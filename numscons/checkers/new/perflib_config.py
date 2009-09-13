@@ -53,13 +53,13 @@ class _Config:
 
     def disabled(self):
         try:
-            val = os.environ[self._msg_name]
+            val = os.environ[self.name]
             return val == 'None'
         except KeyError:
             return False
 
     def __str__(self):
-        msg = ['Uses perflib %s' % self._msg_name]
+        msg = ['Uses perflib %s' % self.name]
         msg.extend(["\t%s: %s" % (k, v) for k, v in self._config_info.items()])
         return "\n".join(msg)
 
@@ -67,7 +67,7 @@ class AtlasConfig(_Config):
     def __init__(self, config_info):
         _Config.__init__(self, config_info)
 
-        self._msg_name = 'ATLAS'
+        self.name = 'ATLAS'
         self._core = {}
         self._interfaces = {'BLAS': {}, 'LAPACK': {}, 'CBLAS': {}}
 
@@ -90,7 +90,7 @@ class MklConfig(_Config):
     def __init__(self, config_info):
         _Config.__init__(self, config_info)
 
-        self._msg_name = 'MKL'
+        self.name = 'MKL'
         self._core = {}
         self._interfaces = {'BLAS': {}, 'LAPACK': {}, 'CBLAS': {}}
 
