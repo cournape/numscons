@@ -180,12 +180,12 @@ def _check_c(context, name, autoadd, test_code):
     context.Result('yes - %s' % info.name)
     return ret
 
-def CheckF77Lapack(context, autoadd=1):
+def CheckF77Lapack(context, autoadd=1, check_version=0):
     return _check_fortran(context, 'LAPACK', autoadd, _LAPACK_TEST_CODE,
             'sgesv')
 
-def CheckF77Blas(context, autoadd=1):
+def CheckF77Blas(context, autoadd=1, check_version=0):
     return _check_fortran(context, 'BLAS', autoadd, _BLAS_TEST_CODE, 'sgemm')
 
-def CheckCblas(context, autoadd=1):
+def CheckCblas(context, autoadd=1, check_version=0):
     return _check_c(context, 'CBLAS', autoadd, _CBLAS_TEST_CODE)

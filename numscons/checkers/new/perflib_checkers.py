@@ -17,10 +17,10 @@ def _check_perflib(context, autoadd, info):
     context.Result(ret)
     return ret
 
-def CheckAtlas(context, autoadd=1):
+def CheckAtlas(context, autoadd=1, check_version=0):
     return _check_perflib(context, autoadd,
             get_initialized_perflib_config(context.env, 'ATLAS'))
 
-def CheckMkl(context, autoadd=1):
+def CheckMkl(context, autoadd=1, check_version=0):
     return _check_perflib(context, autoadd,
             get_initialized_perflib_config(context.env, 'MKL'))
