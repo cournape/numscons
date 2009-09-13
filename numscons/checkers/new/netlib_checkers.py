@@ -90,7 +90,7 @@ def _check_fortran(context, name, autoadd, test_code_tpl, func):
     info = None
     for perflib in get_perflib_names(context.env):
         _info = get_initialized_perflib_config(context.env, perflib)
-        if _check_perflib(context, 0, _info):
+        if  name in _info.interfaces() and _check_perflib(context, 0, _info):
             info = _info
             break
 
