@@ -42,8 +42,29 @@ def _set_common(build_info, config_info):
     if config_info['library_dirs']:
         build_info['LIBPATH']  = config_info['library_dirs']
 
-class AtlasConfig:
+class _Config:
     def __init__(self, config_info):
+        self._config_info = config_info
+    
+    def interfaces(self):
+        return self._interfaces.keys()
+
+    def disabled(self):
+        try:
+            val = os.environ[self._msg_name]
+            return val == 'None'
+        except KeyError:
+            return False
+
+    def __str__(self):
+        msg = ['Uses perflib %s' % self._msg_name]
+        msg.extend(["\t%s: %s" % (k, v) for k, v in self._config_info.items()])
+        return "\n".join(msg)
+
+class AtlasConfig(_Config):
+    def __init__(self, config_info):
+        _Config.__init__(self, config_info)
+
         self._msg_name = 'ATLAS'
         self._core = {}
         self._interfaces = {'blas': {}, 'lapack': {}, 'cblas': {}}
@@ -63,18 +84,10 @@ main()
 }
 """
 
-    def interfaces(self):
-        return self._interfaces.keys()
-
-    def disabled(self):
-        try:
-            val = os.environ['ATLAS']
-            return val == 'None'
-        except KeyError:
-            return False
-
-class MklConfig:
+class MklConfig(_Config):
     def __init__(self, config_info):
+        _Config.__init__(self, config_info)
+
         self._msg_name = 'MKL'
         self._core = {}
         self._interfaces = {'blas': {}, 'lapack': {}, 'cblas': {}}
@@ -94,14 +107,3 @@ main ()
     MKLGetVersion(&v);
 };
         """
-
-    def interfaces(self):
-        return self._interfaces.keys()
-
-    def disabled(self):
-        try:
-            val = os.environ['MKL']
-            return val == 'None'
-        except KeyError:
-            return False
-
