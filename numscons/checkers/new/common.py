@@ -29,3 +29,11 @@ def get_initialized_perflib_config(env, name):
     except KeyError, e:
         raise RuntimeError("Could not find config for perflib %s " \
                            "(exception: %s)" % (name, str(e)))
+
+def get_perflib_names(env):
+    """Return list of perflibs to test before using generic code (if any)."""
+    return env['__NUMSCONS']['CONFIGURATION']['PERFLIBS_TO_TEST']
+
+def set_perflib_names(env, list):
+    """Set list of perflibs to test before using generic code (if any)."""
+    env['__NUMSCONS']['CONFIGURATION']['PERFLIBS_TO_TEST'] = list
