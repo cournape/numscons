@@ -4,7 +4,7 @@ from numscons.checkers.new.common import \
         get_perflib_names, get_initialized_perflib_config, \
         save_and_set, restore
 
-__all__ = ['CheckF77Lapack', 'CheckF77Blas']
+__all__ = ['CheckF77Lapack', 'CheckF77Blas', 'CheckCblas']
 
 # Test for sgesv
 _LAPACK_TEST_CODE = r"""\
@@ -76,6 +76,41 @@ main (void)
 }
 """
 
+# Test for CBLAS
+_CBLAS_TEST_CODE = r"""\
+enum CBLAS_ORDER {CblasRowMajor=101, CblasColMajor=102};
+enum CBLAS_TRANSPOSE {CblasNoTrans=111, CblasTrans=112, CblasConjTrans=113};
+
+void cblas_sgemm(const enum CBLAS_ORDER Order, const enum CBLAS_TRANSPOSE TransA,
+                 const enum CBLAS_TRANSPOSE TransB, const int M, const int N,
+                 const int K, const float alpha, const float *A,
+                 const int lda, const float *B, const int ldb,
+                 const float beta, float *C, const int ldc);
+int
+main (void)
+{
+    int lda = 3;
+    float A[] = {1, 2, 3,
+                 4, 5, 6};
+
+    int ldb = 2;
+    float B[] = {1, 2, 
+	         3, 4,
+		 5, 6};
+
+    int ldc = 2;
+    float C[] = { 0.00, 0.00,
+                 0.00, 0.00 };
+
+    /* Compute C = A B */
+    cblas_sgemm (CblasRowMajor, 
+                CblasNoTrans, CblasNoTrans, 2, 2, 3,
+                1.0, A, lda, B, ldb, 0.0, C, ldc);
+
+    return 0;  
+}
+"""
+
 def _check_fortran(context, name, autoadd, test_code_tpl, func):
     # Generate test code using name mangler
     try:
@@ -114,9 +149,41 @@ def _check_fortran(context, name, autoadd, test_code_tpl, func):
     context.Result('yes - %s' % info._msg_name)
     return ret
 
+def _check_c(context, name, autoadd, test_code):
+    # Detect which performance library to use
+    info = None
+    for perflib in get_perflib_names(context.env):
+        _info = get_initialized_perflib_config(context.env, perflib)
+        if  name in _info.interfaces() and _check_perflib(context, 0, _info):
+            info = _info
+            break
+
+    context.Message("Checking for %s ... " % name.upper())
+
+    if info is None:
+        context.Result('no')
+        return 0
+
+    if not name in info.interfaces():
+        raise RuntimeError("%s does not support %s interface" % \
+                (info.__class__, name.upper()))
+
+    saved = save_and_set(context.env, info._interfaces[name],
+                info._interfaces[name].keys())
+    ret = context.TryLink(test_code, extension='.c')
+    if not ret or not autoadd:
+        restore(context.env, saved)
+    if not ret:
+        context.Result('no')
+    context.Result('yes - %s' % info._msg_name)
+    return ret
+
 def CheckF77Lapack(context, autoadd=0):
     return _check_fortran(context, 'lapack', autoadd, _LAPACK_TEST_CODE,
             'sgesv')
 
 def CheckF77Blas(context, autoadd=0):
     return _check_fortran(context, 'blas', autoadd, _BLAS_TEST_CODE, 'sgemm')
+
+def CheckCblas(context, autoadd=0):
+    return _check_c(context, 'cblas', autoadd, _CBLAS_TEST_CODE)
