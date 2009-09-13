@@ -2,29 +2,29 @@ import os
 
 def set_cblas(config, config_info):
     if config_info['cblas_libraries']:
-        config._interfaces['cblas']['LIBS']  = config_info['cblas_libraries']
+        config._interfaces['CBLAS']['LIBS']  = config_info['cblas_libraries']
     elif config_info['blas_libraries']:
-        config._interfaces['cblas']['LIBS']  = config_info['blas_libraries']
+        config._interfaces['CBLAS']['LIBS']  = config_info['blas_libraries']
     elif config_info['libraries']:
-        config._interfaces['cblas']['LIBS']  = config_info['libraries']
+        config._interfaces['CBLAS']['LIBS']  = config_info['libraries']
 
-    _set_common(config._interfaces['cblas'], config_info)
+    _set_common(config._interfaces['CBLAS'], config_info)
 
 def set_blas(config, config_info):
     if config_info['blas_libraries']:
-        config._interfaces['blas']['LIBS']  = config_info['blas_libraries']
+        config._interfaces['BLAS']['LIBS']  = config_info['blas_libraries']
     elif config_info['libraries']:
-        config._interfaces['blas']['LIBS']  = config_info['libraries']
+        config._interfaces['BLAS']['LIBS']  = config_info['libraries']
 
-    _set_common(config._interfaces['blas'], config_info)
+    _set_common(config._interfaces['BLAS'], config_info)
 
 def set_lapack(config, config_info):
     if config_info['lapack_libraries']:
-        config._interfaces['lapack']['LIBS']  = config_info['lapack_libraries']
+        config._interfaces['LAPACK']['LIBS']  = config_info['lapack_libraries']
     elif config_info['libraries']:
-        config._interfaces['lapack']['LIBS']  = config_info['libraries']
+        config._interfaces['LAPACK']['LIBS']  = config_info['libraries']
 
-    _set_common(config._interfaces['lapack'], config_info)
+    _set_common(config._interfaces['LAPACK'], config_info)
 
 def set_core(config, config_info):
     if config_info['libraries']:
@@ -69,7 +69,7 @@ class AtlasConfig(_Config):
 
         self._msg_name = 'ATLAS'
         self._core = {}
-        self._interfaces = {'blas': {}, 'lapack': {}, 'cblas': {}}
+        self._interfaces = {'BLAS': {}, 'LAPACK': {}, 'CBLAS': {}}
 
         set_blas(self, config_info)
         set_cblas(self, config_info)
@@ -92,7 +92,7 @@ class MklConfig(_Config):
 
         self._msg_name = 'MKL'
         self._core = {}
-        self._interfaces = {'blas': {}, 'lapack': {}, 'cblas': {}}
+        self._interfaces = {'BLAS': {}, 'LAPACK': {}, 'CBLAS': {}}
 
         set_blas(self, config_info)
         set_cblas(self, config_info)

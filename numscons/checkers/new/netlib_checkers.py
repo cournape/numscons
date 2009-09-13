@@ -130,7 +130,7 @@ def _check_fortran(context, name, autoadd, test_code_tpl, func):
             info = _info
             break
 
-    context.Message("Checking for F77 %s ... " % name.upper())
+    context.Message("Checking for F77 %s ... " % name)
 
     if info is None:
         context.Result('no')
@@ -138,7 +138,7 @@ def _check_fortran(context, name, autoadd, test_code_tpl, func):
 
     if not name in info.interfaces():
         raise RuntimeError("%s does not support %s interface" % \
-                (info.__class__, name.upper()))
+                (info.__class__, name))
 
     saved = save_and_set(context.env, info._interfaces[name],
                 info._interfaces[name].keys())
@@ -181,11 +181,11 @@ def _check_c(context, name, autoadd, test_code):
     return ret
 
 def CheckF77Lapack(context, autoadd=1):
-    return _check_fortran(context, 'lapack', autoadd, _LAPACK_TEST_CODE,
+    return _check_fortran(context, 'LAPACK', autoadd, _LAPACK_TEST_CODE,
             'sgesv')
 
 def CheckF77Blas(context, autoadd=1):
-    return _check_fortran(context, 'blas', autoadd, _BLAS_TEST_CODE, 'sgemm')
+    return _check_fortran(context, 'BLAS', autoadd, _BLAS_TEST_CODE, 'sgemm')
 
 def CheckCblas(context, autoadd=1):
-    return _check_c(context, 'cblas', autoadd, _CBLAS_TEST_CODE)
+    return _check_c(context, 'CBLAS', autoadd, _CBLAS_TEST_CODE)
