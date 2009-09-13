@@ -21,3 +21,11 @@ def restore(env, saved):
     keys = saved.keys()
     kw = dict(zip(keys, [saved[k] for k in keys]))
     env.Replace(**kw)
+
+def get_initialized_perflib_config(env, name):
+    """Return initialized configuration of the given name."""
+    try:
+        return env['__NUMSCONS']['CONFIGURATION']['PERFLIB_CONFIG'][name]
+    except KeyError, e:
+        raise RuntimeError("Could not find config for perflib %s " \
+                           "(exception: %s)" % (name, str(e)))
