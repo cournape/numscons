@@ -3,6 +3,8 @@ import os
 def set_cblas(config, config_info):
     if config_info['cblas_libraries']:
         config._interfaces['cblas']['LIBS']  = config_info['cblas_libraries']
+    elif config_info['blas_libraries']:
+        config._interfaces['cblas']['LIBS']  = config_info['blas_libraries']
     elif config_info['libraries']:
         config._interfaces['cblas']['LIBS']  = config_info['libraries']
 
