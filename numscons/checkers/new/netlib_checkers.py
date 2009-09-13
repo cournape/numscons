@@ -1,0 +1,122 @@
+from numscons.checkers.new.perflib_checkers import \
+        _check_perflib
+from numscons.checkers.new.common import \
+        get_perflib_names, get_initialized_perflib_config, \
+        save_and_set, restore
+
+__all__ = ['CheckF77Lapack', 'CheckF77Blas']
+
+# Test for sgesv
+_LAPACK_TEST_CODE = r"""\
+int %(func)s(int *n, int *nrhs, float a[], int *lda, int ipiv[], 
+                  float b[], int *ldb, int *info);
+
+int compare(float A[], float B[], int sz)
+{
+        int i;
+
+        for(i = 0; i < sz; ++i) {
+                if ( (A[i] - B[i] > 0.01) || (A[i] - B[i] < -0.01)) {
+                        return -1;
+                }
+        }
+        return 0;
+}
+
+int main(void)
+{
+    int n = 2;
+    int nrhs = 2;
+    int lda = 2;
+    float A[] = { 1, 3, 2, 4};
+
+    int ldb = 2;
+    float B[] = { 1, 0, 0, 1};
+    float X[] = { -2, 1.5, 1, -0.5};
+
+    int ipov[] = {0, 0};
+    int info;
+
+    /* Compute X in A * X = B */
+    %(func)s(&n, &nrhs, A, &lda, ipov, B, &ldb, &info);
+
+    return compare(B, X, 4);
+}
+"""
+
+# Test for sgemm
+_BLAS_TEST_CODE = r"""\
+#include <stdio.h>
+
+int
+main (void)
+{
+    char transa = 'N', transb = 'N';
+    int lda = 2;
+    int ldb = 3;
+    int n = 2, m = 2, k = 3;
+    float alpha = 1.0, beta = 0.0;
+
+    float A[] = {1, 4,
+		 2, 5,
+		 3, 6};
+
+    float B[] = {1, 3, 5,
+	         2, 4, 6}; 
+    int ldc = 2;
+    float C[] = { 0.00, 0.00,
+                 0.00, 0.00 };
+
+    /* Compute C = A B */
+    %(func)s(&transa, &transb, &n, &m, &k,
+          &alpha, A, &lda, B, &ldb, &beta, C, &ldc);
+
+    printf("C = {%%f, %%f; %%f, %%f}\n", C[0], C[2], C[1], C[3]);
+    return 0;  
+}
+"""
+
+def _check_fortran(context, name, autoadd, test_code_tpl, func):
+    # Generate test code using name mangler
+    try:
+        mangler = context.env['F77_NAME_MANGLER']
+    except KeyError:
+        if not context.sconf.CheckF77Mangling():
+            return 0
+        mangler = context.env['F77_NAME_MANGLER']
+    test_code = test_code_tpl % {'func': mangler(func)}
+
+    # Detect which performance library to use
+    info = None
+    for perflib in get_perflib_names(context.env):
+        _info = get_initialized_perflib_config(context.env, perflib)
+        if _check_perflib(context, 0, _info):
+            info = _info
+            break
+
+    context.Message("Checking for F77 %s ... " % name.upper())
+
+    if info is None:
+        context.Result('no')
+        return 0
+
+    if not name in info.interfaces():
+        raise RuntimeError("%s does not support %s interface" % \
+                (info.__class__, name.upper()))
+
+    saved = save_and_set(context.env, info._interfaces[name],
+                info._interfaces[name].keys())
+    ret = context.TryLink(test_code, extension='.c')
+    if not ret or not autoadd:
+        restore(context.env, saved)
+    if not ret:
+        context.Result('no')
+    context.Result('yes - %s' % info._msg_name)
+    return ret
+
+def CheckF77Lapack(context, autoadd=0):
+    return _check_fortran(context, 'lapack', autoadd, _LAPACK_TEST_CODE,
+            'sgesv')
+
+def CheckF77Blas(context, autoadd=0):
+    return _check_fortran(context, 'blas', autoadd, _BLAS_TEST_CODE, 'sgemm')
