@@ -3,6 +3,7 @@ from numscons.checkers.new.perflib_checkers import \
 from numscons.checkers.new.common import \
         get_perflib_names, get_initialized_perflib_config, \
         save_and_set, restore, set_checker_result
+from numscons.checkers.fortran import CheckF77Mangling
 
 __all__ = ['CheckF77Lapack', 'CheckF77Blas', 'CheckCblas']
 
@@ -116,7 +117,7 @@ def _check_fortran(context, name, autoadd, test_code_tpl, func):
     try:
         mangler = context.env['F77_NAME_MANGLER']
     except KeyError:
-        if not context.sconf.CheckF77Mangling():
+        if not CheckF77Mangling(context):
             return 0
         mangler = context.env['F77_NAME_MANGLER']
     test_code = test_code_tpl % {'func': mangler(func)}
