@@ -60,7 +60,7 @@ def find_libs_paths(libs, libpaths, prefix = "lib", suffix = ".a"):
             ret.append(fdlib(libname, libpaths))
         else:
             raise RuntimeError("%s not found ?" % libname)
-    return ret 
+    return ret
 
 def get_g2c_libs(env, final_flags):
     # XXX:Fix me this ugly piece of code
@@ -71,14 +71,14 @@ def get_g2c_libs(env, final_flags):
     tmpdir = join("build", "g77_runtime")
     # XXX: clean the path before
     if os.path.exists(tmpdir):
-	shutil.rmtree(tmpdir)
+        shutil.rmtree(tmpdir)
     os.makedirs(tmpdir)
     for i in rtlibs:
-	mslib = gnulib2mslib(i)
-	mslibpath = join(tmpdir, mslib)
-	#print "Copying %s in %s" % (i, mslibpath)
-	shutil.copy(i, mslibpath)
-	msrtlibs.append(mslib)
+        mslib = gnulib2mslib(i)
+        mslibpath = join(tmpdir, mslib)
+        #print "Copying %s in %s" % (i, mslibpath)
+        shutil.copy(i, mslibpath)
+        msrtlibs.append(mslib)
 
     return tmpdir, msrtlibs
 
@@ -141,7 +141,7 @@ def _parse_f77link_line(line, final_flags):
             #   -lgcc* | -lSystem | -libmil | -LANG:=* | -LIST:* | -LNO:*)
             #   4 take into account -lkernel32
             #   5 For options of the kind -[[LRuYz]], as they take one argument
-            #   after, the actual option is the next token 
+            #   after, the actual option is the next token
             #   6 For -YP,*: take and replace by -Larg where arg is the old
             #   argument
             #   7 For -[lLR]*: take
