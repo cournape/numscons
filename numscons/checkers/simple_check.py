@@ -13,19 +13,6 @@ from numscons.checkers.config import \
 from numscons.checkers.common import \
     save_and_set, restore
 
-_SYMBOL_DEF_STR = """
-#ifdef __cplusplus
-extern "C"
-#endif
-char %s();\n"""
-
-_MAIN_CALL_CENTER = """
-int main(int argc, char** argv)
-{
-    %s
-    return 0;
-}\n """
-
 def check_symbol(context, headers, sym, extra = r''):
     # XXX: add dep vars in code
     #code = [r'#include <%s>' %h for h in headers]
@@ -46,12 +33,8 @@ return 0;
     code.append(extra)
     return context.TryLink('\n'.join(code), '.c')
 
-def NumpyCheckLibAndHeader(context, libs, symbols = None, headers = None,
-        language = None, section = None, name = None,
-        autoadd = 1):
-    # XXX: would be nice for each extension to add an option to
-    # command line.
-
+def NumpyCheckLibAndHeader(context, libs, symbols=None, headers=None,
+        language=None, section=None, name=None, autoadd=1):
     from SCons.Util import is_List
 
     env = context.env
@@ -88,12 +71,8 @@ def NumpyCheckLibAndHeader(context, libs, symbols = None, headers = None,
     if symbols:
         sbstr = ', '.join(symbols)
         msg = 'Checking for symbol(s) %s in %s... ' % (sbstr, name)
-        if found:
-            msg += '(customized from site.cfg) '
     else:
         msg = 'Checking for %s... ' % name
-        if found:
-            msg += '(customized from site.cfg) '
     context.Message(msg)
 
     # Disable from environment if name=None is in it
