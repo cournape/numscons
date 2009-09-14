@@ -25,11 +25,12 @@ AUTHOR      = 'David Cournapeau'
 AUTHOR_EMAIL = 'david@ar.media.kyoto-u.ac.jp'
 PACKAGES    = ['numscons', 'numscons.core', 'numscons.checkers',
                'numscons.tools', 'numscons.numdist',
-               'numscons.checkers.fortran']
+               'numscons.checkers.fortran', 'numscons.checkers.new']
 PACKAGE_DATA = {'numscons.core' :
                     [os.path.join('configurations', i) for i in
                      ['compiler.cfg', 'fcompiler.cfg', 'cxxcompiler.cfg']],
-              'numscons.checkers' : ['perflib.cfg']}
+              'numscons.checkers' : ['perflib.cfg'],
+              'numscons.checkers.new' : ['numscons.cfg']}
 DATA_DIR    = ['numscons/scons-local']
 
 def build_verstring():
