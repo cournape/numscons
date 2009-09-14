@@ -37,7 +37,7 @@ def _read_section(section):
     parser = ConfigParser()
     files = get_config_files()
     r = parser.read(files)
-    if len(r) <= 1:
+    if len(r) < 1:
         raise IOError("No config file found (looked for %s)" % files)
 
     config = ConfigDict()
