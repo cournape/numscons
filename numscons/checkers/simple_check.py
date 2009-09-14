@@ -8,9 +8,10 @@ import os
 from numscons.core.siteconfig import get_config_from_section, \
                                      get_paths, parse_config_param
 
-from numscons.checkers.support import save_and_set, \
-                                      restore, check_symbol
-from numscons.checkers.configuration import BuildConfig
+from numscons.checkers.new.config import \
+    BuildDict
+from numscons.checkers.new.common import \
+    save_and_set, restore
 
 _SYMBOL_DEF_STR = """
 #ifdef __cplusplus
@@ -24,6 +25,26 @@ int main(int argc, char** argv)
     %s
     return 0;
 }\n """
+
+def check_symbol(context, headers, sym, extra = r''):
+    # XXX: add dep vars in code
+    #code = [r'#include <%s>' %h for h in headers]
+    code = []
+    code.append(r'''
+#undef %(func)s
+#ifdef __cplusplus
+extern "C"
+#endif
+char %(func)s();
+
+int main()
+{
+return %(func)s();
+return 0;
+}
+''' % {'func' : sym})
+    code.append(extra)
+    return context.TryLink('\n'.join(code), '.c')
 
 def NumpyCheckLibAndHeader(context, libs, symbols = None, headers = None,
         language = None, section = None, name = None,
@@ -58,9 +79,10 @@ def NumpyCheckLibAndHeader(context, libs, symbols = None, headers = None,
         # XXX: fix this
         if len(opts['libraries']) == 1 and len(opts['libraries'][0]) == 0:
             opts['libraries'] = libs
+        build_info = BuildDict.from_config_dict(opts)
     else:
-        opts = BuildConfig()
-        opts['libraries'] = libs
+        build_info = BuildDict()
+        build_info['LIBS'] = libs
 
     # Display message
     if symbols:
@@ -84,7 +106,7 @@ def NumpyCheckLibAndHeader(context, libs, symbols = None, headers = None,
         pass
 
     # Check whether the header is available (CheckHeader-like checker)
-    saved = save_and_set(env, opts)
+    saved = save_and_set(env, build_info)
     try:
         src_code = [r'#include <%s>' % h for h in headers]
         src_code.extend([r'#if 0', str(opts), r'#endif', '\n'])
@@ -99,13 +121,13 @@ def NumpyCheckLibAndHeader(context, libs, symbols = None, headers = None,
         return st
 
     # Check whether the library is available (CheckLib-like checker)
-    saved = save_and_set(env, opts)
+    saved = save_and_set(env, build_info)
     try:
         if symbols:
             for sym in symbols:
                 # Add opts at the end of the source code to force dependency of
                 # check from options.
-                extra = [r'#if 0', str(opts), r'#endif', '\n']
+                extra = [r'#if 0', str(build_info), r'#endif', '\n']
                 st = check_symbol(context, None, sym, '\n'.join(extra))
                 if not st:
                     break

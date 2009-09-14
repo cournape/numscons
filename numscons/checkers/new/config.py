@@ -33,6 +33,31 @@ class ConfigDict(DefaultDict):
         for k in self.keys():
             self[k] = []
 
+class BuildDict(DefaultDict):
+    __keys = ['CFLAGS', 'LIBS', 'LINKFLAGS', 'CPPPATH', 'LIBPATH', 'FRAMEWORKS']
+    __convert_dict = {'cflags': 'CFLAGS',
+            'libraries': 'LIBS',
+            'ldflags': 'LINKFLAGS',
+            'include_dirs': 'CPPPATH',
+            'library_dirs': 'LIBPATH',
+            'frameworks': 'FRAMEWORKS'
+            }
+    @classmethod
+    def fromcallable(cls, avkeys, default=None):
+        raise UnimplementedError()
+
+    @classmethod
+    def from_config_dict(cls, config_dict):
+        ret = cls()
+        for k, v in config_dict.items():
+            ret[cls.__convert_dict[k]] = v
+        return ret
+
+    def __init__(self):
+        DefaultDict.__init__(self, self.__keys)
+        for k in self.keys():
+            self[k] = []
+
 def _read_section(section):
     parser = ConfigParser()
     files = get_config_files()
