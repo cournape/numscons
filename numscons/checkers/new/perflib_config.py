@@ -47,7 +47,7 @@ def _set_common(build_info, config_info):
 class _Config:
     def __init__(self, config_info):
         self._config_info = config_info
-    
+
     def interfaces(self):
         return self._interfaces.keys()
 
