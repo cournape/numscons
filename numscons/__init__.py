@@ -5,10 +5,6 @@
 distutils. It is intented as a replacement of numpy.distutils to build numpy
 with more flexibility, and in a more robust mannter."""
 
-import core
-from core import *
-__all__ = core.__all__
-
 # XXX those are needed by the scons command only...
 from core.misc import get_scons_path, get_scons_build_dir, \
                       get_scons_configres_dir, get_scons_configres_filename, \
@@ -19,11 +15,10 @@ from core.misc import get_scons_path, get_scons_build_dir, \
 from core.customization import get_pythonlib_dir
 
 # Those functions really belong to the public API
-from core.helpers import GetNumpyEnvironment
+from numscons.starter import GetNumpyEnvironment, GetInitEnvironment
 
 import checkers
 from checkers import *
-__all__ += checkers.__all__
 
 def get_version():
     import version
@@ -50,3 +45,6 @@ def scons_get_mathlib(env):
         except IOError:
             pass
     raise RuntimeError("FIXME: no mlib found ?")
+
+__all__ = ['GetNumpyEnvironment', 'GetInitEnvironment']
+__all__ += checkers.__all__

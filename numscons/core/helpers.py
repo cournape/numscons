@@ -7,8 +7,6 @@ from os.path import join as pjoin
 from numscons.core.custom_builders import DistutilsSharedLibrary, NumpyCtypes, \
      DistutilsPythonExtension, DistutilsStaticExtLibrary, NumpyPythonExtension, \
      DistutilsInstalledStaticExtLibrary
-from numscons.core.initialization import initialize_tools
-from numscons.core.customization import customize_tools
 from numscons.core.siteconfig import get_config
 from numscons.core.extension_scons import createStaticExtLibraryBuilder
 from numscons.core.misc import get_scons_build_dir, \
@@ -19,8 +17,6 @@ from numscons.core.template_generators import generate_from_c_template, \
 import numscons.core.trace
 
 from numscons.tools.substinfile import TOOL_SUBST
-
-__all__ = ['GetNumpyEnvironment', 'GetInitEnvironment']
 
 def GetNumpyOptions(args):
     """Call this with args=ARGUMENTS to take into account command line args."""
@@ -81,67 +77,10 @@ def GetNumpyOptions(args):
 
     return opts
 
-def GetNumpyEnvironment(args):
-    """Returns a correctly initialized scons environment.
-
-    This environment contains builders for python extensions, ctypes
-    extensions, fortran builders, etc... Generally, call it with args =
-    ARGUMENTS, which contain the arguments given to the scons process.
-
-    This method returns an environment with fully customized flags."""
-    env = _get_numpy_env(args)
-
-    return env
-
 def set_bootstrap(env):
     import __builtin__
     if env['bootstrapping']:
         __builtin__.__NUMPY_SETUP__ = True
-
-def _init_environment(args):
-    from numscons.core.numpyenv import NumpyEnvironment
-    from SCons.Defaults import DefaultEnvironment
-    from SCons.Script import Help
-
-    opts = GetNumpyOptions(args)
-    env = NumpyEnvironment(options = opts)
-
-    set_bootstrap(env)
-
-    # We explicily set DefaultEnvironment to avoid wasting time on initializing
-    # tools a second time.
-    DefaultEnvironment(tools = [])
-
-    Help(opts.GenerateHelpText(env))
-
-    return env
-
-def GetInitEnvironment(args):
-    return _init_environment(args)
-
-def _get_numpy_env(args):
-    """Call this with args = ARGUMENTS."""
-    env = _init_environment(args)
-
-    # Getting the config options from *.cfg files
-    set_site_config(env)
-
-    set_verbosity(env)
-
-    #------------------------------------------------
-    # Setting tools according to command line options
-    #------------------------------------------------
-    initialize_tools(env)
-
-    #---------------
-    #     Misc
-    #---------------
-    customize_tools(env)
-
-    # Adding custom builders
-    add_custom_builders(env)
-
-    return env
 
 def set_verbosity(env):
     level = int(env['silent'])
