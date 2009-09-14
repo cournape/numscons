@@ -9,7 +9,17 @@ from ConfigParser \
 
 from numscons.core.utils import DefaultDict
 
-CONFIG_FILE = pjoin(pdirname(__file__), 'numscons.cfg')
+def get_config_files():
+    """Return the list of configuration files to consider for perflib
+    configuration."""
+    files = [pjoin(pdirname(__file__), 'numscons.cfg')]
+    try:
+        from numpy.distutils.command.scons import get_perflib_config
+        files.extend(get_perflib_config())
+    except ImportError:
+        pass
+    files.append(pjoin(os.getcwd(), 'numscons.cfg'))
+    return files
 
 class ConfigDict(DefaultDict):
     __keys = ['libraries', 'blas_libraries', 'lapack_libraries', 'cblas_libraries',
@@ -25,9 +35,10 @@ class ConfigDict(DefaultDict):
 
 def _read_section(section):
     parser = ConfigParser()
-    r = parser.read(CONFIG_FILE)
-    if not len(r) == 1:
-        raise IOError("%s not found" % CONFIG_FILE)
+    files = get_config_files()
+    r = parser.read(files)
+    if len(r) <= 1:
+        raise IOError("No config file found (looked for %s)" % files)
 
     config = ConfigDict()
 
