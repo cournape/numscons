@@ -5,6 +5,10 @@ from numscons.core.initialization import \
         initialize_tools
 from numscons.core.customization import \
         customize_tools
+from numscons.checkers.new.perflib_config import \
+        AtlasConfig, MklConfig
+from numscons.checkers.new.config import \
+        read_atlas, read_mkl
 
 __all__ = ['GetNumpyEnvironment', 'GetInitEnvironment']
 
@@ -63,5 +67,14 @@ def _get_numpy_env(args):
     # Adding custom builders
     add_custom_builders(env)
 
-    return env
+    # Initialized numscons checkers internal variables
+    env['__NUMSCONS'] = {}
+    env['__NUMSCONS']['CONFIGURATION'] = {}
+    env['__NUMSCONS']['CONFIGURATION']['RESULTS'] = {}
+    env['__NUMSCONS']['CONFIGURATION']['PERFLIB_CONFIG'] = {}
+    env['__NUMSCONS']['CONFIGURATION']['PERFLIBS_TO_TEST'] = ('Mkl', 'Atlas')
+    env['__NUMSCONS']['CONFIGURATION']['PERFLIB_CONFIG'] = {
+            'Atlas': AtlasConfig(read_atlas()), 'Mkl': MklConfig(read_mkl()),
+        }
 
+    return env
