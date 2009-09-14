@@ -1,10 +1,10 @@
-from numscons.checkers.new.netlib_checkers import \
+from numscons.checkers.netlib_checkers import \
         CheckCblas as CheckCBLAS, \
         CheckF77Blas as CheckF77BLAS, \
         CheckF77Lapack as CheckF77LAPACK
-from numscons.checkers.new.common import \
+from numscons.checkers.common import \
         get_perflib_implementation
-from numscons.checkers.new.common import \
+from numscons.checkers.common import \
         write_configuration_results as write_info
 
 from numscons.checkers.simple_check import \

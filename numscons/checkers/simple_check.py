@@ -8,9 +8,9 @@ import os
 from numscons.core.siteconfig import get_config_from_section, \
                                      get_paths, parse_config_param
 
-from numscons.checkers.new.config import \
+from numscons.checkers.config import \
     BuildDict
-from numscons.checkers.new.common import \
+from numscons.checkers.common import \
     save_and_set, restore
 
 _SYMBOL_DEF_STR = """

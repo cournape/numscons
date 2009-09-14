@@ -1,6 +1,6 @@
-from numscons.checkers.new.perflib_checkers import \
+from numscons.checkers.perflib_checkers import \
         _check_perflib
-from numscons.checkers.new.common import \
+from numscons.checkers.common import \
         get_perflib_names, get_initialized_perflib_config, \
         save_and_set, restore, set_checker_result
 from numscons.checkers.fortran import CheckF77Mangling

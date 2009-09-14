@@ -5,9 +5,9 @@ from numscons.core.initialization import \
         initialize_tools
 from numscons.core.customization import \
         customize_tools
-from numscons.checkers.new.perflib_config import \
+from numscons.checkers.perflib_config import \
         AtlasConfig, MklConfig
-from numscons.checkers.new.config import \
+from numscons.checkers.config import \
         read_atlas, read_mkl
 
 __all__ = ['GetNumpyEnvironment', 'GetInitEnvironment']

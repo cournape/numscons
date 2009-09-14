@@ -1,4 +1,4 @@
-from numscons.checkers.new.common import \
+from numscons.checkers.common import \
     save_and_set, restore, get_initialized_perflib_config
 
 # Performance library checks
