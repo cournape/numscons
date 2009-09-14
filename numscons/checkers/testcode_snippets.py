@@ -6,7 +6,7 @@
 # symbols or headers, those are overkill).
 
 # Check whether CBLAS sgemm works
-cblas_sgemm = r"""
+CBLAS_TEST_CODE = r"""
 enum CBLAS_ORDER {CblasRowMajor=101, CblasColMajor=102};
 enum CBLAS_TRANSPOSE {CblasNoTrans=111, CblasTrans=112, CblasConjTrans=113};
 
@@ -72,10 +72,8 @@ main (void)
 """
 
 # Code which try sgesv (the exact symbol has to be given by lapack_sgsev % symbol)
-lapack_sgesv = r"""
-#define our_fancy_func %s
-
-extern int our_fancy_func(int *n, int *nrhs, float a[], int *lda, int ipiv[], 
+LAPACK_TEST_CODE = r"""
+int %(func)s(int *n, int *nrhs, float a[], int *lda, int ipiv[], 
                   float b[], int *ldb, int *info);
 
 int compare(float A[], float B[], int sz)
@@ -105,7 +103,7 @@ int main(void)
     int info;
 
     /* Compute X in A * X = B */
-    our_fancy_func(&n, &nrhs, A, &lda, ipov, B, &ldb, &info);
+    %(func)s(&n, &nrhs, A, &lda, ipov, B, &ldb, &info);
 
     return compare(B, X, 4);
 }
@@ -139,8 +137,8 @@ c          print*, '        ', z(2, 1), z(2, 2)
       end
 """
 
-# Check whether calling sgemm from C works (FOLLOW FORTRAN CONVENTION !). 
-c_sgemm2 = r"""
+# Test whether calling BLAS function from C works: funct should be sgemm
+BLAS_TEST_CODE = r"""
 #include <stdio.h>
 
 int
