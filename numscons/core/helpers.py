@@ -66,7 +66,7 @@ def GetNumpyOptions(args):
     opts.Add(EnumVariable('silent',
                         '0 means max verbose, 1 less verbose, and 2 '\
                         'almost nothing',
-                        '0', allowed_values = ('0', '1', '2')))
+                        '0', allowed_values = ('0', '1', '2', '3')))
     opts.Add(BoolVariable('bootstrapping',
                         "true if bootrapping numpy, false if not", 0))
 
