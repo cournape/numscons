@@ -1,21 +1,37 @@
-from blas_lapack_checkers import CheckCLAPACK, CheckCBLAS, CheckF77BLAS, CheckF77LAPACK
-from fft_checkers import CheckFFT
+from numscons.checkers.new.netlib_checkers import \
+        CheckCblas as CheckCBLAS, \
+        CheckF77Blas as CheckF77BLAS, \
+        CheckF77Lapack as CheckF77LAPACK
+from numscons.checkers.new.common import \
+        get_perflib_implementation
+from numscons.checkers.new.common import \
+        write_configuration_results as write_info
 
-from simple_check import NumpyCheckLibAndHeader
+from numscons.checkers.simple_check import \
+        NumpyCheckLibAndHeader
+from numscons.checkers.fortran import *
+from numscons.checkers import fortran
 
-from perflib import *
-from fortran import *
+# Those are for compatibility only
+def CheckCLAPACK(context, autoadd=1, check_version=0):
+    context.Message("Checking for CLAPACK ... ")
+    context.Result(0)
+    return 0
 
-from perflib_info import write_info
+def IsVeclib(env, interface):
+    return get_perflib_implementation(env, interface.upper()) == 'VECLIB'
 
-import blas_lapack_checkers
-import fft_checkers
-import perflib
-import perflib_info
+def IsAccelerate(env, interface):
+    return get_perflib_implementation(env, interface.upper()) == 'ACCELERATE'
 
-__all__ = blas_lapack_checkers.__all__
-__all__ += fft_checkers.__all__
-__all__ += perflib.__all__
-__all__ += perflib_info.__all__
+def IsATLAS(env, interface):
+    return get_perflib_implementation(env, interface.upper()) == 'ATLAS'
+
+def GetATLASVersion(env):
+    return ''
+
+__all__ = []
+__all__ += ['CheckCBLAS', 'CheckF77LAPACK', 'CheckF77BLAS', 'CheckCLAPACK',
+        'write_info', 'IsVeclib', 'IsAccelerate', 'IsATLAS', 'GetATLASVersion']
 __all__ += fortran.__all__
 __all__ += ['NumpyCheckLibAndHeader']
