@@ -77,3 +77,10 @@ def write_configuration_results(env):
     if not os.path.exists(os.path.dirname(target)):
         os.makedirs(os.path.dirname(target))
     shutil.copy(env['NUMPY_PKG_CONFIG_FILE'], target)
+
+def get_perflib_implementation(env, interface):
+    try:
+        return env['__NUMSCONS']['CONFIGURATION']['RESULTS'][interface].name
+    except KeyError, e:
+        return RuntimeError("Could not get perflib implementing interface %s" \
+                            " (was %s)" % (interface, str(e)))
