@@ -23,7 +23,7 @@ main (void)
                  4, 5, 6};
 
     int ldb = 2;
-    float B[] = {1, 2, 
+    float B[] = {1, 2,
 	         3, 4,
 		 5, 6};
 
@@ -32,11 +32,11 @@ main (void)
                  0.00, 0.00 };
 
     /* Compute C = A B */
-    cblas_sgemm (CblasRowMajor, 
+    cblas_sgemm (CblasRowMajor,
                 CblasNoTrans, CblasNoTrans, 2, 2, 3,
                 1.0, A, lda, B, ldb, 0.0, C, ldc);
 
-    return 0;  
+    return 0;
 }
 """
 
@@ -57,7 +57,7 @@ main (void)
 
     int ldb = 3;
     float B[] = {1, 3, 5,
-	         2, 4, 6}; 
+	         2, 4, 6};
     int ldc = 2;
     float C[] = { 0.00, 0.00,
                  0.00, 0.00 };
@@ -67,13 +67,13 @@ main (void)
           1.0, A, lda, B, ldb, 0.0, C, ldc);
 
     printf("C = {%f, %f; %f, %f}\n", C[0], C[2], C[1], C[3]);
-    return 0;  
+    return 0;
 }
 """
 
 # Code which try sgesv (the exact symbol has to be given by lapack_sgsev % symbol)
 LAPACK_TEST_CODE = r"""
-int %(func)s(int *n, int *nrhs, float a[], int *lda, int ipiv[], 
+int %(func)s(int *n, int *nrhs, float a[], int *lda, int ipiv[],
                   float b[], int *ldb, int *info);
 
 int compare(float A[], float B[], int sz)
@@ -120,12 +120,12 @@ blas_sgemm = """
           m = 2
           k = 2
           alpha = 1
-          
+
           x(1, 1) = 1
           x(2, 1) = 2
           x(1, 2) = 3
           x(2, 2) = 4
-          
+
           y(1, 1) = 1
           y(2, 1) = -2
           y(1, 2) = -1
@@ -155,7 +155,7 @@ main (void)
 		 3, 6};
 
     float B[] = {1, 3, 5,
-	         2, 4, 6}; 
+	         2, 4, 6};
     int ldc = 2;
     float C[] = { 0.00, 0.00,
                  0.00, 0.00 };
@@ -165,11 +165,11 @@ main (void)
           &alpha, A, &lda, B, &ldb, &beta, C, &ldc);
 
     printf("C = {%%f, %%f; %%f, %%f}\n", C[0], C[2], C[1], C[3]);
-    return 0;  
+    return 0;
 }
 """
 
-# Code which try clapack_sgesv 
+# Code which try clapack_sgesv
 clapack_sgesv = r"""
 enum CBLAS_ORDER {CblasRowMajor=101, CblasColMajor=102};
 
