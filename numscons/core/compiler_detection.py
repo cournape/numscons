@@ -2,6 +2,7 @@
 line."""
 import re
 import sys
+import os
 
 from numscons.core.utils import popen_wrapper
 from numscons.core.errors import UnknownCompiler
@@ -48,8 +49,12 @@ def _is_compiler(path, cmdargs, parser):
     # cmdargs is a list of arguments to get verbose information
     cmd = [path] + cmdargs
     try:
-        st, cnt = popen_wrapper(cmd, merge = True, shell = False,
-                                env={'LC_ALL': 'C'})
+        env={'LC_ALL': 'C'}
+        try:
+            env['PATH'] = os.environ['PATH']
+        except KeyError, e:
+            pass
+        st, cnt = popen_wrapper(cmd, merge=True, shell=False, env=env)
     except OSError, e:
         return False, None
     ret, ver = parser(cnt)
