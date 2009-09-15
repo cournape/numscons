@@ -34,8 +34,9 @@ def popen_wrapper(cmd, merge = False, shell = True, env=None):
         stderr = None
 
     p = Popen(cmd, stdout=PIPE, stderr=stderr, shell=shell, env=env)
-    st = p.wait()
-    out = ''.join(p.stdout)
+    stdout = p.communicate()[0]
+    st = p.returncode
+    out = ''.join(stdout)
     return st, out
 
 def pkg_to_path(pkg_name):
