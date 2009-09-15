@@ -51,7 +51,7 @@ def _is_compiler(path, cmdargs, parser):
         st, cnt = popen_wrapper(cmd, merge = True, shell = False,
                                 env={'LC_ALL': 'C'})
     except OSError, e:
-	return False, None
+        return False, None
     ret, ver = parser(cnt)
     if st == 0 and ret:
         return ret, ver
