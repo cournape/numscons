@@ -1,5 +1,6 @@
 import os
 import shutil
+import sys
 
 from copy import deepcopy
 
@@ -64,10 +65,18 @@ def init_configuration(env):
     env['__NUMSCONS']['CONFIGURATION']['RESULTS'] = {}
     env['__NUMSCONS']['CONFIGURATION']['PERFLIB_CONFIG'] = {}
 
-    env['__NUMSCONS']['CONFIGURATION']['PERFLIBS_TO_TEST'] = ('Mkl', 'Atlas', 'Accelerate')
     env['__NUMSCONS']['CONFIGURATION']['PERFLIB_CONFIG'] = {
-            'Atlas': AtlasConfig(read_atlas()), 'Mkl': MklConfig(read_mkl()), 'Accelerate': AccelerateConfig(read_accelerate())
+            'Atlas': AtlasConfig(read_atlas()),
+            'Mkl': MklConfig(read_mkl()),
+            'Accelerate': AccelerateConfig(read_accelerate())
         }
+
+    if sys.platform == "darwin":
+        set_perflib_names(env, ("Accelerate", "Atlas", "Mkl"))
+    elif sys.platform == "win32":
+        set_perflib_names(env, ("Atlas", "Mkl"))
+    else:
+        set_perflib_names(env, ("Atlas", "Mkl"))
 
 def write_configuration_results(env):
     cfg = env['__NUMSCONS']['CONFIGURATION']['RESULTS']
