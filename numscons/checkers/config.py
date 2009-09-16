@@ -84,6 +84,10 @@ def read_atlas():
 def read_mkl():
     return _read_section('mkl')
 
+def read_accelerate():
+    return _read_section('accelerate')
+
 if __name__ == '__main__':
     print read_atlas()
     print read_mkl()
+    print read_accelerate()

@@ -24,3 +24,7 @@ def CheckAtlas(context, autoadd=1, check_version=0):
 def CheckMkl(context, autoadd=1, check_version=0):
     return _check_perflib(context, autoadd,
             get_initialized_perflib_config(context.env, 'MKL'))
+
+def CheckAccelerate(context, autoadd=1, check_version=0):
+    return _check_perflib(context, autoadd,
+            get_initialized_perflib_config(context.env, 'ACCELERATE'))

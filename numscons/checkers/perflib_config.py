@@ -112,3 +112,25 @@ main ()
     MKLGetVersion(&v);
 };
         """
+
+class AccelerateConfig(_Config):
+    def __init__(self, config_info):
+        _Config.__init__(self, config_info)
+
+        self.name = 'ACCELERATE'
+        self._core = {}
+        self._interfaces = {'BLAS': {}, 'LAPACK': {}, 'CBLAS': {}}
+
+        set_blas(self, config_info)
+        set_cblas(self, config_info)
+        set_lapack(self, config_info)
+        set_core(self, config_info)
+
+        self.test_code = """
+#include <Accelerate/Accelerate.h>
+
+int
+main ()
+{
+};
+        """
