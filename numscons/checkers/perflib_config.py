@@ -44,6 +44,9 @@ def _set_common(build_info, config_info):
     if config_info['library_dirs']:
         build_info['LIBPATH']  = config_info['library_dirs']
 
+    if config_info['frameworks']:
+        build_info['FRAMEWORKS']  = config_info['frameworks']
+
 class _Config:
     def __init__(self, config_info):
         self._config_info = config_info
