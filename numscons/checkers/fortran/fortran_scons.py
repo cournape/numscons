@@ -295,9 +295,9 @@ def _set_mangling_var(context, u, du, case, type = 'F77'):
          env['%s_NO_APPEND_FORTRAN' % type] = 1
 
     if case == 'upper':
-        env['%s_UPERCASE_FORTRAN' % type] = 1
+        env['%s_UPPERCASE_FORTRAN' % type] = 1
     else:
-        env['%s_UPERCASE_FORTRAN' % type] = 0
+        env['%s_UPPERCASE_FORTRAN' % type] = 0
 
 def CheckF77Mangling(context):
     """Find mangling of the F77 compiler.
