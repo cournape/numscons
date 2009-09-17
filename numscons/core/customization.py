@@ -24,6 +24,9 @@ def is_bootstrapping(env):
 def is_bypassed(env):
     return env['bypass']
 
+def is_importing_environment(env):
+    return env['import_env']
+
 def has_f77(env):
     return len(env['f77_opt']) > 0
 

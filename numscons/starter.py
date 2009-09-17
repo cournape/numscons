@@ -1,10 +1,12 @@
+import os
+
 from numscons.core.helpers import \
         GetNumpyOptions, set_bootstrap, set_site_config, set_verbosity, \
         add_custom_builders
 from numscons.core.initialization import \
         initialize_tools
 from numscons.core.customization import \
-        customize_tools
+        customize_tools, is_importing_environment
 from numscons.checkers.common import \
         init_configuration
 
@@ -46,6 +48,9 @@ def _init_environment(args):
 def _get_numpy_env(args):
     """Call this with args = ARGUMENTS."""
     env = _init_environment(args)
+
+    if is_importing_environment(env):
+        env['ENV'] = os.environ
 
     # Getting the config options from *.cfg files
     set_site_config(env)
