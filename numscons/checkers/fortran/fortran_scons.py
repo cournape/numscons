@@ -287,16 +287,16 @@ def _set_mangling_var(context, u, du, case, type = 'F77', autoadd=1):
     macros = []
 
     if du == '_':
-         env['%s_UNDERSCORE_G77' % type] = 1
-         macros.append('%s_UNDERSCORE_G77' % type)
+        env['%s_UNDERSCORE_G77' % type] = 1
+        macros.append('%s_UNDERSCORE_G77' % type)
     else:
-         env['%s_UNDERSCORE_G77' % type] = 0
+        env['%s_UNDERSCORE_G77' % type] = 0
 
     if u == '_':
-         env['%s_NO_APPEND_FORTRAN' % type] = 0
+        env['%s_NO_APPEND_FORTRAN' % type] = 0
     else:
-         env['%s_NO_APPEND_FORTRAN' % type] = 1
-         macros.append('%s_NO_APPEND_FORTRAN' % type)
+        env['%s_NO_APPEND_FORTRAN' % type] = 1
+        macros.append('%s_NO_APPEND_FORTRAN' % type)
 
     if case == 'upper':
         env['%s_UPPERCASE_FORTRAN' % type] = 1
