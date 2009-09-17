@@ -21,6 +21,9 @@ def get_pythonlib_dir():
 def is_bootstrapping(env):
     return env['bootstrapping']
 
+def is_bypassed(env):
+    return env['bypass']
+
 def has_f77(env):
     return len(env['f77_opt']) > 0
 

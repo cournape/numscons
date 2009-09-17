@@ -62,6 +62,9 @@ def GetNumpyOptions(args):
     opts.Add('cxx_opt', 'name of C compiler', '')
     opts.Add('cxx_opt_path', 'path of the C compiler set in cc_opt', '')
 
+    opts.Add(BoolVariable('bypass',
+                        "true if bypassing compiler detection by distutils", 0))
+
     # Silent mode
     opts.Add(EnumVariable('silent',
                         '0 means max verbose, 1 less verbose, and 2 '\
