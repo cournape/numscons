@@ -282,10 +282,13 @@ def _check_f_mangling_imp(context, fc, m, ext):
 
     return result, mangler, u, du, c
 
-def _set_mangling_var(context, u, du, case, type = 'F77'):
+def _set_mangling_var(context, u, du, case, type = 'F77', autoadd=1):
     env = context.env
+    macros = []
+
     if du == '_':
          env['%s_UNDERSCORE_G77' % type] = 1
+         macros.append('%s_UNDERSCORE_G77' % type)
     else:
          env['%s_UNDERSCORE_G77' % type] = 0
 
@@ -293,13 +296,18 @@ def _set_mangling_var(context, u, du, case, type = 'F77'):
          env['%s_NO_APPEND_FORTRAN' % type] = 0
     else:
          env['%s_NO_APPEND_FORTRAN' % type] = 1
+         macros.append('%s_NO_APPEND_FORTRAN' % type)
 
     if case == 'upper':
         env['%s_UPPERCASE_FORTRAN' % type] = 1
+        macros.append('%s_UPPERCASE_FORTRAN' % type)
     else:
         env['%s_UPPERCASE_FORTRAN' % type] = 0
 
-def CheckF77Mangling(context):
+    if autoadd:
+        env.Append(CPPPATH=macros)
+
+def CheckF77Mangling(context, autoadd=1):
     """Find mangling of the F77 compiler.
 
     If sucessfull, env['F77_NAME_MANGLER'] is a function which given the C
@@ -314,7 +322,7 @@ def CheckF77Mangling(context):
     if res:
         context.Result("'%s', '%s', %s-case." % (u, du, c))
         env['F77_NAME_MANGLER'] = mangler
-        _set_mangling_var(context, u, du, c, 'F77')
+        _set_mangling_var(context, u, du, c, 'F77', autoadd)
     else:
         context.Result("all variants failed.")
     return res
