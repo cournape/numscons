@@ -17,6 +17,8 @@ from numscons.core.default import tool_list
 from numscons.core.allow_undefined import get_darwin_allow_undefined
 from numscons.core.trace import warn, debug, info
 from numscons.core.errors import UnknownCompiler
+from numscons.core.customization import \
+    is_bypassed
 
 DEF_LINKERS, DEF_C_COMPILERS, DEF_CXX_COMPILERS, DEF_ASSEMBLERS, \
 DEF_FORTRAN_COMPILERS, DEF_ARS, DEF_OTHER_TOOLS = tool_list(pyplat2sconsplat())
@@ -39,6 +41,7 @@ def configure_compiler(name, env, lang):
 def initialize_cc(env):
     """Initialize C compiler from distutils info."""
     from SCons.Tool import FindTool
+
     def set_cc_from_distutils():
         if len(env['cc_opt_path']) > 0:
             debug('Setting cc_opt_path from distutils (%s).' % env['cc_opt_path'])
@@ -67,7 +70,12 @@ def initialize_cc(env):
 
         return name
 
-    if len(env['cc_opt']) > 0:
+    if is_bypassed(env):
+        # Here, the --compiler option is the scons tool name
+        debug('Setting cc_opt from scons.')
+        name = env['cc_opt']
+        env.Tool(name)
+    elif len(env['cc_opt']) > 0:
         debug('Setting cc_opt from distutils.')
         name = set_cc_from_distutils()
     else:
@@ -82,7 +90,6 @@ def initialize_f77(env):
     """Initialize F77 compiler from distutils info."""
     from SCons.Tool import FindTool
     def set_f77_from_distutils():
-        env.AppendUnique(F77FILESUFFIXES = ['.f'])
         if len(env['f77_opt']) > 0:
             debug('Setting F77 from distutils: %s' % env['f77_opt'])
             if len(env['f77_opt_path']) > 0:
@@ -102,7 +109,14 @@ def initialize_f77(env):
 
         return name
 
-    name = set_f77_from_distutils()
+    env.AppendUnique(F77FILESUFFIXES = ['.f'])
+    if is_bypassed(env):
+        # Here, the --compiler option is the scons tool name
+        debug('Setting f77_opt from scons.')
+        name = env['f77_opt']
+        env.Tool(name)
+    else:
+        name = set_f77_from_distutils()
     if name:
         warn("Setting for F77 tool: %s" % name)
         configure_compiler(name, env, "F77")
@@ -133,12 +147,20 @@ def initialize_cxx(env):
                 env.Tool(name)
         return name
 
-    name = set_cxx_from_distutils()
+    if is_bypassed(env):
+        # Here, the --compiler option is the scons tool name
+        debug('Setting cxx_opt from scons.')
+        name = env['cxx_opt']
+        # Do not initialize twice the same tool
+        if not name == env['cc_opt']:
+            env.Tool(name)
+    else:
+        name = set_cxx_from_distutils()
+
     if name:
         warn("Setting for CXX tool: %s" % name)
         configure_compiler(name, env, "CXX")
         env['CXXFILESUFFIX'] = '.cxx'
-    else:
         warn("Found no CXX tool: %s")
         # Some scons tools initialize CXX env var even if no CXX available.
         # This is just confusing, so remove the key here since we could not
