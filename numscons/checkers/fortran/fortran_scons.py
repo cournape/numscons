@@ -8,7 +8,7 @@ from copy import deepcopy
 
 from numscons.core.utils import popen_wrapper
 from numscons.core.misc import built_with_mstools, built_with_mingw, \
-                   built_with_gnu_f77
+                   built_with_gnu_f77, built_with_ifort
 from fortran import parse_f77link, check_link_verbose, gnu_to_scons_flags
 
 __all__ = ['CheckF77Clib', 'CheckF77Mangling']
@@ -78,6 +78,7 @@ def CheckF90DryRun(context):
 def CheckF77Clib(context, autoadd = 1):
     """This tries to get Fortran runtime facilities necessary at link stage,
     and put the relevant flags in env['F77_LDFLAGS']."""
+    import SCons
     fcompiler = 'F77'
 
     if not context.env.has_key(fcompiler):
@@ -101,13 +102,16 @@ def CheckF77Clib(context, autoadd = 1):
 
     if res == 1:
         final_flags = parse_f77link(cnt)
-        if built_with_mstools(env) and built_with_gnu_f77(env):
-            from fortran import get_g2c_libs
-            rtdir, msrtlibs = get_g2c_libs(env, final_flags)
-            # XXX: this is ugly, we interpolate by hand.
-            libdirflags = ["/LIBPATH:%s" % os.path.join(env['build_dir'], rtdir)]
-            libflags    = ["%s" % l for l in msrtlibs]
-            env["F77_LDFLAGS"] = libdirflags + libflags
+        if built_with_mstools(env):
+            if built_with_gnu_f77(env):
+                from fortran import get_g2c_libs
+                rtdir, msrtlibs = get_g2c_libs(env, final_flags)
+                # XXX: this is ugly, we interpolate by hand.
+                libdirflags = ["/LIBPATH:%s" % os.path.join(env['build_dir'], rtdir)]
+                libflags    = ["%s" % l for l in msrtlibs]
+                env["F77_LDFLAGS"] = libdirflags + libflags
+            elif built_with_ifort(env):
+                env["F77_LDFLAGS"] = SCons.Util.CLVar('')
         else:
             env['F77_LDFLAGS'] = final_flags
         context.Result(' '.join(env['F77_LDFLAGS']))
