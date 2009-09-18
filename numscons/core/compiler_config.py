@@ -27,6 +27,9 @@ def get_config(name, language):
 
     name should be a string (corresponding to the section name in the .cfg
     file), and language should be 'C', 'CXX' or 'F77'."""
+    # XXX: ugly backward compat stuff
+    if name == 'intelc':
+        name = 'icc'
     # XXX name should be a list
     config = ConfigParser()
     if language == 'C':
