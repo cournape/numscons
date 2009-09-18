@@ -74,6 +74,8 @@ def initialize_cc(env):
         # Here, the --compiler option is the scons tool name
         debug('Setting cc_opt from scons.')
         name = env['cc_opt']
+        if name == 'msvc':
+            env.Tool('msvs')
         env.Tool(name)
     elif len(env['cc_opt']) > 0:
         debug('Setting cc_opt from distutils.')
