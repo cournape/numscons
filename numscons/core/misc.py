@@ -50,6 +50,10 @@ def built_with_gnu_f77(env):
     """Return true if f77 compiler is gnu (g77, gfortran, etc...)."""
     return env['f77_opt'] == 'g77' or env['f77_opt'] == 'gfortran'
 
+def built_with_ifort(env):
+    """Return true if f77 compiler is Intel Fortran compiler."""
+    return env['f77_opt'] == 'ifort'
+
 def get_pythonlib_name(debug = 0):
     """Return the name of python library (necessary to link on NT with
     mingw."""

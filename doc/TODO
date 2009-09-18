@@ -45,6 +45,10 @@ Not so important things:
     - improve BrokenMathlib and Mathlib in core, and make them available to
       everyone
 
+Compiler support:
+    - have some kind of registry for compiler type per extension
+    - improved support for compiler detection
+
 Analysis of running platform
 ============================
 
