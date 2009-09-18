@@ -54,3 +54,24 @@ def product_dir(abi, version):
                              "0%d" % version[2], "C++"))
     return _winreg.QueryValueEx(k, "ProductDir")[0]
 
+def generate(env):
+    SCons.Tool.msvc.generate(env)
+
+    # YOYOYOY
+    batfile = r"C:\Program Files (x86)\Intel\Compiler\11.1\038\bin\iclvars.bat"
+    out = get_output(batfile, args=_ABI2INTEL[abi])
+    d = parse_output(out)
+    for k, v in d.items():
+	env.PrependENVPath(k, v, delete_existing=True)
+
+    #static_obj, shared_obj = SCons.Tool.createObjBuilders(env)
+
+    #for suffix in CSuffixes:
+    #    static_obj.add_action(suffix, SCons.Defaults.CAction)
+    #    shared_obj.add_action(suffix, SCons.Defaults.ShCAction)
+    #    static_obj.add_emitter(suffix, SCons.Defaults.StaticObjectEmitter)
+    #    shared_obj.add_emitter(suffix, SCons.Defaults.SharedObjectEmitter)
+    env["CC"] = "icl"
+    env["CFLAGS"] = SCons.Util.CLVar("/nologo")
+    env["SHCC"] = "$CC"
+
