@@ -83,12 +83,26 @@ class NumpyEnvironment(Environment):
             self["ENV"]["LD_LIBRARY_PATH"] = os.environ["LD_LIBRARY_PATH"]
 
     def NumpyConfigure(self, *args, **kw):
+        # Import here to avoid addint import times when configuration is not needed
+        from numscons.checkers import CheckF77BLAS, CheckF77LAPACK
+        from numscons.checkers.fortran import CheckF77Mangling
+
         if kw.has_key('conf_dir') or kw.has_key('log_file'):
             # XXX handle this gracefully
             assert 0 == 1
         else:
             kw['conf_dir'] = 'sconf'
             kw['log_file'] = 'config.log'
+
+        if not kw.has_key("custom_tests"):
+            kw["custom_tests"] = {}
+        if not kw["custom_tests"].has_key("CheckF77Mangling"):
+            kw["custom_tests"]["CheckF77Mangling"] = CheckF77Mangling
+        if not kw["custom_tests"].has_key("CheckF77BLAS"):
+            kw["custom_tests"]["CheckF77BLAS"] = CheckF77BLAS
+        if not kw["custom_tests"].has_key("CheckF77LAPACK"):
+            kw["custom_tests"]["CheckF77LAPACK"] = CheckF77LAPACK
+
         config = Environment.Configure(self, *args, **kw)
 
         def GetLastError(self):
