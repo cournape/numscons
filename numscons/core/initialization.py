@@ -163,6 +163,7 @@ def initialize_cxx(env):
         warn("Setting for CXX tool: %s" % name)
         configure_compiler(name, env, "CXX")
         env['CXXFILESUFFIX'] = '.cxx'
+    else:
         warn("Found no CXX tool: %s")
         # Some scons tools initialize CXX env var even if no CXX available.
         # This is just confusing, so remove the key here since we could not
