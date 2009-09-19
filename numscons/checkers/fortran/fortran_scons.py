@@ -88,38 +88,42 @@ def CheckF77Clib(context, autoadd = 1):
     env = context.env
     config = context.sconf
     context.Message('Checking %s C compatibility runtime ...' % env[fcompiler])
-    # XXX: check how to get verbose output
-    verbose = ['-v']
 
-    # Convention old* variables MUST be restored in ANY CONDITION.
-    oldLINKFLAGS = env.has_key(fflags) and deepcopy(env[fflags]) or []
-
-    try:
-        context.env.Append(LINKFLAGS = verbose)
-        res, cnt = _build_empty_program(context, fcompiler)
-    finally:
-        env.Replace(LINKFLAGS = oldLINKFLAGS)
-
-    if res == 1:
-        final_flags = parse_f77link(cnt)
-        if built_with_mstools(env):
-            if built_with_gnu_f77(env):
-                from fortran import get_g2c_libs
-                rtdir, msrtlibs = get_g2c_libs(env, final_flags)
-                # XXX: this is ugly, we interpolate by hand.
-                libdirflags = ["/LIBPATH:%s" % os.path.join(env['build_dir'], rtdir)]
-                libflags    = ["%s" % l for l in msrtlibs]
-                env["F77_LDFLAGS"] = libdirflags + libflags
-            elif built_with_ifort(env):
-                env["F77_LDFLAGS"] = SCons.Util.CLVar('')
+    if built_with_mstools(env):
+        if built_with_gnu_f77(env):
+            from fortran import get_g2c_libs
+            rtdir, msrtlibs = get_g2c_libs(env, final_flags)
+            # XXX: this is ugly, we interpolate by hand.
+            libdirflags = ["/LIBPATH:%s" % os.path.join(env['build_dir'], rtdir)]
+            libflags    = ["%s" % l for l in msrtlibs]
+            env["F77_LDFLAGS"] = libdirflags + libflags
+            context.Result(' '.join(env['F77_LDFLAGS']))
         else:
-            env['F77_LDFLAGS'] = final_flags
-        context.Result(' '.join(env['F77_LDFLAGS']))
-        if autoadd:
-            env.AppendUnique(LINKFLAGSEND =  env['F77_LDFLAGS'])
+            env["F77_LDFLAGS"] = SCons.Util.CLVar('')
+            context.Result('None needed')
+        res = 1
     else:
-        context.Result('Failed !')
+        # XXX: check how to get verbose output
+        verbose = ['-v']
 
+        # Convention old* variables MUST be restored in ANY CONDITION.
+        oldLINKFLAGS = env.has_key(fflags) and deepcopy(env[fflags]) or []
+
+        try:
+            context.env.Append(LINKFLAGS = verbose)
+            res, cnt = _build_empty_program(context, fcompiler)
+        finally:
+            env.Replace(LINKFLAGS = oldLINKFLAGS)
+
+        if res == 1:
+            final_flags = parse_f77link(cnt)
+            env['F77_LDFLAGS'] = final_flags
+            context.Result(' '.join(env['F77_LDFLAGS']))
+        else:
+            context.Result('Failed !')
+
+    if autoadd:
+        env.AppendUnique(LINKFLAGSEND =  env['F77_LDFLAGS'])
     return res
 
 # If need a dummy main
