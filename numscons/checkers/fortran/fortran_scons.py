@@ -315,7 +315,7 @@ def _set_mangling_var(context, u, du, case, type = 'F77', autoadd=1, f2pycompat=
         env['%s_UPPERCASE_FORTRAN' % type] = 0
 
     if autoadd:
-        env.Append(CPPPATH=macros)
+        env.Append(CPPDEFINES=macros)
 
 def CheckF77Mangling(context, autoadd=1, f2pycompat=1):
     """Find mangling of the F77 compiler.
