@@ -168,9 +168,14 @@ int %s() { return 0; }
 """
     mains = ["MAIN__", "__MAIN", "_MAIN", "MAIN_"]
     mains.extend([string.lower(m) for m in mains])
-    mains.insert(0, "")
+    # Speed things up on windows, where main is used by gcc+g77 + ifort+msvc
+    # combinations, which are the most likely ones
+    if sys.platform == 'win32':
+        mains.insert(0, "main")
+    else:
+        mains.append("main")
     mains.append("MAIN")
-    mains.append("main")
+    mains.append("")
     for m in mains:
         prog = fcn_tmpl % "dummy"
         if m:
