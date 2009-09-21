@@ -184,6 +184,15 @@ def iscplusplus(source):
                 return 1
     return 0
 
+def is_debug(env):
+    try:
+	r = env["debug"]
+	if r:
+	    return 1
+        return 0
+    except KeyError:
+	return 0
+
 def get_last_error_from_config(lines, ncontexts = 1):
     """Parse the content the config.log to get the last error only from it."""
     # Each failed target in config file display its output or command in a list

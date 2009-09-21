@@ -66,6 +66,7 @@ def GetNumpyOptions(args):
                         "true if bypassing compiler detection by distutils", 0))
     opts.Add(BoolVariable('import_env',
                         "true if importing user env into numscons env['ENV'].", 0))
+    opts.Add(BoolVariable('debug', "True if debug mode", 0))
 
     # Silent mode
     opts.Add(EnumVariable('silent',
