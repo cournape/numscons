@@ -1,4 +1,5 @@
 import sys
+import os
 import warnings
 
 from SCons.Util import \
@@ -7,6 +8,7 @@ from SCons.Tool.ifort import \
         generate as old_generate
 
 from numscons.tools.intel_common import get_abi
+from numscons.tools.intel_common.win32 import find_fc_versions, product_dir_fc
 
 def generate_linux(env):
     ifort = WhereIs('ifort')
@@ -20,9 +22,12 @@ def generate_win32(env):
 
     abi = get_abi(env, lang='FORTRAN')
 
-    # Set up environment
-    # XXX: detect this properly
-    batfile = r"C:\Program Files\Intel\Compiler\11.1\038\bin\ifortvars.bat"
+    # Get product dir
+    versdict = find_fc_versions(abi)
+    vers = sorted(versdict.keys())[::-1]
+    pdir = product_dir_fc(versdict[vers[0]])
+    batfile = os.path.join(pdir, "bin", "ifortvars.bat")
+
     out = get_output(batfile, args=abi)
     d = parse_output(out)
     for k, v in d.items():

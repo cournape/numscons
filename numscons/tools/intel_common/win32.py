@@ -1,8 +1,10 @@
 import _winreg
+import os
 
-from SCons.Tool.MSVCCommon import get_output, debug, parse_output
+from SCons.Tool.MSCommon.common import get_output, debug, parse_output
 
-_ROOT = {"amd64": r"Software\Wow6432Node\Intel\Suites"}
+_ROOT = {"amd64": r"Software\Wow6432Node\Intel\Suites",
+         "ia32": r"Software\Intel\Compilers"}
 
 def get_key(k):
     return _winreg.OpenKey(_winreg.HKEY_LOCAL_MACHINE, k)
@@ -42,6 +44,34 @@ def find_versions(abi):
                 pass
 
     return availables
+
+def find_fc_versions(abi):
+    """Return the dict of found versions of Intel Fortran compiler
+    for the given ABI.
+
+    Each key is a tuple (maj, min, rev) and each value is the key
+    where to find the product dir"""
+    try:
+        root = _ROOT[abi]
+    except KeyError:
+        # Unsupported ABI
+        raise NotImplementedError("Unsupported abi: %s" % str(abi))
+
+    root = os.path.join(root, "Fortran")
+    availables = {}
+    versions = list_keys(get_key(root))
+    for v in versions:
+        verk = os.path.join(root, v)
+        min = _winreg.QueryValueEx(get_key(verk), "Major Version")[0]
+        maj = _winreg.QueryValueEx(get_key(verk), "Minor Version")[0]
+        bld = _winreg.QueryValueEx(get_key(verk), "Revision")[0]
+	availables[(min, maj, bld)] = verk
+
+    return availables
+
+def product_dir_fc(root):
+    k = get_key(root)
+    return _winreg.QueryValueEx(k, "ProductDir")[0]
 
 def product_dir(abi, version):
     try:
