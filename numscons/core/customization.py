@@ -6,7 +6,7 @@ from distutils.sysconfig import get_config_var
 from numscons.core.utils import flatten
 from numscons.core.misc import get_numscons_toolpaths, get_pythonlib_name, \
      is_f77_gnu, get_vs_version, built_with_mstools, \
-     isfortran, isf2py, scons_get_paths, built_with_mingw
+     isfortran, isf2py, scons_get_paths, built_with_mingw, is_debug
 from numscons.core.errors import InternalError
 from numscons.numdist import msvc_runtime_library
 
@@ -43,7 +43,11 @@ def customize_pyext(env):
     from SCons.Tool import Tool
     from SCons.Tool.FortranCommon import CreateDialectActions, ShFortranEmitter
 
-    env['PYEXTSUFFIX'] = get_config_var('SO')
+    if sys.platform == 'win32' and is_debug(env):
+        env['PYEXTSUFFIX'] = "_d%s" % get_config_var('SO')
+    else:
+        env['PYEXTSUFFIX'] = get_config_var('SO')
+
 
     t = Tool('pyext', toolpath = get_numscons_toolpaths(env))
     t(env)
