@@ -270,9 +270,17 @@ def _check_f_mangling_imp(context, fc, m, ext):
     context.TryCompile(subr, ext)
     obj = context.lastTarget
     env.Append(LIBS = env.StaticLibrary(obj))
-    under = ['', '_']
-    doubleunder = ['', '_']
-    casefcn = ["lower", "upper"]
+
+    # Optimize order of tested code depending on platforms to speed up
+    # configure checks
+    if sys.platform == 'win32':
+        under = ['', '_']
+        doubleunder = ['', '_']
+        casefcn = ["upper", "lower"]
+    else:
+        under = ['_', '']
+        doubleunder = ['', '_']
+        casefcn = ["lower", "upper"]
     gen = _RecursiveGenerator(under, doubleunder, casefcn)
     while True:
         try:
