@@ -8,7 +8,7 @@ from os.path import join as pjoin
 import sys
 
 from numscons.core.misc import built_with_mstools, built_with_mingw, \
-    pyplat2sconsplat, cc_version, iscplusplus
+    pyplat2sconsplat, cc_version, iscplusplus, is_python_win64
 from numscons.core.compiler_detection import get_cc_type, get_f77_type, \
     get_cxx_type
 from numscons.core.compiler_config import get_config as get_compiler_config, \
@@ -173,6 +173,11 @@ def initialize_cxx(env):
 
 def initialize_tools(env):
     from SCons.Tool import FindTool
+
+    if sys.platform == "win32":
+        if is_python_win64():
+            env["ICC_ABI"] = "amd64"
+            env["IFORT_ABI"] = "amd64"
 
     # Initialize CC tool from distutils info
     initialize_cc(env)
