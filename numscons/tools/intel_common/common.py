@@ -1,7 +1,7 @@
 # INPUTS:
 #   ICC_ABI: x86, amd64
 
-_ARG2ABI = {'x86': 'ia32', 'amd64': 'em64t', 'default': 'ia32'}
+_ARG2ABI = {'x86': 'ia32', 'amd64': 'amd64', 'default': 'ia32'}
 
 def get_abi(env, lang='C'):
     if lang == 'C' or lang == 'CXX':

@@ -6,6 +6,9 @@ from SCons.Tool.MSCommon.common import get_output, debug, parse_output
 _ROOT = {"amd64": r"Software\Wow6432Node\Intel\Suites",
          "ia32": r"Software\Intel\Compilers"}
 
+_FC_ROOT = {"amd64": r"Software\Wow6432Node\Intel\Compilers",
+         "ia32": r"Software\Intel\Compilers"}
+
 def get_key(k):
     return _winreg.OpenKey(_winreg.HKEY_LOCAL_MACHINE, k)
 
@@ -52,7 +55,7 @@ def find_fc_versions(abi):
     Each key is a tuple (maj, min, rev) and each value is the key
     where to find the product dir"""
     try:
-        root = _ROOT[abi]
+        root = _FC_ROOT[abi]
     except KeyError:
         # Unsupported ABI
         raise NotImplementedError("Unsupported abi: %s" % str(abi))
