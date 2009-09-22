@@ -10,6 +10,8 @@ from SCons.Tool.ifort import \
 from numscons.tools.intel_common import get_abi
 from numscons.tools.intel_common.win32 import find_fc_versions, product_dir_fc
 
+_ABI2BATABI = {"amd64": "intel64", "ia32": "ia32"}
+
 def generate_linux(env):
     ifort = WhereIs('ifort')
     if not ifort:
@@ -28,7 +30,7 @@ def generate_win32(env):
     pdir = product_dir_fc(versdict[vers[0]])
     batfile = os.path.join(pdir, "bin", "ifortvars.bat")
 
-    out = get_output(batfile, args=abi)
+    out = get_output(batfile, args=_ABI2BATABI[abi])
     d = parse_output(out)
     for k, v in d.items():
         env.PrependENVPath(k, v, delete_existing=True)
