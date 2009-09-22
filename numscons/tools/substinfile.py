@@ -28,7 +28,7 @@ def TOOL_SUBST(env):
         except:
             raise SCons.Errors.UserError, "Can't read source file %s"%sourcefile
         for (k,v) in dict.items():
-            contents = re.sub(k, v, contents)
+            contents = re.sub(k, v.replace("\\", "\\\\"), contents)
         try:
             f = open(targetfile, 'wb')
             f.write(contents)
