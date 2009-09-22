@@ -1,5 +1,6 @@
 """Module to handle compiler configuration. Configuration itself is kept in
 .ini like files"""
+import sys
 
 from ConfigParser import ConfigParser
 from os.path import join as pjoin, dirname as pdirname
