@@ -54,6 +54,11 @@ def built_with_ifort(env):
     """Return true if f77 compiler is Intel Fortran compiler."""
     return env['f77_opt'] == 'ifort'
 
+def is_python_win64():
+    # XXX: import it here because it takes some time
+    import platform
+    return sys.platform == "win32" and plaform.machine() == "AMD64"
+
 def get_pythonlib_name(debug = 0):
     """Return the name of python library (necessary to link on NT with
     mingw."""
