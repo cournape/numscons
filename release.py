@@ -30,8 +30,8 @@ PACKAGES    = ['numscons', 'numscons.core', 'numscons.checkers',
 PACKAGE_DATA = {'numscons.core' :
                     [os.path.join('configurations', i) for i in
                      ['compiler.cfg', 'fcompiler.cfg', 'cxxcompiler.cfg']],
-              'numscons.checkers' : ['numscons.cfg']}
-DATA_DIR    = ['numscons/scons-local']
+                    }
+DATA_DIR    = ['numscons/scons-local', 'numscons/configurations']
 
 def build_verstring():
     return '%d.%d.%d' % (MAJOR, MINOR, MICRO)

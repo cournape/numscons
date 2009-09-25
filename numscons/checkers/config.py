@@ -1,4 +1,5 @@
 import os
+import sys
 
 from copy import \
         deepcopy
@@ -7,18 +8,29 @@ from os.path import \
 from ConfigParser \
         import ConfigParser
 
+import numscons
 from numscons.core.utils import DefaultDict
 
-def get_config_files():
+_CONFDIR = pjoin(pdirname(numscons.__file__), 'configurations')
+
+def _get_win32_config_files():
+    # We import platform here as we only need it for windows and platform
+    # import is relatively slow
+    import platform
+
+    files = [append(pjoin(_CONFDIR, 'win32', 'perflib.cfg'))]
+    if platform.machine() == 'AMD64':
+        files.append(pjoin(_CONFDIR, 'win64', 'perflib.cfg'))
+    return files
+
+def get_config_files(env):
     """Return the list of configuration files to consider for perflib
     configuration."""
-    files = [pjoin(pdirname(__file__), 'numscons.cfg')]
-    try:
-        from numpy.distutils.command.scons import get_perflib_config
-        files.extend(get_perflib_config())
-    except ImportError:
-        pass
-    files.append(pjoin(os.getcwd(), 'numscons.cfg'))
+    files = [pjoin(_CONFDIR, 'perflib.cfg')]
+    if sys.platform == 'win32':
+        files.extend(_get_win32_config_files())
+    if env:
+        files.append(pjoin(str(env.fs.Top), 'numscons.cfg'))
     return files
 
 class ConfigDict(DefaultDict):
@@ -58,9 +70,9 @@ class BuildDict(DefaultDict):
         for k in self.keys():
             self[k] = []
 
-def _read_section(section):
+def _read_section(section, env):
     parser = ConfigParser()
-    files = get_config_files()
+    files = get_config_files(env)
     r = parser.read(files)
     if len(r) < 1:
         raise IOError("No config file found (looked for %s)" % files)
@@ -78,14 +90,14 @@ def _read_section(section):
 
     return config
 
-def read_atlas():
-    return _read_section('atlas')
+def read_atlas(env=None):
+    return _read_section('atlas', env)
 
-def read_mkl():
-    return _read_section('mkl')
+def read_mkl(env=None):
+    return _read_section('mkl', env)
 
-def read_accelerate():
-    return _read_section('accelerate')
+def read_accelerate(env=None):
+    return _read_section('accelerate', env)
 
 if __name__ == '__main__':
     print read_atlas()

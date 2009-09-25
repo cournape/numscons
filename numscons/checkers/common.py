@@ -66,9 +66,9 @@ def init_configuration(env):
     env['__NUMSCONS']['CONFIGURATION']['PERFLIB_CONFIG'] = {}
 
     env['__NUMSCONS']['CONFIGURATION']['PERFLIB_CONFIG'] = {
-            'Atlas': AtlasConfig(read_atlas()),
-            'Mkl': MklConfig(read_mkl()),
-            'Accelerate': AccelerateConfig(read_accelerate())
+            'Atlas': AtlasConfig(read_atlas(env)),
+            'Mkl': MklConfig(read_mkl(env)),
+            'Accelerate': AccelerateConfig(read_accelerate(env))
         }
 
     if sys.platform == "darwin":
