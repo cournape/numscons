@@ -16,11 +16,6 @@ def get_config_files(env):
     """Return the list of configuration files to consider for perflib
     configuration."""
     files = [pjoin(_CONFDIR, 'perflib.cfg')]
-    try:
-        from numpy.distutils.command.scons import get_perflib_config
-        files.extend(get_perflib_config())
-    except ImportError:
-        pass
     if env:
         files.append(pjoin(str(env.fs.Top), 'numscons.cfg'))
     return files
