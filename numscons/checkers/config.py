@@ -1,4 +1,5 @@
 import os
+import sys
 
 from copy import \
         deepcopy
@@ -12,10 +13,22 @@ from numscons.core.utils import DefaultDict
 
 _CONFDIR = pjoin(pdirname(numscons.__file__), 'configurations')
 
+def _get_win32_config_files():
+    # We import platform here as we only need it for windows and platform
+    # import is relatively slow
+    import platform
+
+    files = [append(pjoin(_CONFDIR, 'win32', 'perflib.cfg'))]
+    if platform.machine() == 'AMD64':
+        files.append(pjoin(_CONFDIR, 'win64', 'perflib.cfg'))
+    return files
+
 def get_config_files(env):
     """Return the list of configuration files to consider for perflib
     configuration."""
     files = [pjoin(_CONFDIR, 'perflib.cfg')]
+    if sys.platform == 'win32':
+        files.extend(_get_win32_config_files())
     if env:
         files.append(pjoin(str(env.fs.Top), 'numscons.cfg'))
     return files
