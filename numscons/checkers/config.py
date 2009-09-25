@@ -7,12 +7,15 @@ from os.path import \
 from ConfigParser \
         import ConfigParser
 
+import numscons
 from numscons.core.utils import DefaultDict
+
+_CONFDIR = pjoin(pdirname(numscons.__file__), 'configurations')
 
 def get_config_files(env):
     """Return the list of configuration files to consider for perflib
     configuration."""
-    files = [pjoin(pdirname(__file__), 'numscons.cfg')]
+    files = [pjoin(_CONFDIR, 'perflib.cfg')]
     try:
         from numpy.distutils.command.scons import get_perflib_config
         files.extend(get_perflib_config())
