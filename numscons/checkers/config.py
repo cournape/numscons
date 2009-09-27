@@ -10,8 +10,7 @@ from ConfigParser \
 
 import numscons
 from numscons.core.utils import DefaultDict
-
-_CONFDIR = pjoin(pdirname(numscons.__file__), 'configurations')
+from numscons.core.misc import _CONFDIR
 
 def _get_win32_config_files():
     # We import platform here as we only need it for windows and platform

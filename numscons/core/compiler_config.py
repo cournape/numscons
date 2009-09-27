@@ -6,6 +6,7 @@ from ConfigParser import ConfigParser
 from os.path import join as pjoin, dirname as pdirname
 
 from numscons.core.utils import DefaultDict
+from numscons.core.misc import _CONFDIR
 
 _OPTIONS = ['optim', 'warn', 'debug_sym', 'debug', 'thread', 'extra',
             'link_optim']
@@ -34,12 +35,11 @@ def get_config(name, language):
     # XXX name should be a list
     config = ConfigParser()
     if language == 'C':
-        cfgfname = pjoin(pdirname(__file__), "configurations", "compiler.cfg")
+        cfgfname = pjoin(_CONFDIR, "compiler.cfg")
     elif language == 'F77':
-        cfgfname = pjoin(pdirname(__file__), "configurations", "fcompiler.cfg")
+        cfgfname = pjoin(_CONFDIR, "fcompiler.cfg")
     elif language == 'CXX':
-        cfgfname = pjoin(pdirname(__file__), "configurations",
-                         "cxxcompiler.cfg")
+        cfgfname = pjoin(_CONFDIR, "cxxcompiler.cfg")
     else:
         raise NoCompilerConfig("language %s not recognized !" % language)
 
