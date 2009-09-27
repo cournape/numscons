@@ -23,6 +23,24 @@ class CompilerConfig(DefaultDict):
         for k in self.keys():
             self[k] = []
 
+def _get_win32_config_files(filename):
+    # We import platform here as we only need it for windows and platform
+    # import is relatively slow
+    import platform
+
+    files = [pjoin(_CONFDIR, 'win32', filename)]
+    if platform.machine() == 'AMD64':
+        files.append(pjoin(_CONFDIR, 'win64', filename))
+    return files
+
+def get_config_files(filename):
+    """Return the list of configuration files to consider for perflib
+    configuration."""
+    if sys.platform == 'win32':
+        return _get_win32_config_files(filename)
+    else:
+        return [pjoin(_CONFDIR, filename)]
+
 def get_config(name, language):
     """Returns a CompilerConfig instance for given compiler name and
     language.
@@ -35,17 +53,17 @@ def get_config(name, language):
     # XXX name should be a list
     config = ConfigParser()
     if language == 'C':
-        cfgfname = pjoin(_CONFDIR, "compiler.cfg")
+        files = get_config_files("compiler.cfg")
     elif language == 'F77':
-        cfgfname = pjoin(_CONFDIR, "fcompiler.cfg")
+        files = get_config_files("fcompiler.cfg")
     elif language == 'CXX':
-        cfgfname = pjoin(_CONFDIR, "cxxcompiler.cfg")
+        files = get_config_files("cxxcompiler.cfg")
     else:
         raise NoCompilerConfig("language %s not recognized !" % language)
 
-    st = config.read(cfgfname)
+    st = config.read(files)
     if len(st) < 1:
-        raise IOError("config file %s not found" % cfgfname)
+        raise IOError("config file %s not found" % files)
     if not config.has_section(name):
         raise NoCompilerConfig("compiler %s (lang %s) has no configuration "\
                                "in %s" % (name, language, cfgfname))
