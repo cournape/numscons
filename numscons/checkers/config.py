@@ -18,7 +18,7 @@ def _get_win32_config_files():
     # import is relatively slow
     import platform
 
-    files = [append(pjoin(_CONFDIR, 'win32', 'perflib.cfg'))]
+    files = [pjoin(_CONFDIR, 'win32', 'perflib.cfg')]
     if platform.machine() == 'AMD64':
         files.append(pjoin(_CONFDIR, 'win64', 'perflib.cfg'))
     return files
