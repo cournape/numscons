@@ -71,11 +71,18 @@ class BuildDict(DefaultDict):
             self[k] = []
 
 def _read_section(section, env):
+    """Attempt to build a ConfigDict instance from given section in the
+    configuration files detected by numscons.
+
+    If no file has a section, return None"""
     parser = ConfigParser()
     files = get_config_files(env)
     r = parser.read(files)
     if len(r) < 1:
         raise IOError("No config file found (looked for %s)" % files)
+
+    if not parser.has_section(section):
+        return None
 
     config = ConfigDict()
 

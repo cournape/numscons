@@ -60,10 +60,15 @@ def NumpyCheckLibAndHeader(context, libs, symbols=None, headers=None,
     # files in comment so that scons will automatically consider sources as
     # obsolete whenever config change
     opts = []
+    build_info = None
     if section:
         cfg = _read_section(section, env)
-        opts.append(cfg)
-        build_info = BuildDict.from_config_dict(cfg)
+        if cfg:
+            opts.append(cfg)
+            build_info = BuildDict.from_config_dict(cfg)
+
+    if build_info is None:
+        build_info = BuildDict()
 
     if not build_info['LIBS']:
         build_info['LIBS'] = libs
