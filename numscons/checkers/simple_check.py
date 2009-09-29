@@ -9,7 +9,7 @@ from numscons.core.siteconfig import get_config_from_section, \
                                      get_paths, parse_config_param
 
 from numscons.checkers.config import \
-    BuildDict
+    BuildDict, _read_section
 from numscons.checkers.common import \
     save_and_set, restore
 
@@ -55,17 +55,19 @@ def NumpyCheckLibAndHeader(context, libs, symbols=None, headers=None,
     if not name:
         name = libs[0]
 
-    # Get site.cfg customization if any
-    siteconfig = context.env['NUMPY_SITE_CONFIG'][0]
-    opts, found = get_config_from_section(siteconfig, section)
-    if found:
-        # XXX: fix this
-        if len(opts['libraries']) == 1 and len(opts['libraries'][0]) == 0:
-            opts['libraries'] = libs
-        build_info = BuildDict.from_config_dict(opts)
-    else:
-        build_info = BuildDict()
+    # Get user customization (numscons.cfg) if any
+    # opts will keep all user cusstomization, and put into config check source
+    # files in comment so that scons will automatically consider sources as
+    # obsolete whenever config change
+    opts = []
+    if section:
+        cfg = _read_section(section, env)
+        opts.append(cfg)
+        build_info = BuildDict.from_config_dict(cfg)
+
+    if not build_info['LIBS']:
         build_info['LIBS'] = libs
+    opts.append(build_info)
 
     # Display message
     if symbols:
