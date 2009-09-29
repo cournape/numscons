@@ -85,6 +85,7 @@ class NumpyEnvironment(Environment):
     def NumpyConfigure(self, *args, **kw):
         # Import here to avoid addint import times when configuration is not needed
         from numscons.checkers import CheckF77BLAS, CheckF77LAPACK
+        from numscons.checkers.simple_check import NumpyCheckLibAndHeader
         from numscons.checkers.fortran import CheckF77Mangling
 
         if kw.has_key('conf_dir') or kw.has_key('log_file'):
@@ -102,6 +103,7 @@ class NumpyEnvironment(Environment):
             kw["custom_tests"]["CheckF77BLAS"] = CheckF77BLAS
         if not kw["custom_tests"].has_key("CheckF77LAPACK"):
             kw["custom_tests"]["CheckF77LAPACK"] = CheckF77LAPACK
+        kw["custom_tests"]["NumpyCheckLibAndHeader"] = NumpyCheckLibAndHeader
 
         config = Environment.Configure(self, *args, **kw)
 
