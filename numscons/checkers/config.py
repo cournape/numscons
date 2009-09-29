@@ -61,8 +61,8 @@ class BuildDict(DefaultDict):
     @classmethod
     def from_config_dict(cls, config_dict):
         ret = cls()
-        for k, v in config_dict.items():
-            ret[cls.__convert_dict[k]] = v
+        for k in cls.__convert_dict.keys():
+            ret[cls.__convert_dict[k]] = config_dict[k]
         return ret
 
     def __init__(self):
