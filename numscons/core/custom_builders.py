@@ -1,5 +1,5 @@
 import copy
-from os.path import join as pjoin
+from os.path import join as pjoin, dirname as pdirname
 
 def DistutilsSharedLibrary(env, *args, **kw):
     """This builder is the same as SharedLibrary, except for the fact that
@@ -35,7 +35,18 @@ def NumpyPythonExtension(env, *args, **kw):
     finally:
         kw['PYEXTCPPPATH'] = oldval
 
-    inst_lib = env.Install("$distutils_installdir", lib)
+    # XXX: hack so that if the install builder source contains a directory, the
+    # directory is aknowledged, e.g. installing 'bin/foo' into 'bar' should
+    # give 'bar/bin/foo', whereas Install('bar', 'bin/foo') install 'foo' into
+    # 'bar'
+    inst_lib = []
+    for t in lib:
+        d = pdirname(str(t))
+        if d:
+            install_dir = pjoin(env.subst('$distutils_installdir'), d)
+        else:
+            install_dir = env.subst('$distutils_installdir')
+        inst_lib.extend(env.Install(install_dir, t))
     return lib, inst_lib
 
 def DistutilsStaticExtLibrary(env, *args, **kw):
