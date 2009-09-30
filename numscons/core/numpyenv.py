@@ -27,7 +27,7 @@ class NumpyEnvironment(Environment):
 
         # Set directory where to "install" built C extensions
         if self["inplace"]:
-            self['distutils_installdir'] = pjoin(str(self.fs.Top), self["src_dir"])
+            self['distutils_installdir'] = pjoin(str(self.fs.Top), self["pkg_path"])
         else:
             if not self.has_key('distutils_installdir'):
                 # XXX: compatibility with upstream numpy trunk - this can be
