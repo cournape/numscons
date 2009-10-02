@@ -16,7 +16,7 @@ Operating System :: MacOS
 
 NAME        = 'numscons'
 MAJOR       = 0
-MINOR       = 11
+MINOR       = 12
 MICRO       = 0
 DEV         = True
 DESCRIPTION = 'Enable to use scons within distutils to build extensions'
