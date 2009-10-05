@@ -70,9 +70,6 @@ def get_config(name, language):
 
     cfg = CompilerConfig()
 
-    # XXX: fix this at some point
-    if name == "ifort" and sys.platform == "win32":
-        name = "ifort_win32"
     for o in config.options(name):
         r = config.get(name, o)
         if r:
