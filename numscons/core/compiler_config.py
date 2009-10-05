@@ -66,7 +66,7 @@ def get_config(name, language):
         raise IOError("config file %s not found" % files)
     if not config.has_section(name):
         raise NoCompilerConfig("compiler %s (lang %s) has no configuration "\
-                               "in %s" % (name, language, cfgfname))
+                               "in %s" % (name, language, files))
 
     cfg = CompilerConfig()
 
