@@ -115,8 +115,8 @@ def set_verbosity(env):
 
         env['INSTALLSTR']           = "INSTALL            $SOURCE"
 
-        env['ARRAPIGENCOMSTR']      = "GENERATE ARRAY API $SOURCE"
-        env['UFUNCAPIGENCOMSTR']    = "GENERATE UFUNC API $SOURCE"
+        env['ARRAYPIGENCOMSTR']     = "GENERATE ARRAY API        "
+        env['UFUNCAPIGENCOMSTR']    = "GENERATE UFUNC API        "
         env['TEMPLATECOMSTR']       = "FROM TEMPLATE      $SOURCE"
         env['UMATHCOMSTR']          = "GENERATE UMATH     $SOURCE"
 
