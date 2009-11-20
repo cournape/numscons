@@ -213,12 +213,18 @@ def generate(env):
     # Create the PythonObject builder
     pyobj = createPythonObjectBuilder(env)
     action = SCons.Action.Action("$PYEXTCCCOM", "$PYEXTCCCOMSTR")
-    pyobj.add_emitter('.c', SCons.Defaults.SharedObjectEmitter)
-    pyobj.add_action('.c', action)
+
+    for ext in SCons.Tool.CSuffixes:
+        pyobj.add_emitter(ext, SCons.Defaults.SharedObjectEmitter)
+        pyobj.add_action(ext, action)
 
     action = SCons.Action.Action("$PYEXTCXXCOM", "$PYEXTCXXCOMSTR")
-    pyobj.add_emitter('$CXXFILESUFFIX', SCons.Defaults.SharedObjectEmitter)
-    pyobj.add_action('$CXXFILESUFFIX', action)
+    # XXX: __import__ hack necessary because c++ is not a valid literal for
+    # import
+    cxx = __import__("SCons.Tool.c++", globals(), locals(), ["CXXSuffix"])
+    for ext in cxx.CXXSuffixes:
+        pyobj.add_emitter(ext, SCons.Defaults.SharedObjectEmitter)
+        pyobj.add_action(ext, action)
 
     # Create the PythonExtension builder
     createPythonExtensionBuilder(env)
