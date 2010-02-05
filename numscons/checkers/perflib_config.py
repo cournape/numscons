@@ -134,3 +134,31 @@ main ()
 {
 };
         """
+
+# Generic* config objects are used as last resort when no optimized performance
+# library is found. Those may also be used for not yet supported optimized
+# library, by setting manually every field.
+class GenericBlasConfig(_Config):
+    def __init__(self, config_info):
+        _Config.__init__(self, config_info)
+
+        self.name = 'GenericBlas'
+        self._core = {}
+        self._interfaces = {'BLAS': {}}
+
+        set_blas(self, config_info)
+
+        self.test_code = "int main(void) {}"
+
+class GenericLapackConfig(_Config):
+    def __init__(self, config_info):
+        _Config.__init__(self, config_info)
+
+        self.name = 'GenericLapack'
+        self._core = {}
+        self._interfaces = {'BLAS': {}, 'LAPACK': {}}
+
+        set_blas(self, config_info)
+        set_lapack(self, config_info)
+
+        self.test_code = "int main(void) {}"
