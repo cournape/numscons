@@ -5,7 +5,7 @@ from numscons.checkers.common import \
         save_and_set, restore, set_checker_result
 from numscons.checkers.testcode_snippets import \
         BLAS_TEST_CODE, LAPACK_TEST_CODE, CBLAS_TEST_CODE
-from numscons.checkers.fortran import CheckF77Mangling
+from numscons.checkers.fortran import CheckF77Mangling, CheckF77Clib
 
 __all__ = ['CheckF77Lapack', 'CheckF77Blas', 'CheckCblas']
 
@@ -18,6 +18,13 @@ def _check_fortran(context, name, autoadd, test_code_tpl, func):
             return 0
         mangler = context.env['F77_NAME_MANGLER']
     test_code = test_code_tpl % {'func': mangler(func)}
+
+    try:
+        f77_ldflags = context.env['F77_LDFLAGS']
+    except KeyError:
+        if not CheckF77Clib(context, autoadd=0):
+            return 0
+        f77_ldflags = context.env['F77_LDFLAGS']
 
     # Detect which performance library to use
     info = None
@@ -32,6 +39,11 @@ def _check_fortran(context, name, autoadd, test_code_tpl, func):
     if info is None:
         context.Result('no')
         return 0
+
+    if not info._interfaces[name].has_key("LINKFLAGSEND"):
+        info._interfaces[name]["LINKFLAGSEND"] = f77_ldflags[:]
+    else:
+        info._interfaces[name]["LINKFLAGSEND"].extend(f77_ldflags[:])
 
     if not name in info.interfaces():
         raise RuntimeError("%s does not support %s interface" % \
