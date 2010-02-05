@@ -135,6 +135,9 @@ main ()
 };
         """
 
+# Generic* config objects are used as last resort when no optimized performance
+# library is found. Those may also be used for not yet supported optimized
+# library, by setting manually every field.
 class GenericBlasConfig(_Config):
     def __init__(self, config_info):
         _Config.__init__(self, config_info)

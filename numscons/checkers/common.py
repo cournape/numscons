@@ -7,9 +7,11 @@ from copy import deepcopy
 from numscons.core.misc import \
     get_scons_configres_dir
 from numscons.checkers.perflib_config import \
-        AtlasConfig, MklConfig, AccelerateConfig
+        AtlasConfig, MklConfig, AccelerateConfig, GenericBlasConfig, \
+        GenericLapackConfig
 from numscons.checkers.config import \
-        read_atlas, read_mkl, read_accelerate
+        read_atlas, read_mkl, read_accelerate, read_generic_blas, \
+        read_generic_lapack
 
 def save_and_set(env, opts, keys=None):
     """Put informations from option configuration into a scons environment, and
@@ -68,15 +70,21 @@ def init_configuration(env):
     env['__NUMSCONS']['CONFIGURATION']['PERFLIB_CONFIG'] = {
             'Atlas': AtlasConfig(read_atlas(env)),
             'Mkl': MklConfig(read_mkl(env)),
-            'Accelerate': AccelerateConfig(read_accelerate(env))
+            'Accelerate': AccelerateConfig(read_accelerate(env)),
+            'GenericBlas': GenericBlasConfig(read_generic_blas(env)),
+            'GenericLapack': GenericLapackConfig(read_generic_lapack(env))
         }
 
+    perflibs = []
     if sys.platform == "darwin":
-        set_perflib_names(env, ("Accelerate", "Atlas", "Mkl"))
+        perflibs.extend(["Accelerate", "Atlas", "Mkl"])
     elif sys.platform == "win32":
-        set_perflib_names(env, ("Atlas", "Mkl"))
+        perflibs.extend(["Atlas", "Mkl"])
     else:
-        set_perflib_names(env, ("Atlas", "Mkl"))
+        perflibs.extend(["Atlas", "Mkl"])
+    perflibs.extend(["GenericLapack", "GenericBlas"])
+
+    set_perflib_names(env, perflibs)
 
 def write_configuration_results(env):
     cfg = env['__NUMSCONS']['CONFIGURATION']['RESULTS']
