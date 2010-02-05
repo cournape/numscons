@@ -105,6 +105,12 @@ def read_mkl(env=None):
 def read_accelerate(env=None):
     return _read_section('accelerate', env)
 
+def read_generic_blas(env=None):
+    return _read_section('generic_blas', env)
+
+def read_generic_lapack(env=None):
+    return _read_section('generic_lapack', env)
+
 if __name__ == '__main__':
     print read_atlas()
     print read_mkl()
