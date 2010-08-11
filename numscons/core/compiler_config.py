@@ -29,7 +29,7 @@ def _get_win32_config_files(filename):
     import platform
 
     files = [pjoin(_CONFDIR, 'win32', filename)]
-    if platform.machine() == 'AMD64':
+    if platform.architecture()[0] == '64bit':
         files.append(pjoin(_CONFDIR, 'win64', filename))
     return files
 

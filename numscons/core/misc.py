@@ -59,7 +59,7 @@ def built_with_ifort(env):
 def is_python_win64():
     # XXX: import it here because it takes some time
     import platform
-    return sys.platform == "win32" and platform.machine() == "AMD64"
+    return sys.platform == "win32" and platform.architecture()[0] == '64bit'
 
 def get_pythonlib_name(debug = 0):
     """Return the name of python library (necessary to link on NT with
