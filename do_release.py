@@ -31,11 +31,14 @@ def test_sanity():
     nofailexec([cmd], cwd = "dist/numscons-%s/tests" % ver)
 
 def make_eggs():
-    # Build eggs for 2.4 and 2.5
-    cmd = "python setupegg.py bdist_egg"
+    # Build eggs for 2.5, 2.6 and 2.7
+    cmd = "python2.5 setupegg.py bdist_egg"
     nofailexec([cmd])
 
-    cmd = "python2.4 setupegg.py bdist_egg"
+    cmd = "python2.6 setupegg.py bdist_egg"
+    nofailexec([cmd])
+
+    cmd = "python2.7 setupegg.py bdist_egg"
     nofailexec([cmd])
 
 def register():
@@ -43,10 +46,13 @@ def register():
     cmd = "python setup.py register sdist --formats=bztar,zip upload"
     nofailexec([cmd])
 
-    cmd = "python setupegg.py register bdist_egg upload"
+    cmd = "python2.5 setupegg.py register bdist_egg upload"
     nofailexec([cmd])
 
-    cmd = "python2.4 setupegg.py register bdist_egg upload"
+    cmd = "python2.6 setupegg.py register bdist_egg upload"
+    nofailexec([cmd])
+
+    cmd = "python2.7 setupegg.py register bdist_egg upload"
     nofailexec([cmd])
 
 def process(arg):
