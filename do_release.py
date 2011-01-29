@@ -20,13 +20,14 @@ def make_tarballs(fast = False):
     nofailexec(cmd)
 
 def test_sanity():
-    # This executes numscons unit tests: this is far from convering everything,
+    # This executes numscons unit tests: this is far from covering everything,
     # but at least guarantees basic sanity of the package
     ver = build_fverstring()
     cmd = "tar -xjf numscons-%s.tar.bz2" % ver
     nofailexec([cmd], cwd = "dist")
 
-    cmd = "PYTHONPATH=%s:$PYTHONPATH python setup.py scons" % os.path.join(os.getcwd(), "dist", "numscons-%s" % ver)
+    cmd = "PYTHONPATH=%s:$PYTHONPATH python setup.py scons" % \
+            os.path.join(os.getcwd(), "dist", "numscons-%s" % ver)
     nofailexec([cmd], cwd = "dist/numscons-%s/tests" % ver)
 
 def make_eggs():

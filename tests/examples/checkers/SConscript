@@ -1,13 +1,10 @@
 # vim:syntax=python
 from numscons import GetNumpyEnvironment
-from numscons.checkers.perflib import \
-        CheckATLAS, CheckAccelerate, CheckMKL, CheckSunperf,\
-        IsMKL, IsATLAS, IsAccelerate, GetATLASVersion, GetMKLVersion,\
-        CheckFFTW3, CheckFFTW2, IsFFTW3, IsFFTW2
-from numscons import CheckCBLAS, \
-        CheckCLAPACK, CheckF77BLAS, CheckF77LAPACK,\
-        CheckFFT
-from numscons import CheckF77Mangling
+from numscons.checkers.perflib_checkers import \
+        CheckAtlas, CheckAccelerate, CheckMkl
+from numscons.checkers import IsATLAS, IsAccelerate, GetATLASVersion
+from numscons import CheckCBLAS, CheckCLAPACK, CheckF77BLAS, \
+        CheckF77LAPACK, CheckF77Mangling
 
 env = GetNumpyEnvironment(ARGUMENTS)
 
@@ -20,26 +17,19 @@ except KeyError:
 print "do_check is %s" % do_check
 
 config = env.NumpyConfigure(custom_tests = 
-    {'CheckATLAS' : CheckATLAS,
-    'CheckMKL' : CheckMKL,
+    {'CheckAtlas' : CheckAtlas,
+    'CheckMkl' : CheckMkl,
     'CheckAccelerate' : CheckAccelerate,
     'CheckCBLAS' : CheckCBLAS,
     'CheckF77Mangling' : CheckF77Mangling,
     'CheckF77BLAS' : CheckF77BLAS,
     'CheckF77LAPACK' : CheckF77LAPACK,
-    'CheckCLAPACK' : CheckCLAPACK,
-    'CheckSunperf' : CheckSunperf,
-    'CheckFFTW3' : CheckFFTW3,
-    'CheckFFTW2' : CheckFFTW2,
-    'CheckFFT' : CheckFFT})
+    'CheckCLAPACK' : CheckCLAPACK})
 
 if do_check == 1:
-    st = config.CheckATLAS(autoadd = 0, check_version = True)
-    st = config.CheckMKL(autoadd = 0)
+    st = config.CheckAtlas(autoadd = 0, check_version = True)
+    st = config.CheckMkl(autoadd = 0)
     st = config.CheckAccelerate(autoadd = 0)
-    st = config.CheckSunperf(autoadd = 0)
-    st = config.CheckFFTW2(autoadd = 0)
-    st = config.CheckFFTW3(autoadd = 0)
 
     for k, v in env['NUMPY_PKG_CONFIG']['PERFLIB'].items():
         print "PERFLIB %s is %s" % (k, v)
@@ -51,22 +41,9 @@ if do_check == 1:
     print "========= CLAPACK ============="
     st = config.CheckCLAPACK(autoadd = 0)
     st = config.CheckF77Mangling()
-    st = config.CheckFFT(autoadd = 0)
-
-    if IsMKL(env, 'blas'):
-        print "blas is MKL (%s)" % GetMKLVersion(env)
 
     if IsATLAS(env, 'blas'):
         print "blas is ATLAS (%s)" % GetATLASVersion(env)
-
-    if IsFFTW3(env, 'fft'):
-        print "fft is fftw3"
-    elif IsFFTW2(env, 'fft'):
-        print "fft is fftw2"
-    elif IsMKL(env, 'fft'):
-        print "fft is MKL"
-    else:
-        print "fft ?"
 
     if env.has_key('LIBS'):
         print "LIBS of env is %s" % env.Dump('LIBS')

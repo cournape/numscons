@@ -19,12 +19,12 @@ def _check_perflib(context, autoadd, info):
 
 def CheckAtlas(context, autoadd=1, check_version=0):
     return _check_perflib(context, autoadd,
-            get_initialized_perflib_config(context.env, 'ATLAS'))
+            get_initialized_perflib_config(context.env, 'Atlas'))
 
 def CheckMkl(context, autoadd=1, check_version=0):
     return _check_perflib(context, autoadd,
-            get_initialized_perflib_config(context.env, 'MKL'))
+            get_initialized_perflib_config(context.env, 'Mkl'))
 
 def CheckAccelerate(context, autoadd=1, check_version=0):
     return _check_perflib(context, autoadd,
-            get_initialized_perflib_config(context.env, 'ACCELERATE'))
+            get_initialized_perflib_config(context.env, 'Accelerate'))
