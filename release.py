@@ -20,6 +20,7 @@ MINOR       = 12
 MICRO       = 1
 DEV         = True
 DESCRIPTION = 'Enable to use scons within distutils to build extensions'
+LICENSE     = 'BSD 3-clause'
 CLASSIFIERS = filter(None, CLASSIFIERS.split('\n'))
 AUTHOR      = 'David Cournapeau'
 AUTHOR_EMAIL = 'david@ar.media.kyoto-u.ac.jp'
