@@ -79,6 +79,7 @@ setup(cmdclass = {'install': install, 'install_data': install_data, 'sdist': sdi
       name          = R.NAME,
       version       = R.build_fverstring(),
       description   = R.DESCRIPTION,
+      license       = R.LICENSE,
       author        = R.AUTHOR,
       author_email  = R.AUTHOR_EMAIL,
       packages      = R.PACKAGES,
